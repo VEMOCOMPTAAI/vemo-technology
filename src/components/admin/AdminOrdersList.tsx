@@ -39,6 +39,11 @@ function statusClass(status: string | null) {
   return "bg-slate-100 text-slate-600";
 }
 
+async function logoutAdmin() {
+  await fetch("/api/admin/logout", { method: "POST" });
+  window.location.href = "/admin/connexion";
+}
+
 export default function AdminOrdersList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -123,12 +128,21 @@ export default function AdminOrdersList() {
             </p>
           </div>
 
-          <a
-            href="/fr"
-            className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black hover:border-[#c51f32]"
-          >
-            Retour au site
-          </a>
+          <div className="flex gap-3">
+            <a
+              href="/fr"
+              className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black hover:border-[#c51f32]"
+            >
+              Retour au site
+            </a>
+
+            <button
+              onClick={logoutAdmin}
+              className="rounded-2xl bg-[#111a33] px-5 py-3 text-sm font-black text-white"
+            >
+              Déconnexion
+            </button>
+          </div>
         </div>
       </header>
 

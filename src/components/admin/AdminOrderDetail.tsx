@@ -34,6 +34,11 @@ function FieldCard({
   );
 }
 
+async function logoutAdmin() {
+  await fetch("/api/admin/logout", { method: "POST" });
+  window.location.href = "/admin/connexion";
+}
+
 export default function AdminOrderDetail() {
   const params = useParams();
   const id = String(params.id);
@@ -78,12 +83,21 @@ export default function AdminOrderDetail() {
             </p>
           </div>
 
-          <a
-            href="/admin/dossiers"
-            className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black hover:border-[#c51f32]"
-          >
-            Retour dossiers
-          </a>
+          <div className="flex gap-3">
+            <a
+              href="/admin/dossiers"
+              className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black hover:border-[#c51f32]"
+            >
+              Retour dossiers
+            </a>
+
+            <button
+              onClick={logoutAdmin}
+              className="rounded-2xl bg-[#111a33] px-5 py-3 text-sm font-black text-white"
+            >
+              Déconnexion
+            </button>
+          </div>
         </div>
       </header>
 
