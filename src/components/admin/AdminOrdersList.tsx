@@ -129,6 +129,7 @@ export default function AdminOrdersList() {
           </div>
 
           <div className="flex gap-3">
+            <div className="flex gap-3">
             <a
               href="/fr"
               className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black hover:border-[#c51f32]"
@@ -142,6 +143,8 @@ export default function AdminOrdersList() {
             >
               Déconnexion
             </button>
+          </div>
+
           </div>
         </div>
       </header>
