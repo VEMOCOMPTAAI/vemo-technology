@@ -70,14 +70,29 @@ function StripeInnerForm({
     }
 
     if (paymentIntent?.status === "succeeded") {
-      await supabase
-        .from("llc_orders")
-        .update({
-          payment_status: "paid",
-          stripe_payment_intent_id: paymentIntent.id,
-          status: "paid",
-        })
-        .eq("id", orderId);
+      const updateResponse = await fetch("/api/orders/mark-paid", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId,
+          paymentIntentId: paymentIntent.id,
+        }),
+      });
+
+      const updateResult = await updateResponse.json();
+
+      if (!updateResponse.ok || !updateResult.ok) {
+        console.error("Order paid but Supabase update failed:", updateResult);
+        setMessage(
+          isFr
+            ? "Paiement réussi, mais la mise à jour du dossier a échoué. Vérifiez Supabase."
+            : "Payment succeeded, but order update failed. Please check Supabase."
+        );
+        setIsPaying(false);
+        return;
+      }
 
       setIsPaying(false);
       onSuccess();
