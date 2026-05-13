@@ -7,6 +7,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { supabase } from "@/lib/supabase";
+import EmbeddedStripePayment from "@/components/EmbeddedStripePayment";
 import {
   getCountries,
   getCountryCallingCode,
@@ -550,6 +552,8 @@ export default function LLCFormationWizard({ lang }: { lang: Lang }) {
   const [submitted, setSubmitted] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const stateFee = estimateStateFee(form.jurisdiction);
   const serviceFee = packagePrices[form.packageName] || 0;
@@ -578,6 +582,51 @@ export default function LLCFormationWizard({ lang }: { lang: Lang }) {
   const residenceCountry =
     countries.find((country) => country.code === form.residenceCountry) ||
     countries.find((country) => country.code === "MA")!;
+
+  const orderPayload = {
+    language: lang,
+    status: "payment_pending",
+
+    package_name: form.packageName,
+    entity_type: form.entityType,
+    jurisdiction: form.jurisdiction,
+    company_name: form.companyName,
+    designator: form.designator,
+    full_company_name: fullCompanyName,
+
+    business_purpose_type: form.businessPurposeType,
+    business_activity: form.businessActivity,
+    physical_address_choice: form.physicalAddressChoice,
+    mailing_address_choice: form.mailingAddressChoice,
+
+    first_name: form.firstName,
+    last_name: form.lastName,
+    email: form.email,
+    phone_country: form.phoneCountry,
+    phone_number: form.phoneNumber,
+    phone_e164: phoneE164,
+    residence_country: form.residenceCountry,
+
+    management_type: form.managementType,
+    public_listing: form.publicListing,
+    member_first_name: form.memberFirstName || form.firstName,
+    member_last_name: form.memberLastName || form.lastName,
+    member_country: form.memberCountry,
+
+    need_ein: form.needEin,
+    need_operating_agreement: form.needOperatingAgreement,
+    need_stripe_paypal_docs: form.needStripePaypalDocs,
+    need_compliance_reminders: form.needComplianceReminders,
+
+    service_fee: serviceFee,
+    state_fee: stateFee,
+    options_fee: optionsFee,
+    total_amount: total,
+    currency: "USD",
+
+    message: form.message,
+    payment_status: "pending",
+  };
 
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -619,8 +668,9 @@ export default function LLCFormationWizard({ lang }: { lang: Lang }) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSubmitError("");
 
     if (!validateStep()) return;
 
@@ -629,11 +679,66 @@ export default function LLCFormationWizard({ lang }: { lang: Lang }) {
       return;
     }
 
-    console.log("Next: create Supabase case + Stripe PaymentIntent:", {
-      ...form,
-      phoneE164,
-      total,
-    });
+    setIsSubmitting(true);
+
+    const { error } = await supabase.from("llc_orders").insert([
+      {
+        language: lang,
+        status: "new",
+
+        package_name: form.packageName,
+        entity_type: form.entityType,
+        jurisdiction: form.jurisdiction,
+        company_name: form.companyName,
+        designator: form.designator,
+        full_company_name: fullCompanyName,
+
+        business_purpose_type: form.businessPurposeType,
+        business_activity: form.businessActivity,
+        physical_address_choice: form.physicalAddressChoice,
+        mailing_address_choice: form.mailingAddressChoice,
+
+        first_name: form.firstName,
+        last_name: form.lastName,
+        email: form.email,
+        phone_country: form.phoneCountry,
+        phone_number: form.phoneNumber,
+        phone_e164: phoneE164,
+        residence_country: form.residenceCountry,
+
+        management_type: form.managementType,
+        public_listing: form.publicListing,
+        member_first_name: form.memberFirstName || form.firstName,
+        member_last_name: form.memberLastName || form.lastName,
+        member_country: form.memberCountry,
+
+        need_ein: form.needEin,
+        need_operating_agreement: form.needOperatingAgreement,
+        need_stripe_paypal_docs: form.needStripePaypalDocs,
+        need_compliance_reminders: form.needComplianceReminders,
+
+        service_fee: serviceFee,
+        state_fee: stateFee,
+        options_fee: optionsFee,
+        total_amount: total,
+        currency: "USD",
+
+        message: form.message,
+        payment_status: "pending",
+      },
+    ]);
+
+    setIsSubmitting(false);
+
+    if (error) {
+      console.error(error);
+      setSubmitError(
+        isFr
+          ? "Erreur lors de l’enregistrement du dossier. Vérifiez Supabase et réessayez."
+          : "Error while saving the request. Please check Supabase and try again."
+      );
+      return;
+    }
 
     setSubmitted(true);
   }
@@ -1329,31 +1434,14 @@ export default function LLCFormationWizard({ lang }: { lang: Lang }) {
                   </div>
                 </div>
 
-                <div className="mt-7 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6">
-                  <div className="mb-5 flex items-center justify-between">
-                    <p className="font-black text-[#111a33]">
-                      {isFr ? "Carte bancaire" : "Card payment"}
-                    </p>
-
-                    <div className="flex gap-2 text-xs font-black">
-                      <span className="rounded bg-[#111a33] px-2 py-1 text-white">VISA</span>
-                      <span className="rounded bg-red-100 px-2 py-1 text-[#c51f32]">MC</span>
-                      <span className="rounded bg-blue-100 px-2 py-1 text-blue-700">AMEX</span>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-sm font-bold text-slate-400">
-                    {isFr
-                      ? "Ici apparaîtra le composant sécurisé Stripe Payment Element."
-                      : "The secure Stripe Payment Element will appear here."}
-                  </div>
-
-                  <p className="mt-4 text-xs font-semibold leading-6 text-slate-500">
-                    {isFr
-                      ? "Cette zone sera remplacée par le vrai composant Stripe après configuration de la clé publique, de la clé secrète et de l’API PaymentIntent."
-                      : "This area will be replaced by the real Stripe component after configuring the publishable key, secret key and PaymentIntent API."}
-                  </p>
-                </div>
+                <EmbeddedStripePayment
+                  lang={lang}
+                  amount={total}
+                  orderPayload={orderPayload}
+                  email={form.email}
+                  fullCompanyName={fullCompanyName}
+                  onSuccess={() => setSubmitted(true)}
+                />
               </div>
 
               <div className="mt-6">
@@ -1442,9 +1530,31 @@ export default function LLCFormationWizard({ lang }: { lang: Lang }) {
           </p>
 
           <div className="mt-7 space-y-3">
-            <button type="submit" className="vemo-button-primary w-full">
-              {step === c.steps.length - 1 ? c.submit : c.continue}
-            </button>
+            {submitError && (
+              <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-black text-red-700">
+                {submitError}
+              </div>
+            )}
+
+            {step === c.steps.length - 1 ? (
+              <div className="rounded-2xl bg-slate-50 px-4 py-4 text-center text-sm font-black text-slate-600">
+                {isFr
+                  ? "Finalisez le paiement sécurisé dans le bloc à gauche."
+                  : "Complete secure payment in the block on the left."}
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="vemo-button-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSubmitting
+                  ? isFr
+                    ? "Enregistrement..."
+                    : "Saving..."
+                  : c.continue}
+              </button>
+            )}
 
             {step > 0 && (
               <button
