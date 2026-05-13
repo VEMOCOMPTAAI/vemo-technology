@@ -1,0 +1,124 @@
+﻿@import "tailwindcss";
+
+:root {
+  --vemo-red: #c51f32;
+  --vemo-red-dark: #9f1726;
+  --vemo-navy: #111a33;
+  --vemo-bg: #f6f7fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(197, 31, 50, 0.08), transparent 28rem),
+    radial-gradient(circle at top right, rgba(17, 26, 51, 0.10), transparent 30rem),
+    #f6f7fb;
+  color: #111a33;
+}
+
+a {
+  text-decoration: none;
+}
+
+.vemo-container {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.vemo-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 20px 60px rgba(17, 26, 51, 0.08);
+}
+
+.vemo-input {
+  width: 100%;
+  border-radius: 1.15rem;
+  border: 1px solid #d8deea;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem;
+  font-weight: 700;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.vemo-input:focus {
+  border-color: var(--vemo-red);
+  box-shadow: 0 0 0 4px rgba(197, 31, 50, 0.10);
+}
+
+.vemo-label {
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #334155;
+}
+
+.vemo-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.15rem;
+  background: linear-gradient(135deg, #c51f32, #9f1726);
+  color: white;
+  font-weight: 950;
+  padding: 0.95rem 1.3rem;
+  box-shadow: 0 16px 34px rgba(197, 31, 50, 0.24);
+  transition: 0.2s ease;
+}
+
+.vemo-button-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 44px rgba(197, 31, 50, 0.32);
+}
+
+.vemo-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.15rem;
+  background: white;
+  color: #111a33;
+  font-weight: 950;
+  padding: 0.95rem 1.3rem;
+  border: 1px solid #d8deea;
+  transition: 0.2s ease;
+}
+
+.vemo-button-secondary:hover {
+  border-color: #c51f32;
+  transform: translateY(-1px);
+}
+
+.vemo-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(197, 31, 50, 0.09);
+  color: #c51f32;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6rem 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .vemo-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
