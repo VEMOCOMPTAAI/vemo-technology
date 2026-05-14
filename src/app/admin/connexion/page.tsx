@@ -9,26 +9,41 @@ export default function AdminLoginPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     setErrorMessage("");
     setLoading(true);
 
-    const response = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password }),
-    });
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      });
 
-    const result = await response.json();
-    setLoading(false);
+      let result: { ok?: boolean; error?: string } = {};
 
-    if (!response.ok || !result.ok) {
-      setErrorMessage(result.error || "Connexion impossible.");
-      return;
+      try {
+        result = await response.json();
+      } catch {
+        result = {};
+      }
+
+      if (!response.ok || !result.ok) {
+        setErrorMessage(result.error || "Connexion impossible.");
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = "/admin/dossiers";
+    } catch (error) {
+      console.error(error);
+      setErrorMessage(
+        "Impossible de contacter l’API admin. Relance le serveur local puis réessaie."
+      );
+      setLoading(false);
     }
-
-    window.location.href = "/admin/dossiers";
   }
 
   return (

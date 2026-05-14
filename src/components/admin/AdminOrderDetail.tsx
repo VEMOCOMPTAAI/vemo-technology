@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 type Order = Record<string, any>;
+
+async function logoutAdmin() {
+  await fetch("/api/admin/logout", { method: "POST" });
+  window.location.href = "/admin/connexion";
+}
 
 function formatDate(value?: string) {
   if (!value) return "-";
@@ -34,11 +38,6 @@ function FieldCard({
   );
 }
 
-async function logoutAdmin() {
-  await fetch("/api/admin/logout", { method: "POST" });
-  window.location.href = "/admin/connexion";
-}
-
 export default function AdminOrderDetail() {
   const params = useParams();
   const id = String(params.id);
@@ -51,20 +50,30 @@ export default function AdminOrderDetail() {
     setLoading(true);
     setErrorMessage("");
 
-    const { data, error } = await supabase
-      .from("llc_orders")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const response = await fetch(`/api/admin/orders/${id}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
-    if (error) {
-      console.error(error);
-      setErrorMessage("Impossible de charger ce dossier.");
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error(result);
+      setErrorMessage(
+        response.status === 401
+          ? "Session admin expirée. Reconnectez-vous."
+          : "Impossible de charger ce dossier."
+      );
       setLoading(false);
+
+      if (response.status === 401) {
+        window.location.href = "/admin/connexion";
+      }
+
       return;
     }
 
-    setOrder(data);
+    setOrder(result.order);
     setLoading(false);
   }
 
@@ -79,12 +88,11 @@ export default function AdminOrderDetail() {
           <div>
             <p className="text-2xl font-black">Détail dossier LLC</p>
             <p className="text-sm font-bold text-slate-500">
-              Vemo Technology Admin
+              Vemo Technology Admin sécurisé
             </p>
           </div>
 
           <div className="flex gap-3">
-            <div className="flex gap-3">
             <a
               href="/admin/dossiers"
               className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black hover:border-[#c51f32]"
@@ -98,8 +106,6 @@ export default function AdminOrderDetail() {
             >
               Déconnexion
             </button>
-          </div>
-
           </div>
         </div>
       </header>

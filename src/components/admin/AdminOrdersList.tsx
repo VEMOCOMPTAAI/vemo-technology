@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase";
 
 type Order = {
   id: string;
@@ -21,6 +20,11 @@ type Order = {
   stripe_payment_intent_id: string | null;
 };
 
+async function logoutAdmin() {
+  await fetch("/api/admin/logout", { method: "POST" });
+  window.location.href = "/admin/connexion";
+}
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("fr-FR", {
     dateStyle: "medium",
@@ -36,12 +40,8 @@ function statusClass(status: string | null) {
   if (status === "paid") return "bg-green-50 text-green-700";
   if (status === "payment_pending") return "bg-amber-50 text-amber-700";
   if (status === "new") return "bg-blue-50 text-blue-700";
+  if (status === "failed") return "bg-red-50 text-red-700";
   return "bg-slate-100 text-slate-600";
-}
-
-async function logoutAdmin() {
-  await fetch("/api/admin/logout", { method: "POST" });
-  window.location.href = "/admin/connexion";
 }
 
 export default function AdminOrdersList() {
@@ -54,35 +54,30 @@ export default function AdminOrdersList() {
     setLoading(true);
     setErrorMessage("");
 
-    const { data, error } = await supabase
-      .from("llc_orders")
-      .select(`
-        id,
-        created_at,
-        language,
-        status,
-        payment_status,
-        package_name,
-        jurisdiction,
-        full_company_name,
-        first_name,
-        last_name,
-        email,
-        phone_e164,
-        total_amount,
-        currency,
-        stripe_payment_intent_id
-      `)
-      .order("created_at", { ascending: false });
+    const response = await fetch("/api/admin/orders", {
+      method: "GET",
+      cache: "no-store",
+    });
 
-    if (error) {
-      console.error(error);
-      setErrorMessage("Erreur lors du chargement des dossiers.");
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error(result);
+      setErrorMessage(
+        response.status === 401
+          ? "Session admin expirée. Reconnectez-vous."
+          : "Erreur lors du chargement des dossiers."
+      );
       setLoading(false);
+
+      if (response.status === 401) {
+        window.location.href = "/admin/connexion";
+      }
+
       return;
     }
 
-    setOrders(data || []);
+    setOrders(result.orders || []);
     setLoading(false);
   }
 
@@ -124,12 +119,11 @@ export default function AdminOrdersList() {
           <div>
             <p className="text-2xl font-black">Vemo Technology Admin</p>
             <p className="text-sm font-bold text-slate-500">
-              Gestion des dossiers LLC
+              Gestion sécurisée des dossiers LLC
             </p>
           </div>
 
           <div className="flex gap-3">
-            <div className="flex gap-3">
             <a
               href="/fr"
               className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black hover:border-[#c51f32]"
@@ -143,8 +137,6 @@ export default function AdminOrdersList() {
             >
               Déconnexion
             </button>
-          </div>
-
           </div>
         </div>
       </header>
@@ -167,7 +159,7 @@ export default function AdminOrdersList() {
 
           <div className="rounded-[2rem] bg-white p-6 shadow-sm">
             <p className="text-sm font-black uppercase tracking-wide text-slate-500">
-              CA test
+              Chiffre d'affaires
             </p>
             <p className="mt-2 text-4xl font-black text-[#c51f32]">
               ${totalRevenue}
