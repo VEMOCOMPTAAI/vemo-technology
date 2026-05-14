@@ -1,9 +1,26 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 type Order = Record<string, any>;
+
+type AdminDocument = {
+  id: string;
+  created_at: string;
+  order_id: string;
+  uploaded_by: string;
+  document_type: string;
+  document_label: string;
+  file_name: string;
+  file_path: string;
+  mime_type: string | null;
+  file_size: number | null;
+  status: string;
+  admin_comment: string | null;
+  reviewed_at: string | null;
+  signed_url?: string | null;
+};
 
 const adminStatuses = [
   { value: "new", label: "Nouveau" },
@@ -15,18 +32,46 @@ const adminStatuses = [
   { value: "cancelled", label: "Annulé" },
 ];
 
+const documentTypes = [
+  { value: "prepared_document", label: "Document préparé" },
+  { value: "articles_of_organization", label: "Articles of Organization" },
+  { value: "operating_agreement", label: "Operating Agreement" },
+  { value: "ein_document", label: "Document EIN" },
+  { value: "state_confirmation", label: "Confirmation État" },
+  { value: "banking_document", label: "Document bancaire" },
+  { value: "other", label: "Autre document" },
+];
+
+const documentStatuses = [
+  { value: "uploaded", label: "Uploadé" },
+  { value: "needs_signature", label: "À signer" },
+  { value: "signed_received", label: "Signé reçu" },
+  { value: "approved", label: "Validé" },
+  { value: "rejected", label: "Refusé" },
+];
+
 async function logoutAdmin() {
   await fetch("/api/admin/logout", { method: "POST" });
   window.location.href = "/admin/connexion";
 }
 
-function formatDate(value?: string) {
+function formatDate(value?: string | null) {
   if (!value) return "-";
 
   return new Intl.DateTimeFormat("fr-FR", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function formatFileSize(value?: number | null) {
+  if (!value) return "-";
+
+  if (value < 1024 * 1024) {
+    return `${Math.round(value / 1024)} KB`;
+  }
+
+  return `${(value / 1024 / 1024).toFixed(2)} MB`;
 }
 
 function FieldCard({
@@ -48,15 +93,33 @@ function FieldCard({
   );
 }
 
+function documentStatusClass(status: string) {
+  if (status === "approved") return "bg-green-50 text-green-700";
+  if (status === "rejected") return "bg-red-50 text-red-700";
+  if (status === "needs_signature") return "bg-amber-50 text-amber-700";
+  if (status === "signed_received") return "bg-blue-50 text-blue-700";
+  return "bg-slate-100 text-slate-700";
+}
+
 export default function AdminOrderDetail() {
   const params = useParams();
   const id = String(params.id);
 
   const [order, setOrder] = useState<Order | null>(null);
+  const [documents, setDocuments] = useState<AdminDocument[]>([]);
+
   const [adminStatus, setAdminStatus] = useState("new");
   const [internalNotes, setInternalNotes] = useState("");
+
+  const [documentType, setDocumentType] = useState("prepared_document");
+  const [documentLabel, setDocumentLabel] = useState("Document préparé");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const [loading, setLoading] = useState(true);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -94,6 +157,28 @@ export default function AdminOrderDetail() {
     setLoading(false);
   }
 
+  async function loadDocuments() {
+    setDocumentsLoading(true);
+    setErrorMessage("");
+
+    const response = await fetch(`/api/admin/order-documents?orderId=${encodeURIComponent(id)}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    setDocumentsLoading(false);
+
+    if (!response.ok) {
+      console.error(result);
+      setErrorMessage("Impossible de charger les documents.");
+      return;
+    }
+
+    setDocuments(result.documents || []);
+  }
+
   async function saveAdminTracking() {
     setSaving(true);
     setErrorMessage("");
@@ -124,8 +209,97 @@ export default function AdminOrderDetail() {
     setSuccessMessage("Suivi admin sauvegardé.");
   }
 
+  async function uploadDocument(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (!selectedFile) {
+      setErrorMessage("Choisis un fichier à uploader.");
+      return;
+    }
+
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("document_type", documentType);
+    formData.append("document_label", documentLabel || "Document");
+
+    const response = await fetch(`/api/admin/order-documents?orderId=${encodeURIComponent(id)}`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    setUploading(false);
+
+    if (!response.ok) {
+      console.error(result);
+      setErrorMessage(result.error || "Upload impossible.");
+      return;
+    }
+
+    setSelectedFile(null);
+    setDocumentLabel("Document préparé");
+    setDocumentType("prepared_document");
+    setSuccessMessage("Document uploadé avec succès.");
+    await loadDocuments();
+  }
+
+  async function updateDocument(document: AdminDocument) {
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const response = await fetch("/api/admin/order-documents", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        document_id: document.id,
+        status: document.status,
+        admin_comment: document.admin_comment || "",
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error(result);
+      setErrorMessage(result.error || "Impossible de mettre à jour le document.");
+      return;
+    }
+
+    setSuccessMessage("Document mis à jour.");
+    await loadDocuments();
+  }
+
+  async function deleteDocument(documentId: string) {
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const response = await fetch(`/api/admin/order-documents?documentId=${encodeURIComponent(documentId)}`, {
+      method: "DELETE",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error(result);
+      setErrorMessage(result.error || "Impossible de supprimer le document.");
+      return;
+    }
+
+    setSuccessMessage("Document supprimé.");
+    await loadDocuments();
+  }
+
   useEffect(() => {
     loadOrder();
+    loadDocuments();
   }, [id]);
 
   return (
@@ -261,6 +435,208 @@ export default function AdminOrderDetail() {
                 </button>
               </div>
 
+              <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h2 className="text-2xl font-black">Documents du dossier</h2>
+                    <p className="mt-1 text-sm font-bold text-slate-500">
+                      Upload admin, liens privés, statuts et commentaires.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={loadDocuments}
+                    className="rounded-2xl bg-[#111a33] px-5 py-3 text-sm font-black text-white"
+                  >
+                    Actualiser documents
+                  </button>
+                </div>
+
+                <form
+                  onSubmit={uploadDocument}
+                  className="mt-6 rounded-[1.5rem] bg-slate-50 p-5"
+                >
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                        Type document
+                      </label>
+
+                      <select
+                        value={documentType}
+                        onChange={(event) => {
+                          setDocumentType(event.target.value);
+                          const selected = documentTypes.find(
+                            (item) => item.value === event.target.value
+                          );
+                          setDocumentLabel(selected?.label || "Document");
+                        }}
+                        className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 font-bold outline-none focus:border-[#c51f32]"
+                      >
+                        {documentTypes.map((type) => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                        Libellé affiché
+                      </label>
+
+                      <input
+                        value={documentLabel}
+                        onChange={(event) => setDocumentLabel(event.target.value)}
+                        className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 font-bold outline-none focus:border-[#c51f32]"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                        Fichier
+                      </label>
+
+                      <input
+                        type="file"
+                        onChange={(event) =>
+                          setSelectedFile(event.target.files?.[0] || null)
+                        }
+                        className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 font-bold outline-none focus:border-[#c51f32]"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={uploading}
+                    className="mt-5 rounded-2xl bg-[#c51f32] px-6 py-4 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {uploading ? "Upload..." : "Uploader le document"}
+                  </button>
+                </form>
+
+                {documentsLoading ? (
+                  <div className="mt-6 rounded-2xl bg-slate-50 p-6 text-center font-black text-slate-500">
+                    Chargement documents...
+                  </div>
+                ) : (
+                  <div className="mt-6 space-y-4">
+                    {documents.map((document) => (
+                      <div
+                        key={document.id}
+                        className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5"
+                      >
+                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                          <div>
+                            <p className="text-lg font-black">
+                              {document.document_label}
+                            </p>
+
+                            <p className="mt-1 text-sm font-bold text-slate-500">
+                              {document.file_name} · {formatFileSize(document.file_size)} ·{" "}
+                              {formatDate(document.created_at)}
+                            </p>
+
+                            <span
+                              className={[
+                                "mt-3 inline-flex rounded-full px-3 py-2 text-xs font-black uppercase",
+                                documentStatusClass(document.status),
+                              ].join(" ")}
+                            >
+                              {document.status}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            {document.signed_url && (
+                              <a
+                                href={document.signed_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="rounded-xl bg-[#111a33] px-4 py-3 text-sm font-black text-white"
+                              >
+                                Ouvrir
+                              </a>
+                            )}
+
+                            <button
+                              onClick={() => deleteDocument(document.id)}
+                              className="rounded-xl bg-red-50 px-4 py-3 text-sm font-black text-red-700"
+                            >
+                              Supprimer
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="mt-5 grid gap-4 md:grid-cols-[260px_1fr_auto] md:items-end">
+                          <div>
+                            <label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                              Statut document
+                            </label>
+
+                            <select
+                              value={document.status}
+                              onChange={(event) =>
+                                setDocuments((current) =>
+                                  current.map((item) =>
+                                    item.id === document.id
+                                      ? { ...item, status: event.target.value }
+                                      : item
+                                  )
+                                )
+                              }
+                              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 font-bold outline-none focus:border-[#c51f32]"
+                            >
+                              {documentStatuses.map((status) => (
+                                <option key={status.value} value={status.value}>
+                                  {status.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                              Commentaire admin
+                            </label>
+
+                            <input
+                              value={document.admin_comment || ""}
+                              onChange={(event) =>
+                                setDocuments((current) =>
+                                  current.map((item) =>
+                                    item.id === document.id
+                                      ? { ...item, admin_comment: event.target.value }
+                                      : item
+                                  )
+                                )
+                              }
+                              placeholder="Ex : à signer, envoyé au client, refusé car incomplet..."
+                              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 font-bold outline-none focus:border-[#c51f32]"
+                            />
+                          </div>
+
+                          <button
+                            onClick={() => updateDocument(document)}
+                            className="rounded-2xl bg-[#c51f32] px-5 py-4 font-black text-white"
+                          >
+                            Sauvegarder
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {documents.length === 0 && (
+                      <div className="rounded-2xl bg-slate-50 p-6 text-center font-black text-slate-500">
+                        Aucun document pour ce dossier.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className="mt-8">
                 <h2 className="text-2xl font-black">Client</h2>
 
@@ -348,7 +724,10 @@ export default function AdminOrderDetail() {
               </div>
 
               <button
-                onClick={loadOrder}
+                onClick={() => {
+                  loadOrder();
+                  loadDocuments();
+                }}
                 className="mt-8 w-full rounded-2xl bg-[#111a33] px-5 py-4 font-black text-white"
               >
                 Actualiser
