@@ -154,6 +154,11 @@ export default function EmbeddedStripePayment({
   const [isPreparing, setIsPreparing] = useState(true);
 
   const createdRef = useRef(false);
+  const clientTokenRef = useRef(
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID().replace(/-/g, "")
+      : `${Date.now()}${Math.random().toString(16).slice(2)}`
+  );
 
   useEffect(() => {
     async function preparePayment() {
@@ -165,7 +170,7 @@ export default function EmbeddedStripePayment({
 
       const { data, error } = await supabase
         .from("llc_orders")
-        .insert([orderPayload])
+        .insert([{ ...orderPayload, client_access_token: clientTokenRef.current }])
         .select("id")
         .single();
 

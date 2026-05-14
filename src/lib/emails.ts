@@ -14,6 +14,7 @@ type PaidOrderEmailInput = {
   amount: number;
   currency: string;
   paymentIntentId: string;
+  clientAccessToken?: string;
 };
 
 export async function sendPaidOrderEmails(input: PaidOrderEmailInput) {
@@ -23,6 +24,10 @@ export async function sendPaidOrderEmails(input: PaidOrderEmailInput) {
   }
 
   const amountText = `${input.amount} ${input.currency || "USD"}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.vemo-technology.com";
+  const clientLink = input.clientAccessToken
+    ? `${siteUrl}/fr/espace-client?token=${input.clientAccessToken}`
+    : `${siteUrl}/fr/espace-client`;
 
   if (input.customerEmail) {
     await resend.emails.send({
@@ -48,6 +53,16 @@ export async function sendPaidOrderEmails(input: PaidOrderEmailInput) {
 
             <p style="color:#475569; font-size:16px; line-height:1.7;">
               Our team will review your information and follow up with the next steps.
+            </p>
+
+            <p style="margin:28px 0;">
+              <a href="${clientLink}" style="display:inline-block; background:#c51f32; color:white; padding:14px 22px; border-radius:14px; text-decoration:none; font-weight:bold;">
+                Espace client / Client space
+              </a>
+            </p>
+
+            <p style="color:#64748b; font-size:13px; line-height:1.7;">
+              Private tracking link: ${clientLink}
             </p>
 
             <p style="color:#111a33; font-weight:bold;">

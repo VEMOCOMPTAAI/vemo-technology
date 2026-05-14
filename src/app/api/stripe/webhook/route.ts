@@ -81,6 +81,7 @@ export async function POST(request: Request) {
           amount: order.total_amount || 0,
           currency: order.currency || "USD",
           paymentIntentId: paymentIntent.id,
+          clientAccessToken: order.client_access_token || undefined,
         });
       } catch (emailError) {
         console.error("Email sending failed:", emailError);
