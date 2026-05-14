@@ -8,6 +8,7 @@ type Order = {
   language: string | null;
   status: string | null;
   payment_status: string | null;
+  admin_status: string | null;
   package_name: string | null;
   jurisdiction: string | null;
   full_company_name: string | null;
@@ -42,6 +43,28 @@ function statusClass(status: string | null) {
   if (status === "new") return "bg-blue-50 text-blue-700";
   if (status === "failed") return "bg-red-50 text-red-700";
   return "bg-slate-100 text-slate-600";
+}
+
+function adminStatusLabel(status: string | null) {
+  const labels: Record<string, string> = {
+    new: "Nouveau",
+    paid_to_process: "Payé à traiter",
+    in_progress: "En cours",
+    waiting_client: "Attente client",
+    documents_prepared: "Documents prêts",
+    completed: "Terminé",
+    cancelled: "Annulé",
+  };
+
+  return labels[status || "new"] || "Nouveau";
+}
+
+function adminStatusClass(status: string | null) {
+  if (status === "completed") return "bg-green-50 text-green-700";
+  if (status === "in_progress") return "bg-blue-50 text-blue-700";
+  if (status === "waiting_client") return "bg-amber-50 text-amber-700";
+  if (status === "cancelled") return "bg-red-50 text-red-700";
+  return "bg-slate-100 text-slate-700";
 }
 
 export default function AdminOrdersList() {
@@ -100,6 +123,7 @@ export default function AdminOrdersList() {
         order.jurisdiction,
         order.payment_status,
         order.status,
+        order.admin_status,
       ]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(term));
@@ -107,7 +131,7 @@ export default function AdminOrdersList() {
   }, [orders, search]);
 
   const paidCount = orders.filter((order) => order.payment_status === "paid").length;
-  const pendingCount = orders.filter((order) => order.payment_status !== "paid").length;
+  const pendingCount = orders.filter((order) => order.admin_status !== "completed").length;
   const totalRevenue = orders
     .filter((order) => order.payment_status === "paid")
     .reduce((sum, order) => sum + (order.total_amount || 0), 0);
@@ -172,17 +196,24 @@ export default function AdminOrdersList() {
             <div>
               <h1 className="text-3xl font-black">Dossiers LLC</h1>
               <p className="mt-1 text-sm font-bold text-slate-500">
-                {pendingCount} dossier(s) en attente ou non payé(s)
+                {pendingCount} dossier(s) non terminé(s)
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Rechercher..."
                 className="w-full rounded-2xl border border-slate-200 px-5 py-3 font-bold outline-none focus:border-[#c51f32] md:w-80"
               />
+
+              <a
+                href="/api/admin/orders/export"
+                className="rounded-2xl border border-slate-200 bg-white px-5 py-3 font-black hover:border-[#c51f32]"
+              >
+                Export CSV
+              </a>
 
               <button
                 onClick={loadOrders}
@@ -205,7 +236,7 @@ export default function AdminOrdersList() {
             </div>
           ) : (
             <div className="mt-8 overflow-x-auto">
-              <table className="w-full min-w-[1100px] border-separate border-spacing-y-3">
+              <table className="w-full min-w-[1200px] border-separate border-spacing-y-3">
                 <thead>
                   <tr className="text-left text-xs font-black uppercase tracking-wide text-slate-500">
                     <th className="px-4">Date</th>
@@ -214,6 +245,7 @@ export default function AdminOrdersList() {
                     <th className="px-4">État</th>
                     <th className="px-4">Formule</th>
                     <th className="px-4">Paiement</th>
+                    <th className="px-4">Suivi admin</th>
                     <th className="px-4">Total</th>
                     <th className="px-4">Action</th>
                   </tr>
@@ -260,6 +292,17 @@ export default function AdminOrdersList() {
                           ].join(" ")}
                         >
                           {order.payment_status || "pending"}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <span
+                          className={[
+                            "rounded-full px-3 py-2 text-xs font-black uppercase",
+                            adminStatusClass(order.admin_status),
+                          ].join(" ")}
+                        >
+                          {adminStatusLabel(order.admin_status)}
                         </span>
                       </td>
 

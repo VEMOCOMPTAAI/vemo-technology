@@ -5,6 +5,16 @@ import { useParams } from "next/navigation";
 
 type Order = Record<string, any>;
 
+const adminStatuses = [
+  { value: "new", label: "Nouveau" },
+  { value: "paid_to_process", label: "Payé à traiter" },
+  { value: "in_progress", label: "En cours" },
+  { value: "waiting_client", label: "Attente client" },
+  { value: "documents_prepared", label: "Documents prêts" },
+  { value: "completed", label: "Terminé" },
+  { value: "cancelled", label: "Annulé" },
+];
+
 async function logoutAdmin() {
   await fetch("/api/admin/logout", { method: "POST" });
   window.location.href = "/admin/connexion";
@@ -43,12 +53,17 @@ export default function AdminOrderDetail() {
   const id = String(params.id);
 
   const [order, setOrder] = useState<Order | null>(null);
+  const [adminStatus, setAdminStatus] = useState("new");
+  const [internalNotes, setInternalNotes] = useState("");
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   async function loadOrder() {
     setLoading(true);
     setErrorMessage("");
+    setSuccessMessage("");
 
     const response = await fetch(`/api/admin/orders/${id}`, {
       method: "GET",
@@ -74,7 +89,39 @@ export default function AdminOrderDetail() {
     }
 
     setOrder(result.order);
+    setAdminStatus(result.order?.admin_status || "new");
+    setInternalNotes(result.order?.internal_notes || "");
     setLoading(false);
+  }
+
+  async function saveAdminTracking() {
+    setSaving(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const response = await fetch(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        admin_status: adminStatus,
+        internal_notes: internalNotes,
+      }),
+    });
+
+    const result = await response.json();
+
+    setSaving(false);
+
+    if (!response.ok) {
+      console.error(result);
+      setErrorMessage(result.error || "Impossible de sauvegarder le suivi admin.");
+      return;
+    }
+
+    setOrder(result.order);
+    setSuccessMessage("Suivi admin sauvegardé.");
   }
 
   useEffect(() => {
@@ -118,8 +165,14 @@ export default function AdminOrderDetail() {
         )}
 
         {errorMessage && (
-          <div className="rounded-[2rem] bg-red-50 p-8 font-black text-red-700">
+          <div className="mb-6 rounded-[2rem] bg-red-50 p-6 font-black text-red-700">
             {errorMessage}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="mb-6 rounded-[2rem] bg-green-50 p-6 font-black text-green-700">
+            {successMessage}
           </div>
         )}
 
@@ -150,6 +203,62 @@ export default function AdminOrderDetail() {
                     {order.payment_status || "pending"}
                   </p>
                 </div>
+              </div>
+
+              <div className="mt-8 rounded-[2rem] border border-red-100 bg-red-50/40 p-6">
+                <h2 className="text-2xl font-black">Suivi interne admin</h2>
+
+                <div className="mt-5 grid gap-5 md:grid-cols-2">
+                  <div>
+                    <label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                      Statut interne
+                    </label>
+
+                    <select
+                      value={adminStatus}
+                      onChange={(event) => setAdminStatus(event.target.value)}
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 font-bold outline-none focus:border-[#c51f32]"
+                    >
+                      {adminStatuses.map((status) => (
+                        <option key={status.value} value={status.value}>
+                          {status.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                      Dernière mise à jour admin
+                    </label>
+
+                    <div className="mt-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 font-black">
+                      {formatDate(order.admin_updated_at)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                    Notes internes
+                  </label>
+
+                  <textarea
+                    value={internalNotes}
+                    onChange={(event) => setInternalNotes(event.target.value)}
+                    rows={7}
+                    placeholder="Ajouter une note interne : documents à préparer, statut EIN, actions à faire..."
+                    className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-white px-5 py-4 font-bold leading-7 outline-none focus:border-[#c51f32]"
+                  />
+                </div>
+
+                <button
+                  onClick={saveAdminTracking}
+                  disabled={saving}
+                  className="mt-5 rounded-2xl bg-[#c51f32] px-6 py-4 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {saving ? "Sauvegarde..." : "Sauvegarder le suivi admin"}
+                </button>
               </div>
 
               <div className="mt-8">
@@ -191,7 +300,7 @@ export default function AdminOrderDetail() {
               </div>
 
               <div className="mt-10">
-                <h2 className="text-2xl font-black">Message</h2>
+                <h2 className="text-2xl font-black">Message client</h2>
 
                 <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 font-bold leading-7 text-slate-700">
                   {order.message || "Aucun message."}
@@ -234,6 +343,8 @@ export default function AdminOrderDetail() {
 
                 <FieldCard label="Statut dossier" value={order.status} />
                 <FieldCard label="Statut paiement" value={order.payment_status} />
+                <FieldCard label="Statut interne" value={order.admin_status || "new"} />
+                <FieldCard label="Dossier terminé le" value={formatDate(order.processed_at)} />
               </div>
 
               <button

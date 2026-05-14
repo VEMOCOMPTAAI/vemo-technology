@@ -39,6 +39,7 @@ export async function GET() {
         language,
         status,
         payment_status,
+        admin_status,
         package_name,
         jurisdiction,
         full_company_name,
