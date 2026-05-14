@@ -1,6 +1,7 @@
 ﻿import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { sendPaidOrderEmails } from "@/lib/emails";
 
 export async function POST(request: Request) {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -20,7 +21,10 @@ export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
 
   if (!signature) {
-    return NextResponse.json({ error: "Missing Stripe signature" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing Stripe signature" },
+      { status: 400 }
+    );
   }
 
   let event: Stripe.Event;
@@ -29,7 +33,11 @@ export async function POST(request: Request) {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
     console.error("Stripe webhook signature error:", error);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+
+    return NextResponse.json(
+      { error: "Invalid signature" },
+      { status: 400 }
+    );
   }
 
   const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
@@ -44,18 +52,38 @@ export async function POST(request: Request) {
     const orderId = paymentIntent.metadata?.order_id;
 
     if (orderId) {
-      const { error } = await supabaseAdmin
+      const { data: order, error } = await supabaseAdmin
         .from("llc_orders")
         .update({
           status: "paid",
           payment_status: "paid",
           stripe_payment_intent_id: paymentIntent.id,
         })
-        .eq("id", orderId);
+        .eq("id", orderId)
+        .select("*")
+        .single();
 
       if (error) {
         console.error("Webhook Supabase update error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+
+        return NextResponse.json(
+          { error: error.message },
+          { status: 500 }
+        );
+      }
+
+      try {
+        await sendPaidOrderEmails({
+          orderId,
+          customerEmail: order.email || "",
+          customerName: [order.first_name, order.last_name].filter(Boolean).join(" "),
+          companyName: order.full_company_name || order.company_name || "US LLC",
+          amount: order.total_amount || 0,
+          currency: order.currency || "USD",
+          paymentIntentId: paymentIntent.id,
+        });
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
       }
     }
   }
