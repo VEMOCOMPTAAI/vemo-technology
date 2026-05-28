@@ -46,6 +46,31 @@ function fmtTime(value?: string) {
   }
 }
 
+function ActionIcon({ type }: { type: "open" | "replace" | "delete" }) {
+  if (type === "open") {
+    return (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M14 5h5v5M10 14L19 5M19 14v4.5A1.5 1.5 0 0 1 17.5 20h-12A1.5 1.5 0 0 1 4 18.5v-12A1.5 1.5 0 0 1 5.5 5H10" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (type === "replace") {
+    return (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+
 export default function VemoAdminClientClean() {
   const [email, setEmail] = useState("");
   const [docs, setDocs] = useState<DocumentRow[]>([]);
@@ -120,12 +145,14 @@ export default function VemoAdminClientClean() {
   async function upload(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    const formElement = e.currentTarget;
+
     if (!email) {
       ko("Email client manquant.");
       return;
     }
 
-    const form = new FormData(e.currentTarget);
+    const form = new FormData(formElement);
     const file = form.get("file");
 
     if (!(file instanceof File) || !file.name) {
@@ -152,7 +179,7 @@ export default function VemoAdminClientClean() {
         return;
       }
 
-      e.currentTarget.reset();
+      formElement.reset();
       setReplaceId("");
       await loadDocs();
       await loadMessages();
@@ -385,21 +412,29 @@ export default function VemoAdminClientClean() {
                         <a
                           href={doc.file_url || "#"}
                           target="_blank"
-                          className="rounded-[13px] border border-[#E8E2DC] bg-white px-3 py-2 text-xs font-black text-[#123A63] hover:bg-[#FFF7F2] hover:text-[#F15A24]"
+                          title="Ouvrir"
+                          aria-label="Ouvrir"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#E8E2DC] bg-white text-[#123A63] shadow-sm transition hover:border-[#F15A24]/30 hover:bg-[#FFF7F2] hover:text-[#F15A24]"
                         >
-                          Ouvrir
+                          <ActionIcon type="open" />
                         </a>
                         <button
+                          type="button"
                           onClick={() => setReplaceId(doc.id || "")}
-                          className="rounded-[13px] border border-[#E8E2DC] bg-white px-3 py-2 text-xs font-black text-[#123A63] hover:bg-[#FFF7F2] hover:text-[#F15A24]"
+                          title="Remplacer"
+                          aria-label="Remplacer"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#E8E2DC] bg-white text-[#123A63] shadow-sm transition hover:border-[#F15A24]/30 hover:bg-[#FFF7F2] hover:text-[#F15A24]"
                         >
-                          Remplacer
+                          <ActionIcon type="replace" />
                         </button>
                         <button
+                          type="button"
                           onClick={() => deleteDoc(doc.id)}
-                          className="rounded-[13px] border border-red-200 bg-red-50 px-3 py-2 text-xs font-black text-red-700 hover:bg-red-100"
+                          title="Supprimer"
+                          aria-label="Supprimer"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-red-100 bg-red-50 text-red-700 shadow-sm transition hover:border-red-200 hover:bg-red-100"
                         >
-                          Suppr.
+                          <ActionIcon type="delete" />
                         </button>
                       </div>
                     </div>
