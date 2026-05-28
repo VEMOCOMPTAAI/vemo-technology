@@ -303,6 +303,13 @@ export default function VemoAdminDashboardClean() {
               </button>
             </div>
 
+            <a
+              href="/fr/admin/parametres"
+              className="rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F2] hover:text-[#F15A24]"
+            >
+              Paramètres
+            </a>
+
             <button
               onClick={load}
               className="rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F2] hover:text-[#F15A24]"

@@ -1,0 +1,33 @@
+{
+  "currency": "USD",
+  "packs": [
+    {
+      "id": "starter",
+      "name_fr": "Pack Starter",
+      "name_en": "Starter Pack",
+      "price": 249,
+      "description_fr": "Création LLC avec accompagnement essentiel.",
+      "description_en": "LLC formation with essential support.",
+      "active": true
+    },
+    {
+      "id": "standard",
+      "name_fr": "Pack Standard",
+      "name_en": "Standard Pack",
+      "price": 399,
+      "description_fr": "Création LLC avec EIN, documents et suivi.",
+      "description_en": "LLC formation with EIN, documents and tracking.",
+      "active": true
+    },
+    {
+      "id": "premium",
+      "name_fr": "Pack Premium",
+      "name_en": "Premium Pack",
+      "price": 599,
+      "description_fr": "Accompagnement premium avec suivi prioritaire.",
+      "description_en": "Premium support with priority tracking.",
+      "active": true
+    }
+  ],
+  "updated_at": null
+}
