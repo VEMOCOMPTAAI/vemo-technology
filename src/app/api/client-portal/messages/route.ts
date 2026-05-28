@@ -1,98 +1,91 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+function supabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !serviceRoleKey) return null;
+  if (!url || !key) throw new Error("Variables Supabase manquantes");
 
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  return createClient(url, key);
 }
 
-function getBearerToken(request: Request) {
-  const authorization = request.headers.get("authorization") || "";
-  if (!authorization.toLowerCase().startsWith("bearer ")) return "";
-  return authorization.slice(7).trim();
-}
-
-export async function POST(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = getSupabaseAdmin();
+    const email = String(request.nextUrl.searchParams.get("email") || "").trim().toLowerCase();
 
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Supabase admin manquant." },
-        { status: 500 }
-      );
+    if (!email) return NextResponse.json({ ok: true, messages: [] });
+
+    const supabase = supabaseAdmin();
+
+    const { data, error } = await supabase
+      .from("client_messages")
+      .select("*")
+      .eq("client_email", email)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      return NextResponse.json({
+        ok: false,
+        messages: [],
+        error: error.message,
+      });
     }
 
-    const token = getBearerToken(request);
+    return NextResponse.json({
+      ok: true,
+      messages: data || [],
+    });
+  } catch (error: any) {
+    return NextResponse.json({
+      ok: false,
+      messages: [],
+      error: error?.message || "Erreur chargement messages.",
+    });
+  }
+}
 
-    if (!token) {
-      return NextResponse.json(
-        { error: "Session client introuvable." },
-        { status: 401 }
-      );
-    }
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => ({}));
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser(token);
-
-    if (userError || !user?.email) {
-      return NextResponse.json(
-        { error: "Session client invalide." },
-        { status: 401 }
-      );
-    }
-
-    const body = await request.json();
+    const email = String(body.email || body.client_email || "").trim().toLowerCase();
     const message = String(body.message || "").trim();
 
-    if (!message) {
-      return NextResponse.json(
-        { error: "Message vide." },
-        { status: 400 }
-      );
+    if (!email) {
+      return NextResponse.json({ ok: false, error: "Email client manquant." }, { status: 400 });
     }
 
-    const email = user.email.trim().toLowerCase();
+    if (!message) {
+      return NextResponse.json({ ok: false, error: "Message vide." }, { status: 400 });
+    }
+
+    const supabase = supabaseAdmin();
 
     const { data, error } = await supabase
       .from("client_messages")
       .insert({
         client_email: email,
-        subject: "Client reply",
-        message,
         sender: "client",
-        status: "sent",
+        message,
       })
       .select("*")
       .single();
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ ok: false, error: error.message }, { status: 200 });
     }
 
     return NextResponse.json({ ok: true, message: data });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Impossible d’envoyer le message.",
-      },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    return NextResponse.json({
+      ok: false,
+      error: error?.message || "Erreur envoi message.",
+    });
   }
 }

@@ -1,8 +1,5 @@
-import ClientSpacePage from "@/components/client/ClientSpacePage";
+import VemoClientSpacePremium from "@/components/client/VemoClientSpacePremium";
 
-export default function EnglishClientSpacePage() {
-  return <ClientSpacePage lang="en" />;
+export default function ClientSpacePage() {
+  return <VemoClientSpacePremium lang="en" />;
 }
-
-
-
