@@ -167,12 +167,9 @@ export default function VemoAdminDashboardClean() {
               </p>
             </div>
 
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher par nom LLC ou statut..."
-              className="w-full rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-bold outline-none transition focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10 lg:max-w-sm"
-            />
+            <div className="hidden lg:block rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-black text-slate-400 lg:min-w-[320px]">
+              Recherche déplacée dans la sélection rapide
+            </div>
           </div>
         </div>
 
@@ -201,8 +198,8 @@ export default function VemoAdminDashboardClean() {
           </div>
         </div>
 
-        <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
-          <div className="grid gap-4 lg:grid-cols-[1fr_180px]">
+        <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+          <div className="grid gap-4 xl:grid-cols-[1.05fr_0.85fr_170px]">
             <div>
               <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
                 Sélection rapide par nom LLC
@@ -210,7 +207,7 @@ export default function VemoAdminDashboardClean() {
               <select
                 value={selectedIndex}
                 onChange={(e) => setSelectedIndex(e.target.value)}
-                className="w-full rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                className="h-[54px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
               >
                 <option value="">Sélectionner une LLC</option>
                 {clients.map((client, index) => (
@@ -221,10 +218,22 @@ export default function VemoAdminDashboardClean() {
               </select>
             </div>
 
+            <div>
+              <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
+                Recherche rapide
+              </label>
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Nom LLC, statut paiement, statut dossier..."
+                className="h-[54px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+              />
+            </div>
+
             <div className="flex items-end">
               <button
                 onClick={() => openClient()}
-                className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
+                className="h-[54px] w-full rounded-[16px] bg-[#F15A24] px-5 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
               >
                 Ouvrir dossier →
               </button>
@@ -232,11 +241,11 @@ export default function VemoAdminDashboardClean() {
           </div>
 
           {selectedClient && (
-            <div className="mt-5 rounded-[1.5rem] border border-[#E8E2DC] bg-[#FBFCFD] p-5">
-              <div className="grid gap-4 md:grid-cols-4">
+            <div className="mt-5 rounded-[1.4rem] border border-[#E8E2DC] bg-[#FBFCFD] p-4">
+              <div className="grid gap-4 md:grid-cols-[1.2fr_150px_180px_180px]">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Nom LLC</p>
-                  <p className="mt-1 text-sm font-black text-[#123A63]">{displayName(selectedClient)}</p>
+                  <p className="mt-1 truncate text-sm font-black text-[#123A63]">{displayName(selectedClient)}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Date création</p>
@@ -256,7 +265,7 @@ export default function VemoAdminDashboardClean() {
         </div>
 
         <div className="mt-6 overflow-hidden rounded-[2rem] border border-[#E8E2DC] bg-white shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
-          <div className="grid grid-cols-[1.1fr_150px_180px_180px_130px] bg-[#FBFCFD] px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+          <div className="grid grid-cols-[minmax(240px,1.25fr)_140px_160px_170px_110px] bg-[#FBFCFD] px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
             <div>Nom LLC</div>
             <div>Date création</div>
             <div>Statut paiement</div>
@@ -271,7 +280,7 @@ export default function VemoAdminDashboardClean() {
               <div className="px-6 py-10 text-center text-sm font-black text-slate-500">Aucun dossier trouvé.</div>
             ) : (
               filtered.map((client, index) => (
-                <div key={client.id || index} className="grid grid-cols-[1.1fr_150px_180px_180px_130px] items-center px-6 py-5">
+                <div key={client.id || index} className="grid grid-cols-[minmax(240px,1.25fr)_140px_160px_170px_110px] items-center px-6 py-4">
                   <div>
                     <p className="font-black text-[#111827]">{displayName(client)}</p>
                   </div>

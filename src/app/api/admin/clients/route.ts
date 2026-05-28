@@ -38,7 +38,7 @@ function getLLCName(row: any) {
     row?.name ||
     row?.client_name ||
     row?.full_name ||
-    "Dossier LLC"
+    ""
   );
 }
 
@@ -56,19 +56,20 @@ function getCreatedAt(row: any) {
 
 function normalize(row: any, source: string) {
   const email = getEmail(row);
+  const llcName = getLLCName(row);
 
   return {
-    id: row?.id || `${source}-${email || Math.random()}`,
+    id: row?.id || `${source}-${email}`,
     source,
     email,
     client_email: email,
-    llc_name: getLLCName(row),
+    llc_name: llcName || "Sans nom LLC",
     payment_status:
       row?.payment_status ||
       row?.status_payment ||
       row?.paymentStatus ||
       row?.payment_state ||
-      row?.status ||
+      row?.payment_status_label ||
       "non défini",
     dossier_status:
       row?.dossier_status ||
@@ -109,12 +110,16 @@ export async function GET() {
   try {
     const supabase = supabaseAdmin();
 
+    /*
+      IMPORTANT :
+      On ne lit PAS client_messages ni client_documents ici.
+      Ces tables créent des fausses lignes "Dossier LLC".
+      La liste admin doit venir uniquement des vraies tables dossiers/clients/paiements.
+    */
     const tables = [
       "orders",
       "clients",
       "client_payments",
-      "client_documents",
-      "client_messages",
       "client_orders",
       "llc_orders",
       "llc_clients",
@@ -122,15 +127,19 @@ export async function GET() {
     ];
 
     const sources = await Promise.all(tables.map((t) => safeSelect(supabase, t)));
-
     const merged = new Map<string, any>();
 
     for (const source of sources) {
       for (const row of source.rows) {
         const item = normalize(row, source.table);
-        const key = item.email || item.id;
 
-        if (!key) continue;
+        // On ignore les lignes sans email ET sans vrai nom LLC.
+        if (!item.email && (!item.llc_name || item.llc_name === "Sans nom LLC")) {
+          continue;
+        }
+
+        // Clé de fusion : email d'abord, sinon nom LLC.
+        const key = item.email || item.llc_name;
 
         const existing = merged.get(key);
 
@@ -142,7 +151,7 @@ export async function GET() {
         merged.set(key, {
           ...existing,
           llc_name:
-            existing.llc_name !== "Dossier LLC"
+            existing.llc_name && existing.llc_name !== "Sans nom LLC"
               ? existing.llc_name
               : item.llc_name,
           payment_status:
