@@ -1,0 +1,29 @@
+
+<svg width="1200" height="620" viewBox="0 0 1200 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="620" rx="24" fill="#FFF7F1"/>
+  <path d="M0 0H1200V620H0V0Z" fill="url(#grid)"/>
+  <circle cx="790" cy="260" r="220" fill="#EAF1F6"/>
+  <rect x="610" y="270" width="430" height="245" rx="18" fill="#0B2746"/>
+  <rect x="635" y="300" width="380" height="185" rx="12" fill="white"/>
+  <rect x="665" y="335" width="110" height="42" rx="10" fill="#FFF7F1" stroke="#E8E2DC"/>
+  <rect x="795" y="335" width="110" height="42" rx="10" fill="#FFF7F1" stroke="#E8E2DC"/>
+  <rect x="925" y="335" width="60" height="42" rx="10" fill="#FFF7F1" stroke="#E8E2DC"/>
+  <rect x="665" y="405" width="320" height="13" rx="6" fill="#E8E2DC"/>
+  <rect x="665" y="435" width="260" height="13" rx="6" fill="#E8E2DC"/>
+  <rect x="665" y="465" width="210" height="13" rx="6" fill="#E8E2DC"/>
+  <path d="M215 475C250 380 280 240 335 160C390 240 420 380 455 475H215Z" fill="#123A63"/>
+  <rect x="250" y="475" width="170" height="28" rx="8" fill="#F15A24"/>
+  <path d="M340 115L350 145H382L356 163L366 193L340 174L314 193L324 163L298 145H330L340 115Z" fill="#F15A24"/>
+  <rect x="120" y="120" width="330" height="78" rx="14" fill="white" stroke="#E8E2DC"/>
+  <text x="145" y="155" font-family="Arial" font-size="18" font-weight="700" fill="#123A63">US LLC SETUP</text>
+  <text x="145" y="181" font-family="Arial" font-size="14" fill="#6B7280">Formation, EIN, banking guidance</text>
+  <rect x="120" y="235" width="300" height="70" rx="14" fill="white" stroke="#E8E2DC"/>
+  <circle cx="155" cy="270" r="16" fill="#F15A24"/>
+  <text x="183" y="263" font-family="Arial" font-size="15" font-weight="700" fill="#2B2F36">Fast online process</text>
+  <text x="183" y="286" font-family="Arial" font-size="13" fill="#6B7280">Clear steps for non-residents</text>
+  <defs>
+    <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse">
+      <path d="M56 0H0V56" stroke="#E8E2DC" stroke-width="1" opacity="0.55"/>
+    </pattern>
+  </defs>
+</svg>

@@ -1,0 +1,17 @@
+
+<svg width="900" height="520" viewBox="0 0 900 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="520" rx="20" fill="#FFFFFF"/>
+  <rect x="80" y="90" width="320" height="340" rx="18" fill="#FFF7F1" stroke="#E8E2DC"/>
+  <rect x="500" y="90" width="320" height="340" rx="18" fill="#FFF7F1" stroke="#E8E2DC"/>
+  <text x="125" y="150" font-family="Arial" font-size="30" font-weight="800" fill="#123A63">New Mexico</text>
+  <text x="545" y="150" font-family="Arial" font-size="30" font-weight="800" fill="#123A63">Wyoming</text>
+  <rect x="125" y="205" width="210" height="12" rx="6" fill="#E8E2DC"/>
+  <rect x="125" y="235" width="160" height="12" rx="6" fill="#E8E2DC"/>
+  <rect x="545" y="205" width="210" height="12" rx="6" fill="#E8E2DC"/>
+  <rect x="545" y="235" width="160" height="12" rx="6" fill="#E8E2DC"/>
+  <circle cx="240" cy="330" r="55" fill="#F15A24"/>
+  <circle cx="660" cy="330" r="55" fill="#123A63"/>
+  <path d="M210 330H270" stroke="white" stroke-width="12" stroke-linecap="round"/>
+  <path d="M660 300V360" stroke="white" stroke-width="12" stroke-linecap="round"/>
+  <path d="M630 330H690" stroke="white" stroke-width="12" stroke-linecap="round"/>
+</svg>

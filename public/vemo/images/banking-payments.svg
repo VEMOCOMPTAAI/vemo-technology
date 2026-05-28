@@ -1,0 +1,13 @@
+
+<svg width="900" height="520" viewBox="0 0 900 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="520" rx="20" fill="#FFF7F1"/>
+  <rect x="90" y="110" width="720" height="300" rx="24" fill="white" stroke="#E8E2DC"/>
+  <rect x="130" y="160" width="240" height="150" rx="16" fill="#123A63"/>
+  <rect x="160" y="195" width="120" height="16" rx="8" fill="white"/>
+  <rect x="160" y="235" width="170" height="12" rx="6" fill="#E8E2DC"/>
+  <rect x="160" y="265" width="130" height="12" rx="6" fill="#E8E2DC"/>
+  <rect x="430" y="170" width="300" height="46" rx="12" fill="#FFF7F1" stroke="#E8E2DC"/>
+  <rect x="430" y="240" width="300" height="46" rx="12" fill="#FFF7F1" stroke="#E8E2DC"/>
+  <rect x="430" y="310" width="210" height="46" rx="12" fill="#F15A24"/>
+  <text x="455" y="340" font-family="Arial" font-size="18" font-weight="700" fill="white">Payment setup</text>
+</svg>

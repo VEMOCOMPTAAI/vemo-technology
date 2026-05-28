@@ -1,0 +1,716 @@
+﻿@import "tailwindcss";
+
+:root {
+  --vemo-bg: #f8fafc;
+  --vemo-surface: #ffffff;
+  --vemo-primary: #F15A24;
+  --vemo-primary-dark: #0f2a4f;
+  --vemo-primary-soft: #ecfeff;
+  --vemo-text: #0f172a;
+  --vemo-muted: #64748b;
+  --vemo-border: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--vemo-text);
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(14, 116, 144, 0.10), transparent 26%),
+    radial-gradient(circle at 88% 10%, rgba(15, 42, 79, 0.08), transparent 24%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 46%, #f1f5f9 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(15, 42, 79, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 42, 79, 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 70%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.vemo-container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.vemo-card {
+  border-radius: 1.65rem;
+  border: 1px solid var(--vemo-border);
+  background: rgba(255,255,255,0.94);
+  box-shadow:
+    0 18px 48px rgba(15, 23, 42, 0.065),
+    0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.vemo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(14, 116, 144, 0.18);
+  background: rgba(236, 254, 255, 0.92);
+  color: var(--vemo-primary);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vemo-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 0.95rem;
+  background: linear-gradient(135deg, #F15A24, #F15A24);
+  color: white;
+  padding: 14px 22px;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 16px 36px rgba(14, 116, 144, 0.24);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.vemo-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 46px rgba(14, 116, 144, 0.32);
+}
+
+.vemo-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 0.95rem;
+  border: 1px solid var(--vemo-border);
+  background: white;
+  color: var(--vemo-text);
+  padding: 14px 22px;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+}
+
+.vemo-input {
+  width: 100%;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: white;
+  padding: 12px 14px;
+  color: var(--vemo-text);
+  outline: none;
+}
+
+.vemo-input:focus {
+  border-color: var(--vemo-primary);
+  box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.12);
+}
+
+::selection {
+  background: rgba(14, 116, 144, 0.18);
+}
+
+/* ===== Form polish — Style 3 teal/navy ===== */
+
+input,
+select,
+textarea {
+  border-radius: 1rem;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #F15A24 !important;
+  box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.12) !important;
+  outline: none !important;
+}
+
+button[type="button"],
+button[type="submit"] {
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    background .18s ease,
+    border-color .18s ease;
+}
+
+button[type="button"]:hover,
+button[type="submit"]:hover {
+  transform: translateY(-1px);
+}
+
+/* Bouton principal formulaire */
+.vemo-form-primary,
+form button[type="submit"],
+form button:not([type]) {
+  border-radius: 1rem !important;
+  background: linear-gradient(135deg, #F15A24, #0f2a4f) !important;
+  color: white !important;
+  font-weight: 900 !important;
+  padding: 0.95rem 1.35rem !important;
+  box-shadow: 0 16px 34px rgba(14, 116, 144, 0.24) !important;
+}
+
+/* Cartes premium formulaire */
+.vemo-form-card {
+  border-radius: 2rem;
+  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 18px 55px rgba(15, 23, 42, 0.07),
+    0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+/* Badge/statut premium */
+.vemo-form-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #ecfeff;
+  color: #F15A24;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+/* Bloc résumé */
+.vemo-summary-box {
+  border-radius: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+/* Stripe / sécurité */
+.vemo-stripe-box {
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at top right, rgba(14, 116, 144, 0.22), transparent 28%),
+    linear-gradient(135deg, #0f2a4f, #0f172a);
+  color: white;
+  box-shadow: 0 22px 50px rgba(15, 42, 79, 0.22);
+}
+
+
+/* VEMO HOME CLEAN WHITE BACKGROUND */
+html,
+body {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
+body::before,
+body::after {
+  display: none !important;
+  content: none !important;
+}
+
+.vemo-home-clean,
+.vemo-home-clean section,
+.vemo-home-clean main {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+.vemo-home-clean::before,
+.vemo-home-clean::after,
+.vemo-home-clean section::before,
+.vemo-home-clean section::after {
+  background-image: none !important;
+}
+
+/* =========================================================
+   VEMO GLOBAL THEME — WHITE / ORANGE / NAVY
+   ========================================================= */
+
+:root {
+  --vemo-orange: #F15A24;
+  --vemo-orange-dark: #D94A1B;
+  --vemo-navy: #123A63;
+  --vemo-text: #202838;
+  --vemo-muted: #667085;
+  --vemo-border: #E8E2DC;
+  --vemo-soft: #F8FAFC;
+  --vemo-white: #FFFFFF;
+}
+
+html,
+body {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: var(--vemo-text);
+}
+
+body::before,
+body::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Supprime les fonds quadrillés / gradients décoratifs globaux */
+[class*="background-image"],
+[class*="bg-grid"],
+[class*="grid-bg"],
+.vemo-grid,
+.bg-grid,
+.grid-bg {
+  background-image: none !important;
+}
+
+/* Buttons */
+.vemo-btn-primary {
+  background: var(--vemo-orange) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--vemo-orange) !important;
+  border-radius: 14px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 16px 34px rgba(241, 90, 36, 0.22) !important;
+  transition: all 0.2s ease !important;
+}
+
+.vemo-btn-primary:hover {
+  background: var(--vemo-orange-dark) !important;
+  transform: translateY(-1px);
+}
+
+.vemo-btn-secondary {
+  background: #ffffff !important;
+  color: var(--vemo-orange) !important;
+  border: 1px solid var(--vemo-orange) !important;
+  border-radius: 14px !important;
+  font-weight: 900 !important;
+}
+
+/* Cards */
+.vemo-card {
+  background: #ffffff !important;
+  border: 1px solid var(--vemo-border) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 22px 60px rgba(18, 58, 99, 0.08) !important;
+}
+
+/* Inputs */
+.vemo-input,
+input,
+select,
+textarea {
+  border-color: var(--vemo-border);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--vemo-orange) !important;
+  box-shadow: 0 0 0 4px rgba(241, 90, 36, 0.10) !important;
+  outline: none !important;
+}
+
+/* Header / nav */
+.vemo-header,
+header {
+  background: #ffffff !important;
+}
+
+/* Force white sections */
+.vemo-white-page,
+.vemo-white-page main,
+.vemo-white-page section {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Premium action messages */
+.vemo-action-message {
+  background: #ffffff !important;
+  border: 1px solid var(--vemo-border) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 18px 45px rgba(18, 58, 99, 0.10) !important;
+  color: var(--vemo-text) !important;
+}
+
+/* Remove old cyan visual mood */
+.shadow-cyan-900\/10,
+.shadow-cyan-900\/20,
+.shadow-cyan-900\/5 {
+  --tw-shadow-color: rgba(241, 90, 36, 0.18) !important;
+}
+
+
+/* =========================================================
+   VEMO GLOBAL THEME — WHITE / ORANGE / NAVY
+   ========================================================= */
+
+:root {
+  --vemo-orange: #F15A24;
+  --vemo-orange-dark: #D94A1B;
+  --vemo-navy: #123A63;
+  --vemo-text: #202838;
+  --vemo-muted: #667085;
+  --vemo-border: #E8E2DC;
+  --vemo-soft: #F8FAFC;
+  --vemo-white: #FFFFFF;
+}
+
+html,
+body {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: var(--vemo-text);
+}
+
+body::before,
+body::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Supprime les fonds quadrillés / gradients décoratifs globaux */
+[class*="background-image"],
+[class*="bg-grid"],
+[class*="grid-bg"],
+.vemo-grid,
+.bg-grid,
+.grid-bg {
+  background-image: none !important;
+}
+
+/* Buttons */
+.vemo-btn-primary {
+  background: var(--vemo-orange) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--vemo-orange) !important;
+  border-radius: 14px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 16px 34px rgba(241, 90, 36, 0.22) !important;
+  transition: all 0.2s ease !important;
+}
+
+.vemo-btn-primary:hover {
+  background: var(--vemo-orange-dark) !important;
+  transform: translateY(-1px);
+}
+
+.vemo-btn-secondary {
+  background: #ffffff !important;
+  color: var(--vemo-orange) !important;
+  border: 1px solid var(--vemo-orange) !important;
+  border-radius: 14px !important;
+  font-weight: 900 !important;
+}
+
+/* Cards */
+.vemo-card {
+  background: #ffffff !important;
+  border: 1px solid var(--vemo-border) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 22px 60px rgba(18, 58, 99, 0.08) !important;
+}
+
+/* Inputs */
+.vemo-input,
+input,
+select,
+textarea {
+  border-color: var(--vemo-border);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--vemo-orange) !important;
+  box-shadow: 0 0 0 4px rgba(241, 90, 36, 0.10) !important;
+  outline: none !important;
+}
+
+/* Header / nav */
+.vemo-header,
+header {
+  background: #ffffff !important;
+}
+
+/* Force white sections */
+.vemo-white-page,
+.vemo-white-page main,
+.vemo-white-page section {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Premium action messages */
+.vemo-action-message {
+  background: #ffffff !important;
+  border: 1px solid var(--vemo-border) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 18px 45px rgba(18, 58, 99, 0.10) !important;
+  color: var(--vemo-text) !important;
+}
+
+/* Remove old cyan visual mood */
+.shadow-cyan-900\/10,
+.shadow-cyan-900\/20,
+.shadow-cyan-900\/5 {
+  --tw-shadow-color: rgba(241, 90, 36, 0.18) !important;
+}
+
+/* VEMO CTA clean — boutons orange simples, sans dégradé */
+button[type="submit"] {
+  background-image: none !important;
+}
+
+button[type="submit"][class*="bg-[#F15A24]"],
+a[class*="bg-[#F15A24]"] {
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #F15A24 !important;
+}
+
+button[type="submit"][class*="bg-[#F15A24]"]:hover,
+a[class*="bg-[#F15A24]"]:hover {
+  background-color: #D94A1B !important;
+  background-image: none !important;
+}
+
+/* VEMO Admin Theme — remove old navy gradient on admin CTAs */
+[data-vemo-admin="true"] button,
+[data-vemo-admin="true"] a.vemo-admin-cta,
+.vemo-admin-cta {
+  background-image: none !important;
+}
+
+[data-vemo-admin="true"] button[type="submit"],
+.vemo-admin-cta {
+  background-color: #F15A24 !important;
+  color: #ffffff !important;
+  border-color: #F15A24 !important;
+  box-shadow: 0 16px 34px rgba(241, 90, 36, 0.22) !important;
+}
+
+[data-vemo-admin="true"] button[type="submit"]:hover,
+.vemo-admin-cta:hover {
+  background-color: #D94A1B !important;
+  background-image: none !important;
+}
+
+/* VEMO admin cleanup */
+body:has([data-vemo-admin-login="true"]) .bg-gradient-to-r {
+  background-image: none !important;
+}
+
+/* VEMO Admin stats cards compact */
+.vemo-admin-stat-card {
+  min-height: 104px !important;
+}
+
+/* VEMO ADMIN - kill old gradients */
+button,
+a {
+  background-image: none;
+}
+
+.bg-gradient-to-r,
+.bg-gradient-to-l,
+.bg-gradient-to-br,
+.bg-gradient-to-bl,
+.bg-gradient-to-tr,
+.bg-gradient-to-tl {
+  background-image: none !important;
+}
+
+.vemo-admin-orange-btn {
+  background: #F15A24 !important;
+  background-image: none !important;
+}
+
+/* VEMO ADMIN - final no gradient */
+.vemo-admin-no-gradient,
+.vemo-admin-no-gradient:hover,
+.vemo-admin-no-gradient:focus {
+  background: #F15A24 !important;
+  background-image: none !important;
+}
+
+[data-vemo-admin="true"] button,
+[data-vemo-admin="true"] a {
+  background-image: none !important;
+}
+
+[data-vemo-admin="true"] .bg-gradient-to-r,
+[data-vemo-admin="true"] .bg-gradient-to-l,
+[data-vemo-admin="true"] .bg-gradient-to-br,
+[data-vemo-admin="true"] .bg-gradient-to-bl,
+[data-vemo-admin="true"] .bg-gradient-to-tr,
+[data-vemo-admin="true"] .bg-gradient-to-tl {
+  background-image: none !important;
+}
+
+/* VEMO ADMIN - uploader orange strict */
+button.vemo-uploader-orange,
+button.vemo-uploader-orange:hover,
+button.vemo-uploader-orange:focus,
+button.vemo-uploader-orange:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  filter: none !important;
+}
+
+/* VEMO ADMIN - uploader orange strict final */
+button.vemo-uploader-orange,
+button.vemo-uploader-orange:hover,
+button.vemo-uploader-orange:focus,
+button.vemo-uploader-orange:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  filter: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* VEMO ADMIN — bouton upload orange pur */
+button[data-vemo-upload-button="true"],
+button[data-vemo-upload-button="true"]:hover,
+button[data-vemo-upload-button="true"]:focus,
+button[data-vemo-upload-button="true"]:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  box-shadow: 0 14px 28px rgba(241, 90, 36, 0.20) !important;
+  filter: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+button[data-vemo-upload-button="true"]::before,
+button[data-vemo-upload-button="true"]::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* VEMO ADMIN — upload button orange pure */
+button[data-vemo-upload-button="true"],
+button[data-vemo-upload-button="true"]:hover,
+button[data-vemo-upload-button="true"]:focus,
+button[data-vemo-upload-button="true"]:active,
+.vemo-uploader-orange,
+.vemo-uploader-orange:hover,
+.vemo-uploader-orange:focus,
+.vemo-uploader-orange:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  box-shadow: 0 14px 28px rgba(241, 90, 36, 0.20) !important;
+  filter: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+button[data-vemo-upload-button="true"]::before,
+button[data-vemo-upload-button="true"]::after,
+.vemo-uploader-orange::before,
+.vemo-uploader-orange::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* VEMO ADMIN — bouton upload orange pur */
+button[data-vemo-upload-button="true"],
+button[data-vemo-upload-button="true"]:hover,
+button[data-vemo-upload-button="true"]:focus,
+button[data-vemo-upload-button="true"]:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  box-shadow: 0 14px 28px rgba(241, 90, 36, 0.20) !important;
+  filter: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+button[data-vemo-upload-button="true"]::before,
+button[data-vemo-upload-button="true"]::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* VEMO ADMIN — bouton upload orange pur */
+button[data-vemo-upload-button="true"],
+button[data-vemo-upload-button="true"]:hover,
+button[data-vemo-upload-button="true"]:focus,
+button[data-vemo-upload-button="true"]:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  box-shadow: 0 14px 28px rgba(241, 90, 36, 0.20) !important;
+  filter: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+button[data-vemo-upload-button="true"]::before,
+button[data-vemo-upload-button="true"]::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* VEMO ADMIN — bouton uploader orange uni définitif */
+.vemo-upload-solid-btn,
+.vemo-upload-solid-btn:hover,
+.vemo-upload-solid-btn:focus,
+.vemo-upload-solid-btn:active,
+button[data-vemo-upload-button="true"],
+button[data-vemo-upload-button="true"]:hover,
+button[data-vemo-upload-button="true"]:focus,
+button[data-vemo-upload-button="true"]:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  box-shadow: 0 14px 28px rgba(241, 90, 36, 0.20) !important;
+  filter: none !important;
+  opacity: 1;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+.vemo-upload-solid-btn::before,
+.vemo-upload-solid-btn::after,
+button[data-vemo-upload-button="true"]::before,
+button[data-vemo-upload-button="true"]::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+  background-image: none !important;
+}
