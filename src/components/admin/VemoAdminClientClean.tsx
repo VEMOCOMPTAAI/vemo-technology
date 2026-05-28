@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type DocumentRow = {
   id?: string;
@@ -18,6 +18,25 @@ type MessageRow = {
   created_at?: string;
 };
 
+type ClientInfo = {
+  id?: string;
+  email?: string;
+  client_email?: string;
+  dossier_number?: string;
+  llc_name?: string;
+  name?: string;
+  full_name?: string;
+  client_name?: string;
+  phone?: string;
+  state?: string;
+  llc_state?: string;
+  jurisdiction?: string;
+  payment_status?: string;
+  dossier_status?: string;
+  status?: string;
+  created_at?: string;
+};
+
 const docTypes = [
   "Company Document",
   "EIN",
@@ -26,6 +45,22 @@ const docTypes = [
   "Certificat Registered Agent",
   "Banking",
   "Autre document",
+];
+
+const paymentOptions = [
+  { value: "pending_verification", label: "En attente de vérification" },
+  { value: "paid", label: "Paiement confirmé" },
+  { value: "unpaid", label: "Non payé" },
+  { value: "rejected", label: "Paiement rejeté" },
+];
+
+const dossierOptions = [
+  { value: "new", label: "Nouveau dossier" },
+  { value: "in_progress", label: "En cours" },
+  { value: "waiting_client", label: "En attente client" },
+  { value: "documents_received", label: "Documents reçus" },
+  { value: "completed", label: "Terminé" },
+  { value: "suspended", label: "Suspendu" },
 ];
 
 function fmtDate(value?: string) {
@@ -44,6 +79,84 @@ function fmtTime(value?: string) {
   } catch {
     return "";
   }
+}
+
+function cleanStatus(value?: string) {
+  return String(value || "")
+    .replace(/[_-]+/g, " ")
+    .trim();
+}
+
+function paymentLabel(value?: string) {
+  const raw = cleanStatus(value).toLowerCase();
+
+  if (!raw) return "Non défini";
+  if (raw.includes("paid") || raw.includes("confirmed") || raw.includes("payé")) return "Paiement confirmé";
+  if (raw.includes("unpaid")) return "Non payé";
+  if (raw.includes("pending") || raw.includes("attente") || raw.includes("verification")) return "En attente de vérification";
+  if (raw.includes("reject") || raw.includes("rejet") || raw.includes("refus")) return "Paiement rejeté";
+
+  return cleanStatus(value);
+}
+
+function dossierLabel(value?: string) {
+  const raw = cleanStatus(value).toLowerCase();
+
+  if (!raw) return "Non défini";
+  if (raw.includes("new")) return "Nouveau dossier";
+  if (raw.includes("in progress") || raw.includes("progress") || raw.includes("cours")) return "En cours";
+  if (raw.includes("waiting client") || raw.includes("attente client")) return "En attente client";
+  if (raw.includes("documents received")) return "Documents reçus";
+  if (raw.includes("completed") || raw.includes("done") || raw.includes("termine") || raw.includes("terminé")) return "Terminé";
+  if (raw.includes("suspended")) return "Suspendu";
+  if (raw.includes("payment confirmed") || raw.includes("confirmed")) return "Paiement confirmé";
+  if (raw.includes("pending") || raw.includes("attente")) return "En attente";
+
+  return cleanStatus(value);
+}
+
+function statusBadge(value: string, type: "payment" | "dossier") {
+  const label = type === "payment" ? paymentLabel(value) : dossierLabel(value);
+  const raw = cleanStatus(value).toLowerCase();
+
+  const cls =
+    raw.includes("paid") || raw.includes("confirmed") || raw.includes("completed") || raw.includes("done")
+      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+      : raw.includes("pending") || raw.includes("waiting") || raw.includes("progress") || raw.includes("unpaid")
+      ? "border-amber-200 bg-amber-50 text-amber-700"
+      : raw.includes("reject") || raw.includes("suspended") || raw.includes("refus")
+      ? "border-red-200 bg-red-50 text-red-700"
+      : "border-slate-200 bg-slate-50 text-slate-600";
+
+  return (
+    <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${cls}`}>
+      {label}
+    </span>
+  );
+}
+
+function clientEmail(client?: ClientInfo) {
+  return client?.email || client?.client_email || "";
+}
+
+function clientName(client?: ClientInfo) {
+  return client?.full_name || client?.client_name || client?.name || "—";
+}
+
+function llcName(client?: ClientInfo) {
+  return client?.llc_name || "—";
+}
+
+function clientPhone(client?: ClientInfo) {
+  return client?.phone || "—";
+}
+
+function llcState(client?: ClientInfo) {
+  return client?.llc_state || client?.state || client?.jurisdiction || "—";
+}
+
+function dossierNumber(client?: ClientInfo) {
+  return client?.dossier_number || "—";
 }
 
 function ActionIcon({ type }: { type: "open" | "replace" | "delete" }) {
@@ -70,9 +183,22 @@ function ActionIcon({ type }: { type: "open" | "replace" | "delete" }) {
   );
 }
 
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[1.4rem] border border-[#E8E2DC] bg-[#FBFCFD] p-4">
+      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+        {label}
+      </p>
+      <p className="mt-2 break-words text-sm font-black text-[#123A63]">
+        {value || "—"}
+      </p>
+    </div>
+  );
+}
 
 export default function VemoAdminClientClean() {
   const [email, setEmail] = useState("");
+  const [client, setClient] = useState<ClientInfo | undefined>();
   const [docs, setDocs] = useState<DocumentRow[]>([]);
   const [messages, setMessages] = useState<MessageRow[]>([]);
   const [notice, setNotice] = useState("");
@@ -81,12 +207,20 @@ export default function VemoAdminClientClean() {
   const [replaceId, setReplaceId] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState("pending_verification");
+  const [dossierStatus, setDossierStatus] = useState("in_progress");
+
+  const currentPaymentLabel = useMemo(() => paymentLabel(paymentStatus), [paymentStatus]);
+  const currentDossierLabel = useMemo(() => dossierLabel(dossierStatus), [dossierStatus]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const currentEmail = params.get("email") || "";
+
     setEmail(currentEmail);
+
     if (currentEmail) {
+      loadClient(currentEmail);
       loadDocs(currentEmail);
       loadMessages(currentEmail);
     }
@@ -101,7 +235,37 @@ export default function VemoAdminClientClean() {
   function ko(msg: string) {
     setNotice("");
     setError(msg);
-    setTimeout(() => setError(""), 6000);
+    setTimeout(() => setError(""), 6500);
+  }
+
+  async function loadClient(currentEmail = email) {
+    if (!currentEmail) return;
+
+    try {
+      const res = await fetch("/api/admin/clients", { cache: "no-store" });
+      const data = await res.json().catch(() => null);
+      const rows = Array.isArray(data?.clients) ? data.clients : [];
+
+      const found = rows.find((item: ClientInfo) => clientEmail(item).toLowerCase() === currentEmail.toLowerCase());
+
+      if (found) {
+        setClient(found);
+        setPaymentStatus(found.payment_status || found.status || "pending_verification");
+        setDossierStatus(found.dossier_status || found.status || "in_progress");
+      } else {
+        setClient({
+          email: currentEmail,
+          client_email: currentEmail,
+          llc_name: "—",
+          dossier_number: "—",
+        });
+      }
+    } catch {
+      setClient({
+        email: currentEmail,
+        client_email: currentEmail,
+      });
+    }
   }
 
   async function loadDocs(currentEmail = email) {
@@ -111,7 +275,7 @@ export default function VemoAdminClientClean() {
       const res = await fetch(`/api/admin/documents?email=${encodeURIComponent(currentEmail)}`, { cache: "no-store" });
       const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.error) {
+      if (!res.ok || data?.error || data?.ok === false) {
         setDocs([]);
         if (data?.error) ko(data.error);
         return;
@@ -131,7 +295,7 @@ export default function VemoAdminClientClean() {
       const res = await fetch(`/api/admin/messages?email=${encodeURIComponent(currentEmail)}`, { cache: "no-store" });
       const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.error) {
+      if (!res.ok || data?.error || data?.ok === false) {
         setMessages([]);
         return;
       }
@@ -262,7 +426,7 @@ export default function VemoAdminClientClean() {
     }
   }
 
-  async function updateStatus(payment_status: string) {
+  async function updateStatuses(nextPayment = paymentStatus, nextDossier = dossierStatus) {
     if (!email) {
       ko("Email client manquant.");
       return;
@@ -274,20 +438,25 @@ export default function VemoAdminClientClean() {
       const res = await fetch("/api/admin/dossier-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, payment_status }),
+        body: JSON.stringify({
+          email,
+          payment_status: nextPayment,
+          dossier_status: nextDossier,
+        }),
       });
 
       const data = await res.json().catch(() => null);
 
       if (!res.ok || data?.error || data?.ok === false) {
-        ko(data?.error || "Erreur statut paiement.");
+        ko(data?.error || "Erreur mise à jour des statuts.");
         return;
       }
 
+      await loadClient();
       await loadMessages();
-      ok(`Statut paiement mis à jour : ${payment_status}`);
+      ok("Statuts mis à jour avec succès.");
     } catch {
-      ko("Erreur réseau pendant la mise à jour du statut.");
+      ko("Erreur réseau pendant la mise à jour des statuts.");
     } finally {
       setBusy(false);
     }
@@ -317,15 +486,45 @@ export default function VemoAdminClientClean() {
 
       <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_24px_70px_rgba(18,58,99,0.08)]">
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F15A24]">
-            Dossier client
-          </p>
-          <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">
-            Gestion premium du dossier
-          </h1>
-          <p className="mt-3 break-all text-sm font-bold text-slate-500">
-            {email || "Aucun client sélectionné"}
-          </p>
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F15A24]">
+                Fiche client
+              </p>
+              <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">
+                {llcName(client) !== "—" ? llcName(client) : "Gestion premium du dossier"}
+              </h1>
+              <p className="mt-3 text-sm font-bold text-slate-500">
+                Dossier {dossierNumber(client)}
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-[1.4rem] border border-[#E8E2DC] bg-[#FBFCFD] p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                  Paiement
+                </p>
+                <div className="mt-2">{statusBadge(paymentStatus, "payment")}</div>
+              </div>
+              <div className="rounded-[1.4rem] border border-[#E8E2DC] bg-[#FBFCFD] p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                  Dossier
+                </p>
+                <div className="mt-2">{statusBadge(dossierStatus, "dossier")}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <InfoCard label="Nom complet" value={clientName(client)} />
+            <InfoCard label="Nom LLC" value={llcName(client)} />
+            <InfoCard label="État LLC" value={llcState(client)} />
+            <InfoCard label="N° dossier" value={dossierNumber(client)} />
+            <InfoCard label="Téléphone" value={clientPhone(client)} />
+            <InfoCard label="Email" value={clientEmail(client) || email || "—"} />
+            <InfoCard label="Date création" value={fmtDate(client?.created_at)} />
+            <InfoCard label="Statut actuel" value={`${currentPaymentLabel} / ${currentDossierLabel}`} />
+          </div>
         </div>
 
         {notice && (
@@ -340,7 +539,7 @@ export default function VemoAdminClientClean() {
           </div>
         )}
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-[2.2rem] border border-[#E8E2DC] bg-white p-7 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-[#F15A24]">Documents</p>
             <h2 className="mt-2 text-3xl font-black tracking-[-0.06em]">Documents du dossier</h2>
@@ -392,7 +591,7 @@ export default function VemoAdminClientClean() {
             </form>
 
             <div className="mt-6 overflow-hidden rounded-[1.8rem] border border-[#E8E2DC]">
-              <div className="grid grid-cols-[1.2fr_1fr_120px_180px] bg-[#FBFCFD] px-5 py-4 text-xs font-black uppercase tracking-[0.13em] text-slate-500">
+              <div className="grid grid-cols-[1.1fr_1fr_110px_150px] bg-[#FBFCFD] px-5 py-4 text-xs font-black uppercase tracking-[0.13em] text-slate-500">
                 <div>Document</div>
                 <div>Type</div>
                 <div>Date</div>
@@ -404,9 +603,9 @@ export default function VemoAdminClientClean() {
                   <div className="px-5 py-8 text-center text-sm font-black text-slate-500">Aucun document uploadé.</div>
                 ) : (
                   docs.map((doc, i) => (
-                    <div key={doc.id || i} className="grid grid-cols-[1.2fr_1fr_120px_180px] items-center px-5 py-5">
-                      <div className="text-sm font-black">{doc.title || doc.file_name || "Document"}</div>
-                      <div className="text-xs font-black text-[#123A63]">{doc.document_type || "—"}</div>
+                    <div key={doc.id || i} className="grid grid-cols-[1.1fr_1fr_110px_150px] items-center px-5 py-4">
+                      <div className="truncate text-sm font-black">{doc.title || doc.file_name || "Document"}</div>
+                      <div className="truncate text-xs font-black text-[#123A63]">{doc.document_type || "—"}</div>
                       <div className="text-xs font-black text-slate-500">{fmtDate(doc.created_at)}</div>
                       <div className="flex justify-end gap-2">
                         <a
@@ -446,23 +645,57 @@ export default function VemoAdminClientClean() {
 
           <div className="space-y-6">
             <div className="rounded-[2.2rem] border border-[#E8E2DC] bg-white p-7 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#F15A24]">Paiement</p>
-              <h2 className="mt-2 text-2xl font-black">Statut paiement</h2>
-              <div className="mt-5 grid gap-3">
-                {[
-                  ["pending_admin_validation", "En attente de vérification"],
-                  ["paid", "Payé"],
-                  ["rejected", "Rejeté"],
-                ].map(([value, label]) => (
-                  <button
-                    key={value}
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#F15A24]">Statuts</p>
+              <h2 className="mt-2 text-2xl font-black">Pilotage du dossier</h2>
+
+              <div className="mt-5 grid gap-4">
+                <label>
+                  <span className="mb-2 block text-sm font-black text-[#123A63]">Statut paiement</span>
+                  <select
+                    value={paymentStatus}
+                    onChange={(e) => {
+                      setPaymentStatus(e.target.value);
+                      updateStatuses(e.target.value, dossierStatus);
+                    }}
                     disabled={busy}
-                    onClick={() => updateStatus(value)}
-                    className="rounded-[16px] border border-[#E8E2DC] bg-white px-5 py-4 text-left text-sm font-black text-[#123A63] hover:bg-[#FFF7F2] hover:text-[#F15A24] disabled:opacity-60"
+                    className="w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 py-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10 disabled:opacity-60"
                   >
-                    {label}
-                  </button>
-                ))}
+                    {paymentOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span className="mb-2 block text-sm font-black text-[#123A63]">Statut du dossier</span>
+                  <select
+                    value={dossierStatus}
+                    onChange={(e) => {
+                      setDossierStatus(e.target.value);
+                      updateStatuses(paymentStatus, e.target.value);
+                    }}
+                    disabled={busy}
+                    className="w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 py-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10 disabled:opacity-60"
+                  >
+                    {dossierOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div className="mt-5 rounded-[1.5rem] border border-[#E8E2DC] bg-[#FBFCFD] p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">
+                  Résumé actuel
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {statusBadge(paymentStatus, "payment")}
+                  {statusBadge(dossierStatus, "dossier")}
+                </div>
               </div>
             </div>
 
