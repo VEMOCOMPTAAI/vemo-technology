@@ -1,5 +1,5 @@
-import VemoAdminDashboard from "@/components/admin/VemoAdminDashboard";
+import VemoAdminDashboardClean from "@/components/admin/VemoAdminDashboardClean";
 
 export default function AdminPage() {
-  return <VemoAdminDashboard />;
+  return <VemoAdminDashboardClean />;
 }
