@@ -11,7 +11,7 @@ function supabaseAdmin() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    throw new Error("Variables Supabase manquantes : NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY");
+    throw new Error("Variables Supabase manquantes");
   }
 
   return createClient(url, key);
@@ -24,15 +24,17 @@ function getEmail(row: any) {
     row?.customer_email ||
     row?.billing_email ||
     row?.user_email ||
+    row?.owner_email ||
     ""
   );
 }
 
-function getName(row: any) {
+function getLLCName(row: any) {
   return (
     row?.llc_name ||
     row?.company_name ||
     row?.business_name ||
+    row?.company ||
     row?.name ||
     row?.client_name ||
     row?.full_name ||
@@ -40,55 +42,64 @@ function getName(row: any) {
   );
 }
 
+function getCreatedAt(row: any) {
+  return (
+    row?.created_at ||
+    row?.createdAt ||
+    row?.order_date ||
+    row?.payment_date ||
+    row?.date ||
+    row?.updated_at ||
+    null
+  );
+}
+
 function normalize(row: any, source: string) {
   const email = getEmail(row);
 
   return {
-    id: row?.id || `${source}-${email}`,
+    id: row?.id || `${source}-${email || Math.random()}`,
     source,
     email,
     client_email: email,
-    name: getName(row),
-    llc_name: row?.llc_name || row?.company_name || row?.business_name || "",
-    company_name: row?.company_name || row?.llc_name || row?.business_name || "",
+    llc_name: getLLCName(row),
     payment_status:
       row?.payment_status ||
       row?.status_payment ||
       row?.paymentStatus ||
+      row?.payment_state ||
       row?.status ||
       "non défini",
-    account_status:
+    dossier_status:
+      row?.dossier_status ||
       row?.account_status ||
       row?.portal_status ||
-      row?.accountStatus ||
-      "",
-    status:
-      row?.status ||
-      row?.dossier_status ||
       row?.order_status ||
-      "",
-    created_at:
-      row?.created_at ||
-      row?.createdAt ||
-      row?.date ||
-      row?.updated_at ||
-      null,
+      row?.status ||
+      "non défini",
+    created_at: getCreatedAt(row),
     raw: row,
   };
 }
 
 async function safeSelect(supabase: any, table: string) {
   try {
-    const { data, error } = await supabase
+    const withOrder = await supabase
       .from(table)
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      return { table, rows: [], error: error.message };
+    if (!withOrder.error) {
+      return { table, rows: withOrder.data || [], error: null };
     }
 
-    return { table, rows: data || [], error: null };
+    const plain = await supabase.from(table).select("*");
+
+    if (!plain.error) {
+      return { table, rows: plain.data || [], error: null };
+    }
+
+    return { table, rows: [], error: plain.error.message || withOrder.error.message };
   } catch (e: any) {
     return { table, rows: [], error: e?.message || "Erreur inconnue" };
   }
@@ -98,11 +109,19 @@ export async function GET() {
   try {
     const supabase = supabaseAdmin();
 
-    const sources = await Promise.all([
-      safeSelect(supabase, "orders"),
-      safeSelect(supabase, "clients"),
-      safeSelect(supabase, "client_payments"),
-    ]);
+    const tables = [
+      "orders",
+      "clients",
+      "client_payments",
+      "client_documents",
+      "client_messages",
+      "client_orders",
+      "llc_orders",
+      "llc_clients",
+      "profiles",
+    ];
+
+    const sources = await Promise.all(tables.map((t) => safeSelect(supabase, t)));
 
     const merged = new Map<string, any>();
 
@@ -122,18 +141,20 @@ export async function GET() {
 
         merged.set(key, {
           ...existing,
-          ...item,
+          llc_name:
+            existing.llc_name !== "Dossier LLC"
+              ? existing.llc_name
+              : item.llc_name,
           payment_status:
             item.payment_status !== "non défini"
               ? item.payment_status
               : existing.payment_status,
-          account_status: item.account_status || existing.account_status,
-          status: item.status || existing.status,
+          dossier_status:
+            item.dossier_status !== "non défini"
+              ? item.dossier_status
+              : existing.dossier_status,
           created_at: existing.created_at || item.created_at,
-          raw: {
-            ...existing.raw,
-            ...item.raw,
-          },
+          raw: { ...existing.raw, ...item.raw },
         });
       }
     }

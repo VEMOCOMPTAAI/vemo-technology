@@ -6,11 +6,9 @@ type ClientRow = {
   id?: string;
   email?: string;
   client_email?: string;
-  name?: string;
-  company_name?: string;
   llc_name?: string;
   payment_status?: string;
-  account_status?: string;
+  dossier_status?: string;
   status?: string;
   created_at?: string;
 };
@@ -25,24 +23,26 @@ function fmtDate(value?: string) {
 }
 
 function displayName(client: ClientRow) {
-  return client.llc_name || client.company_name || client.name || "Dossier LLC";
+  return client.llc_name || "Dossier LLC";
 }
 
 function clientEmail(client: ClientRow) {
   return client.email || client.client_email || "";
 }
 
-function badge(value?: string) {
+function badge(value?: string, type: "payment" | "dossier" = "payment") {
   const v = value || "non défini";
   const low = v.toLowerCase();
 
   const cls =
-    low.includes("paid") || low.includes("payé") || low.includes("active")
+    low.includes("paid") || low.includes("payé") || low.includes("active") || low.includes("valid")
       ? "border-emerald-200 bg-emerald-50 text-emerald-700"
       : low.includes("pending") || low.includes("attente") || low.includes("verification") || low.includes("vérification")
       ? "border-amber-200 bg-amber-50 text-amber-700"
-      : low.includes("reject") || low.includes("rejet")
+      : low.includes("reject") || low.includes("rejet") || low.includes("refus")
       ? "border-red-200 bg-red-50 text-red-700"
+      : type === "dossier"
+      ? "border-blue-200 bg-blue-50 text-blue-700"
       : "border-slate-200 bg-slate-50 text-slate-600";
 
   return (
@@ -57,8 +57,7 @@ export default function VemoAdminDashboardClean() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
-  const [selectedEmail, setSelectedEmail] = useState("");
-  const [manualEmail, setManualEmail] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState("");
 
   async function load() {
     setLoading(true);
@@ -77,12 +76,16 @@ export default function VemoAdminDashboardClean() {
 
       setClients(rows);
 
-      if (rows.length > 0 && !selectedEmail) {
-        setSelectedEmail(clientEmail(rows[0]));
+      if (rows.length > 0 && selectedIndex === "") {
+        setSelectedIndex("0");
       }
 
       if (!res.ok || data?.error) {
         setNotice(data?.error || "Impossible de charger les clients.");
+      }
+
+      if (data?.debug) {
+        console.table(data.debug);
       }
     } catch {
       setNotice("Impossible de charger les clients.");
@@ -101,15 +104,13 @@ export default function VemoAdminDashboardClean() {
     if (!q) return clients;
 
     return clients.filter((c) => {
-      return `${displayName(c)} ${clientEmail(c)} ${c.payment_status || ""} ${c.account_status || ""} ${c.status || ""}`
+      return `${displayName(c)} ${c.payment_status || ""} ${c.dossier_status || ""} ${c.status || ""}`
         .toLowerCase()
         .includes(q);
     });
   }, [clients, search]);
 
-  const selectedClient = useMemo(() => {
-    return clients.find((c) => clientEmail(c) === selectedEmail);
-  }, [clients, selectedEmail]);
+  const selectedClient = selectedIndex !== "" ? clients[Number(selectedIndex)] : undefined;
 
   const paidCount = clients.filter((c) => String(c.payment_status || "").toLowerCase().includes("paid")).length;
   const pendingCount = clients.filter((c) => {
@@ -117,11 +118,11 @@ export default function VemoAdminDashboardClean() {
     return s.includes("pending") || s.includes("attente") || s.includes("verification");
   }).length;
 
-  function openSelected() {
-    const email = selectedEmail || manualEmail.trim();
+  function openClient(client?: ClientRow) {
+    const email = client ? clientEmail(client) : selectedClient ? clientEmail(selectedClient) : "";
 
     if (!email) {
-      setNotice("Sélectionne un client ou saisis un email.");
+      setNotice("Ce dossier n’a pas d’identifiant client exploitable.");
       return;
     }
 
@@ -169,7 +170,7 @@ export default function VemoAdminDashboardClean() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher un dossier..."
+              placeholder="Rechercher par nom LLC ou statut..."
               className="w-full rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-bold outline-none transition focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10 lg:max-w-sm"
             />
           </div>
@@ -201,43 +202,28 @@ export default function VemoAdminDashboardClean() {
         </div>
 
         <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
-          <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr_170px]">
+          <div className="grid gap-4 lg:grid-cols-[1fr_180px]">
             <div>
               <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                Sélection rapide client
+                Sélection rapide par nom LLC
               </label>
               <select
-                value={selectedEmail}
-                onChange={(e) => setSelectedEmail(e.target.value)}
+                value={selectedIndex}
+                onChange={(e) => setSelectedIndex(e.target.value)}
                 className="w-full rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
               >
-                <option value="">Sélectionner un client</option>
-                {clients.map((client, index) => {
-                  const email = clientEmail(client);
-                  return (
-                    <option key={client.id || email || index} value={email}>
-                      {displayName(client)} — {email || "email manquant"}
-                    </option>
-                  );
-                })}
+                <option value="">Sélectionner une LLC</option>
+                {clients.map((client, index) => (
+                  <option key={client.id || index} value={String(index)}>
+                    {displayName(client)}
+                  </option>
+                ))}
               </select>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                Ou saisir un email client
-              </label>
-              <input
-                value={manualEmail}
-                onChange={(e) => setManualEmail(e.target.value)}
-                placeholder="client@email.com"
-                className="w-full rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
-              />
             </div>
 
             <div className="flex items-end">
               <button
-                onClick={openSelected}
+                onClick={() => openClient()}
                 className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
               >
                 Ouvrir dossier →
@@ -249,20 +235,20 @@ export default function VemoAdminDashboardClean() {
             <div className="mt-5 rounded-[1.5rem] border border-[#E8E2DC] bg-[#FBFCFD] p-5">
               <div className="grid gap-4 md:grid-cols-4">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Client</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Nom LLC</p>
                   <p className="mt-1 text-sm font-black text-[#123A63]">{displayName(selectedClient)}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Email</p>
-                  <p className="mt-1 break-all text-sm font-black text-[#123A63]">{clientEmail(selectedClient) || "—"}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Date création</p>
+                  <p className="mt-1 text-sm font-black text-[#123A63]">{fmtDate(selectedClient.created_at)}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Paiement</p>
-                  <div className="mt-1">{badge(selectedClient.payment_status || selectedClient.status)}</div>
+                  <div className="mt-1">{badge(selectedClient.payment_status || selectedClient.status, "payment")}</div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Création</p>
-                  <p className="mt-1 text-sm font-black text-[#123A63]">{fmtDate(selectedClient.created_at)}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Dossier</p>
+                  <div className="mt-1">{badge(selectedClient.dossier_status || selectedClient.status, "dossier")}</div>
                 </div>
               </div>
             </div>
@@ -270,10 +256,11 @@ export default function VemoAdminDashboardClean() {
         </div>
 
         <div className="mt-6 overflow-hidden rounded-[2rem] border border-[#E8E2DC] bg-white shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
-          <div className="grid grid-cols-[1.2fr_160px_180px_140px] bg-[#FBFCFD] px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+          <div className="grid grid-cols-[1.1fr_150px_180px_180px_130px] bg-[#FBFCFD] px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
             <div>Nom LLC</div>
             <div>Date création</div>
-            <div>Paiement</div>
+            <div>Statut paiement</div>
+            <div>Statut dossier</div>
             <div className="text-right">Action</div>
           </div>
 
@@ -283,27 +270,24 @@ export default function VemoAdminDashboardClean() {
             ) : filtered.length === 0 ? (
               <div className="px-6 py-10 text-center text-sm font-black text-slate-500">Aucun dossier trouvé.</div>
             ) : (
-              filtered.map((client, index) => {
-                const email = clientEmail(client);
-                return (
-                  <div key={client.id || email || index} className="grid grid-cols-[1.2fr_160px_180px_140px] items-center px-6 py-5">
-                    <div>
-                      <p className="font-black text-[#111827]">{displayName(client)}</p>
-                      <p className="mt-1 break-all text-xs font-bold text-slate-400">{email || "Email manquant"}</p>
-                    </div>
-                    <div className="text-sm font-black text-[#123A63]">{fmtDate(client.created_at)}</div>
-                    <div>{badge(client.payment_status || client.status)}</div>
-                    <div className="text-right">
-                      <a
-                        href={`/fr/admin/client?email=${encodeURIComponent(email)}`}
-                        className="inline-flex rounded-[14px] bg-[#F15A24] px-4 py-3 text-xs font-black text-white shadow-[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
-                      >
-                        Gérer →
-                      </a>
-                    </div>
+              filtered.map((client, index) => (
+                <div key={client.id || index} className="grid grid-cols-[1.1fr_150px_180px_180px_130px] items-center px-6 py-5">
+                  <div>
+                    <p className="font-black text-[#111827]">{displayName(client)}</p>
                   </div>
-                );
-              })
+                  <div className="text-sm font-black text-[#123A63]">{fmtDate(client.created_at)}</div>
+                  <div>{badge(client.payment_status || client.status, "payment")}</div>
+                  <div>{badge(client.dossier_status || client.status, "dossier")}</div>
+                  <div className="text-right">
+                    <button
+                      onClick={() => openClient(client)}
+                      className="inline-flex rounded-[14px] bg-[#F15A24] px-4 py-3 text-xs font-black text-white shadow-[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
+                    >
+                      Gérer →
+                    </button>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>
