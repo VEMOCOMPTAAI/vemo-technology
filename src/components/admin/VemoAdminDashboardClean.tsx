@@ -34,16 +34,22 @@ function clientEmail(client: ClientRow) {
 
 function badge(value?: string) {
   const v = value || "non défini";
+  const low = v.toLowerCase();
+
   const cls =
-    v.includes("paid") || v.includes("actif") || v.includes("active") || v.includes("termine")
+    low.includes("paid") || low.includes("payé") || low.includes("active")
       ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-      : v.includes("pending") || v.includes("attente") || v.includes("verification")
+      : low.includes("pending") || low.includes("attente") || low.includes("verification") || low.includes("vérification")
       ? "border-amber-200 bg-amber-50 text-amber-700"
-      : v.includes("reject") || v.includes("refus")
+      : low.includes("reject") || low.includes("rejet")
       ? "border-red-200 bg-red-50 text-red-700"
       : "border-slate-200 bg-slate-50 text-slate-600";
 
-  return <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${cls}`}>{v}</span>;
+  return (
+    <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${cls}`}>
+      {v}
+    </span>
+  );
 }
 
 export default function VemoAdminDashboardClean() {
@@ -51,6 +57,8 @@ export default function VemoAdminDashboardClean() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
+  const [selectedEmail, setSelectedEmail] = useState("");
+  const [manualEmail, setManualEmail] = useState("");
 
   async function load() {
     setLoading(true);
@@ -68,9 +76,16 @@ export default function VemoAdminDashboardClean() {
         [];
 
       setClients(rows);
-      if (!res.ok) setNotice(data?.error || "Impossible de charger les clients.");
+
+      if (rows.length > 0 && !selectedEmail) {
+        setSelectedEmail(clientEmail(rows[0]));
+      }
+
+      if (!res.ok || data?.error) {
+        setNotice(data?.error || "Impossible de charger les clients.");
+      }
     } catch {
-      setNotice("API clients indisponible. La page reste stable.");
+      setNotice("Impossible de charger les clients.");
       setClients([]);
     } finally {
       setLoading(false);
@@ -92,8 +107,26 @@ export default function VemoAdminDashboardClean() {
     });
   }, [clients, search]);
 
-  const paidCount = clients.filter((c) => String(c.payment_status || "").includes("paid")).length;
-  const pendingCount = clients.filter((c) => String(c.payment_status || "").includes("pending") || String(c.payment_status || "").includes("attente")).length;
+  const selectedClient = useMemo(() => {
+    return clients.find((c) => clientEmail(c) === selectedEmail);
+  }, [clients, selectedEmail]);
+
+  const paidCount = clients.filter((c) => String(c.payment_status || "").toLowerCase().includes("paid")).length;
+  const pendingCount = clients.filter((c) => {
+    const s = String(c.payment_status || "").toLowerCase();
+    return s.includes("pending") || s.includes("attente") || s.includes("verification");
+  }).length;
+
+  function openSelected() {
+    const email = selectedEmail || manualEmail.trim();
+
+    if (!email) {
+      setNotice("Sélectionne un client ou saisis un email.");
+      return;
+    }
+
+    window.location.href = `/fr/admin/client?email=${encodeURIComponent(email)}`;
+  }
 
   return (
     <main className="min-h-screen bg-[#F7FAFC] text-[#111827]">
@@ -167,6 +200,75 @@ export default function VemoAdminDashboardClean() {
           </div>
         </div>
 
+        <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+          <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr_170px]">
+            <div>
+              <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
+                Sélection rapide client
+              </label>
+              <select
+                value={selectedEmail}
+                onChange={(e) => setSelectedEmail(e.target.value)}
+                className="w-full rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+              >
+                <option value="">Sélectionner un client</option>
+                {clients.map((client, index) => {
+                  const email = clientEmail(client);
+                  return (
+                    <option key={client.id || email || index} value={email}>
+                      {displayName(client)} — {email || "email manquant"}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
+                Ou saisir un email client
+              </label>
+              <input
+                value={manualEmail}
+                onChange={(e) => setManualEmail(e.target.value)}
+                placeholder="client@email.com"
+                className="w-full rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+              />
+            </div>
+
+            <div className="flex items-end">
+              <button
+                onClick={openSelected}
+                className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
+              >
+                Ouvrir dossier →
+              </button>
+            </div>
+          </div>
+
+          {selectedClient && (
+            <div className="mt-5 rounded-[1.5rem] border border-[#E8E2DC] bg-[#FBFCFD] p-5">
+              <div className="grid gap-4 md:grid-cols-4">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Client</p>
+                  <p className="mt-1 text-sm font-black text-[#123A63]">{displayName(selectedClient)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Email</p>
+                  <p className="mt-1 break-all text-sm font-black text-[#123A63]">{clientEmail(selectedClient) || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Paiement</p>
+                  <div className="mt-1">{badge(selectedClient.payment_status || selectedClient.status)}</div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Création</p>
+                  <p className="mt-1 text-sm font-black text-[#123A63]">{fmtDate(selectedClient.created_at)}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="mt-6 overflow-hidden rounded-[2rem] border border-[#E8E2DC] bg-white shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
           <div className="grid grid-cols-[1.2fr_160px_180px_140px] bg-[#FBFCFD] px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
             <div>Nom LLC</div>
@@ -187,7 +289,7 @@ export default function VemoAdminDashboardClean() {
                   <div key={client.id || email || index} className="grid grid-cols-[1.2fr_160px_180px_140px] items-center px-6 py-5">
                     <div>
                       <p className="font-black text-[#111827]">{displayName(client)}</p>
-                      <p className="mt-1 text-xs font-bold text-slate-400">Dossier client</p>
+                      <p className="mt-1 break-all text-xs font-bold text-slate-400">{email || "Email manquant"}</p>
                     </div>
                     <div className="text-sm font-black text-[#123A63]">{fmtDate(client.created_at)}</div>
                     <div>{badge(client.payment_status || client.status)}</div>
