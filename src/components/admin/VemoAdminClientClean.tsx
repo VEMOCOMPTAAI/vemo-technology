@@ -147,7 +147,7 @@ export default function VemoAdminClientClean() {
 
       const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.error) {
+      if (!res.ok || data?.error || data?.ok === false) {
         ko(data?.error || "Erreur pendant l’upload.");
         return;
       }
@@ -157,8 +157,8 @@ export default function VemoAdminClientClean() {
       await loadDocs();
       await loadMessages();
       ok(replaceId ? "Document remplacé avec succès." : "Document uploadé avec succès.");
-    } catch {
-      ko("Erreur réseau pendant l’upload.");
+    } catch (err: any) {
+      ko(`Erreur réseau pendant l’upload : ${err?.message || "requête interrompue"}`);
     } finally {
       setBusy(false);
     }
@@ -181,7 +181,7 @@ export default function VemoAdminClientClean() {
 
       const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.error) {
+      if (!res.ok || data?.error || data?.ok === false) {
         ko(data?.error || "Erreur suppression document.");
         return;
       }
@@ -220,7 +220,7 @@ export default function VemoAdminClientClean() {
 
       const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.error) {
+      if (!res.ok || data?.error || data?.ok === false) {
         ko(data?.error || "Erreur envoi message.");
         return;
       }
@@ -252,7 +252,7 @@ export default function VemoAdminClientClean() {
 
       const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.error) {
+      if (!res.ok || data?.error || data?.ok === false) {
         ko(data?.error || "Erreur statut paiement.");
         return;
       }

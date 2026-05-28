@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import path from "path";
 import fs from "fs/promises";
+import path from "path";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function supabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
     throw new Error("Variables Supabase manquantes");
@@ -17,8 +20,8 @@ function supabaseAdmin() {
   return createClient(url, key);
 }
 
-function cleanFileName(name: string) {
-  return name
+function safeName(name: string) {
+  return String(name || "document.pdf")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-zA-Z0-9._-]/g, "-")
@@ -26,12 +29,25 @@ function cleanFileName(name: string) {
     .toLowerCase();
 }
 
+async function insertMessage(email: string, message: string) {
+  try {
+    const supabase = supabaseAdmin();
+    await supabase.from("client_messages").insert({
+      client_email: email,
+      sender: "admin",
+      message,
+    });
+  } catch {
+    // Ne bloque jamais l'upload si la table messages a un problème
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const email = request.nextUrl.searchParams.get("email");
+    const email = request.nextUrl.searchParams.get("email") || "";
 
     if (!email) {
-      return NextResponse.json({ documents: [] });
+      return NextResponse.json({ ok: true, documents: [] });
     }
 
     const supabase = supabaseAdmin();
@@ -43,12 +59,23 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false });
 
     if (error) {
-      return NextResponse.json({ documents: [], error: error.message }, { status: 200 });
+      return NextResponse.json({
+        ok: false,
+        documents: [],
+        error: error.message,
+      });
     }
 
-    return NextResponse.json({ documents: data || [] });
+    return NextResponse.json({
+      ok: true,
+      documents: data || [],
+    });
   } catch (error: any) {
-    return NextResponse.json({ documents: [], error: error?.message || "Erreur documents" }, { status: 200 });
+    return NextResponse.json({
+      ok: false,
+      documents: [],
+      error: error?.message || "Erreur chargement documents",
+    });
   }
 }
 
@@ -56,96 +83,121 @@ export async function POST(request: NextRequest) {
   try {
     const form = await request.formData();
 
-    const email = String(form.get("email") || "");
-    const document_type = String(form.get("document_type") || "Autre document");
-    const replace_id = String(form.get("replace_id") || "");
+    const email = String(form.get("email") || "").trim();
+    const documentType = String(form.get("document_type") || "Autre document").trim();
+    const replaceId = String(form.get("replace_id") || "").trim();
     const file = form.get("file");
 
     if (!email) {
-      return NextResponse.json({ error: "Email client manquant" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Email client manquant." }, { status: 400 });
     }
 
-    if (!(file instanceof File)) {
-      return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
+    if (!file || typeof file === "string") {
+      return NextResponse.json({ ok: false, error: "Fichier manquant." }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const safeName = cleanFileName(file.name || "document.pdf");
-    const finalName = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}-${safeName}`;
+    const anyFile = file as any;
 
+    if (!anyFile.name || typeof anyFile.arrayBuffer !== "function") {
+      return NextResponse.json({ ok: false, error: "Fichier invalide." }, { status: 400 });
+    }
+
+    const buffer = Buffer.from(await anyFile.arrayBuffer());
+
+    if (!buffer.length) {
+      return NextResponse.json({ ok: false, error: "Fichier vide." }, { status: 400 });
+    }
+
+    const finalName = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}-${safeName(anyFile.name)}`;
     const uploadDir = path.join(process.cwd(), "public", "uploads", "admin-documents");
     await fs.mkdir(uploadDir, { recursive: true });
 
-    const diskPath = path.join(uploadDir, finalName);
-    await fs.writeFile(diskPath, buffer);
+    const filePath = path.join(uploadDir, finalName);
+    await fs.writeFile(filePath, buffer);
 
-    const file_url = `/uploads/admin-documents/${finalName}`;
+    const fileUrl = `/uploads/admin-documents/${finalName}`;
     const supabase = supabaseAdmin();
 
-    if (replace_id) {
+    if (replaceId) {
       const { data, error } = await supabase
         .from("client_documents")
         .update({
-          document_type,
-          title: document_type,
-          file_name: file.name,
-          file_url,
+          document_type: documentType,
+          title: documentType,
+          file_name: anyFile.name,
+          file_url: fileUrl,
+          status: "uploaded",
           updated_at: new Date().toISOString(),
         })
-        .eq("id", replace_id)
+        .eq("id", replaceId)
         .select("*")
         .single();
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 400 });
+        return NextResponse.json({
+          ok: false,
+          error: `Document enregistré localement, mais mise à jour Supabase impossible : ${error.message}`,
+          file_url: fileUrl,
+        }, { status: 200 });
       }
 
-      await supabase.from("client_messages").insert({
-        client_email: email,
-        sender: "admin",
-        message: `Document remplacé : ${document_type}`,
-      });
+      await insertMessage(email, `Document remplacé : ${documentType}`);
 
-      return NextResponse.json({ document: data, replaced: true });
+      return NextResponse.json({
+        ok: true,
+        replaced: true,
+        document: data,
+        file_url: fileUrl,
+      });
     }
 
     const { data, error } = await supabase
       .from("client_documents")
       .insert({
         client_email: email,
-        document_type,
-        title: document_type,
-        file_name: file.name,
-        file_url,
+        document_type: documentType,
+        title: documentType,
+        file_name: anyFile.name,
+        file_url: fileUrl,
         status: "uploaded",
       })
       .select("*")
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return NextResponse.json({
+        ok: false,
+        error: `Document enregistré localement, mais insertion Supabase impossible : ${error.message}`,
+        file_url: fileUrl,
+      }, { status: 200 });
     }
 
-    await supabase.from("client_messages").insert({
-      client_email: email,
-      sender: "admin",
-      message: `Nouveau document ajouté : ${document_type}`,
-    });
+    await insertMessage(email, `Nouveau document ajouté : ${documentType}`);
 
-    return NextResponse.json({ document: data, uploaded: true });
+    return NextResponse.json({
+      ok: true,
+      uploaded: true,
+      document: data,
+      file_url: fileUrl,
+    });
   } catch (error: any) {
-    return NextResponse.json({ error: error?.message || "Erreur upload document" }, { status: 500 });
+    console.error("UPLOAD_DOCUMENT_ERROR", error);
+
+    return NextResponse.json({
+      ok: false,
+      error: error?.message || "Erreur serveur pendant l’upload.",
+    }, { status: 500 });
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const id = body.id;
-    const email = body.email;
+    const id = String(body.id || "");
+    const email = String(body.email || "");
 
     if (!id) {
-      return NextResponse.json({ error: "ID document manquant" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "ID document manquant." }, { status: 400 });
     }
 
     const supabase = supabaseAdmin();
@@ -156,19 +208,18 @@ export async function DELETE(request: NextRequest) {
       .eq("id", id);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return NextResponse.json({ ok: false, error: error.message }, { status: 200 });
     }
 
     if (email) {
-      await supabase.from("client_messages").insert({
-        client_email: email,
-        sender: "admin",
-        message: "Document supprimé du dossier.",
-      });
+      await insertMessage(email, "Document supprimé du dossier.");
     }
 
     return NextResponse.json({ ok: true });
   } catch (error: any) {
-    return NextResponse.json({ error: error?.message || "Erreur suppression document" }, { status: 500 });
+    return NextResponse.json({
+      ok: false,
+      error: error?.message || "Erreur suppression document",
+    }, { status: 500 });
   }
 }
