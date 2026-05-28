@@ -1,5 +1,5 @@
-import PricingUnifiedPage from "@/components/PricingUnifiedPage";
+import VemoPublicPricingPage from "@/components/pricing/VemoPublicPricingPage";
 
-export default function Page() {
-  return <PricingUnifiedPage locale="fr" />;
+export default function TarifsPage() {
+  return <VemoPublicPricingPage lang="fr" />;
 }
