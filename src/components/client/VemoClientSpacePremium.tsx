@@ -173,6 +173,15 @@ function InfoCard({ label, value }: { label: string; value?: string | number }) 
   );
 }
 
+function documentActionUrl(doc: DocumentRow, mode: "view" | "download") {
+  if (!doc.id) return "";
+  return `/api/client-portal/documents/file?id=${encodeURIComponent(doc.id)}&mode=${mode}`;
+}
+
+function hasDocumentFile(doc: DocumentRow) {
+  return Boolean(doc.id || doc.file_url);
+}
+
 function DocumentIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -408,16 +417,26 @@ export default function VemoClientSpacePremium({ lang = "fr" }: { lang?: Lang })
 
                       <div className="flex justify-start gap-2 md:justify-end">
                         <a
-                          href={doc.file_url || "#"}
+                          href={hasDocumentFile(doc) ? documentActionUrl(doc, "view") : "#"}
                           target="_blank"
-                          className="inline-flex h-10 items-center justify-center rounded-[13px] border border-[#E8E2DC] bg-white px-4 text-xs font-black text-[#123A63] transition hover:border-[#F15A24]/30 hover:bg-[#FFF7F1] hover:text-[#F15A24]"
+                          rel="noreferrer"
+                          aria-disabled={!hasDocumentFile(doc)}
+                          className={`inline-flex h-10 items-center justify-center rounded-[13px] border px-4 text-xs font-black transition ${
+                            hasDocumentFile(doc)
+                              ? "border-[#E8E2DC] bg-white text-[#123A63] hover:border-[#F15A24]/30 hover:bg-[#FFF7F1] hover:text-[#F15A24]"
+                              : "pointer-events-none border-slate-100 bg-slate-50 text-slate-300"
+                          }`}
                         >
                           {t.view}
                         </a>
                         <a
-                          href={doc.file_url || "#"}
-                          download
-                          className="inline-flex h-10 items-center justify-center rounded-[13px] bg-[#F15A24] px-4 text-xs font-black text-white shadow-[0_10px_22px_rgba(241,90,36,.16)] transition hover:bg-[#D94A1B]"
+                          href={hasDocumentFile(doc) ? documentActionUrl(doc, "download") : "#"}
+                          aria-disabled={!hasDocumentFile(doc)}
+                          className={`inline-flex h-10 items-center justify-center rounded-[13px] px-4 text-xs font-black shadow-[0_10px_22px_rgba(241,90,36,.16)] transition ${
+                            hasDocumentFile(doc)
+                              ? "bg-[#F15A24] text-white hover:bg-[#D94A1B]"
+                              : "pointer-events-none bg-slate-100 text-slate-300 shadow-none"
+                          }`}
                         >
                           {t.download}
                         </a>

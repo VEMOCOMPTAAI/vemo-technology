@@ -159,6 +159,11 @@ function dossierNumber(client?: ClientInfo) {
   return client?.dossier_number || "—";
 }
 
+function adminDocumentActionUrl(doc: DocumentRow, mode: "view" | "download" = "view") {
+  if (!doc.id) return doc.file_url || "#";
+  return `/api/client-portal/documents/file?id=${encodeURIComponent(doc.id)}&mode=${mode}`;
+}
+
 function ActionIcon({ type }: { type: "open" | "replace" | "delete" }) {
   if (type === "open") {
     return (
@@ -609,7 +614,7 @@ export default function VemoAdminClientClean() {
                       <div className="text-xs font-black text-slate-500">{fmtDate(doc.created_at)}</div>
                       <div className="flex justify-end gap-2">
                         <a
-                          href={doc.file_url || "#"}
+                          href={adminDocumentActionUrl(doc, "view")}
                           target="_blank"
                           title="Ouvrir"
                           aria-label="Ouvrir"
