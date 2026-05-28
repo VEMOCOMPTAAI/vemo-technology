@@ -103,7 +103,7 @@ export default function StripePaymentPage() {
 
               <button
                 disabled={loading}
-                className="mt-2 h-13 min-h-[52px] rounded-[14px] bg-[#F15A24] text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] disabled:opacity-60"
+                className="mt-2 h-13 min-h-[52px] rounded-[14px] bg-[#F15A24] text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B] disabled:opacity-60"
               >
                 {loading ? "Redirection..." : "Payer par carte →"}
               </button>
