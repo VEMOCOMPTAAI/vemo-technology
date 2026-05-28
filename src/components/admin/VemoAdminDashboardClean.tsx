@@ -2,15 +2,78 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+type Locale = "fr" | "en";
+
 type ClientRow = {
   id?: string;
   email?: string;
   client_email?: string;
+  dossier_number?: string;
   llc_name?: string;
+  phone?: string;
   payment_status?: string;
   dossier_status?: string;
   status?: string;
   created_at?: string;
+};
+
+const text = {
+  fr: {
+    adminSpace: "ESPACE ADMIN",
+    secure: "Pilotage sécurisé",
+    title: "Dossiers clients VEMO",
+    subtitle: "Vue premium des dossiers LLC, paiements, statuts et actions administratives.",
+    refresh: "Actualiser",
+    clients: "Clients",
+    paid: "Payés",
+    pending: "En attente",
+    shown: "Affichés",
+    quickSelection: "Sélection rapide par nom LLC",
+    allClients: "Tous les clients",
+    search: "Recherche rapide",
+    searchPlaceholder: "Nom LLC, numéro dossier, téléphone, statut...",
+    hideTests: "Masquer les dossiers test",
+    openFolder: "Ouvrir dossier",
+    no: "N° dossier",
+    llc: "Nom LLC",
+    phone: "Téléphone",
+    created: "Date création",
+    payment: "Statut paiement",
+    folder: "Statut dossier",
+    action: "Action",
+    manage: "Gérer",
+    loading: "Chargement...",
+    empty: "Aucun dossier trouvé.",
+    missingId: "Ce dossier n’a pas d’identifiant client exploitable.",
+  },
+  en: {
+    adminSpace: "ADMIN SPACE",
+    secure: "Secure management",
+    title: "VEMO client files",
+    subtitle: "Premium overview of LLC files, payments, statuses and admin actions.",
+    refresh: "Refresh",
+    clients: "Clients",
+    paid: "Paid",
+    pending: "Pending",
+    shown: "Shown",
+    quickSelection: "Quick selection by LLC name",
+    allClients: "All clients",
+    search: "Quick search",
+    searchPlaceholder: "LLC name, file number, phone, status...",
+    hideTests: "Hide test files",
+    openFolder: "Open file",
+    no: "File no.",
+    llc: "LLC name",
+    phone: "Phone",
+    created: "Created",
+    payment: "Payment status",
+    folder: "File status",
+    action: "Action",
+    manage: "Manage",
+    loading: "Loading...",
+    empty: "No file found.",
+    missingId: "This file has no usable client identifier.",
+  },
 };
 
 function fmtDate(value?: string) {
@@ -23,41 +86,110 @@ function fmtDate(value?: string) {
 }
 
 function displayName(client: ClientRow) {
-  return client.llc_name || "Dossier LLC";
+  return client.llc_name || "Sans nom LLC";
 }
 
 function clientEmail(client: ClientRow) {
   return client.email || client.client_email || "";
 }
 
-function badge(value?: string, type: "payment" | "dossier" = "payment") {
-  const v = value || "non défini";
-  const low = v.toLowerCase();
+function normalizeForSearch(value?: string) {
+  return String(value || "").toLowerCase().replace(/[_-]+/g, " ");
+}
+
+function statusLabel(value: string | undefined, locale: Locale, type: "payment" | "dossier") {
+  const raw = normalizeForSearch(value);
+
+  if (!raw || raw === "non défini") {
+    return locale === "fr" ? "Non défini" : "Not defined";
+  }
+
+  if (type === "payment") {
+    if (raw.includes("paid") || raw.includes("payé") || raw.includes("payment confirmed") || raw.includes("confirmed")) {
+      return locale === "fr" ? "Paiement confirmé" : "Payment confirmed";
+    }
+
+    if (raw.includes("unpaid")) {
+      return locale === "fr" ? "Non payé" : "Unpaid";
+    }
+
+    if (raw.includes("pending") || raw.includes("attente") || raw.includes("verification") || raw.includes("vérification")) {
+      return locale === "fr" ? "En attente de vérification" : "Pending verification";
+    }
+
+    if (raw.includes("reject") || raw.includes("rejet") || raw.includes("refus")) {
+      return locale === "fr" ? "Paiement rejeté" : "Payment rejected";
+    }
+
+    if (raw.includes("sent")) {
+      return locale === "fr" ? "Envoyé" : "Sent";
+    }
+  }
+
+  if (type === "dossier") {
+    if (raw.includes("in progress") || raw.includes("progress") || raw.includes("cours")) {
+      return locale === "fr" ? "En cours" : "In progress";
+    }
+
+    if (raw.includes("completed") || raw.includes("done") || raw.includes("termine") || raw.includes("terminé")) {
+      return locale === "fr" ? "Terminé" : "Completed";
+    }
+
+    if (raw.includes("payment confirmed") || raw.includes("confirmed")) {
+      return locale === "fr" ? "Paiement confirmé" : "Payment confirmed";
+    }
+
+    if (raw.includes("pending") || raw.includes("attente") || raw.includes("verification")) {
+      return locale === "fr" ? "En attente" : "Pending";
+    }
+
+    if (raw.includes("sent")) {
+      return locale === "fr" ? "Envoyé" : "Sent";
+    }
+  }
+
+  return raw
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function badge(value: string | undefined, locale: Locale, type: "payment" | "dossier") {
+  const label = statusLabel(value, locale, type).replace(/[-_]/g, " ");
+  const low = normalizeForSearch(value);
 
   const cls =
-    low.includes("paid") || low.includes("payé") || low.includes("active") || low.includes("valid")
+    low.includes("paid") || low.includes("confirmed") || low.includes("payé") || low.includes("valid") || low.includes("completed")
       ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-      : low.includes("pending") || low.includes("attente") || low.includes("verification") || low.includes("vérification")
+      : low.includes("pending") || low.includes("attente") || low.includes("verification") || low.includes("progress")
       ? "border-amber-200 bg-amber-50 text-amber-700"
       : low.includes("reject") || low.includes("rejet") || low.includes("refus")
       ? "border-red-200 bg-red-50 text-red-700"
-      : type === "dossier"
-      ? "border-blue-200 bg-blue-50 text-blue-700"
       : "border-slate-200 bg-slate-50 text-slate-600";
 
   return (
-    <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${cls}`}>
-      {v}
+    <span className={`inline-flex max-w-full rounded-full border px-3 py-1 text-[11px] font-black ${cls}`}>
+      <span className="truncate">{label}</span>
     </span>
   );
 }
 
+function isTestClient(client: ClientRow) {
+  const haystack = `${client.llc_name || ""} ${client.dossier_number || ""}`.toLowerCase();
+  return haystack.includes("test") || haystack.includes("demo") || haystack.includes("dossier llc") || haystack.includes("sans nom");
+}
+
 export default function VemoAdminDashboardClean() {
+  const [locale, setLocale] = useState<Locale>("fr");
   const [clients, setClients] = useState<ClientRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState("all");
+  const [hideTests, setHideTests] = useState(true);
+
+  const t = text[locale];
 
   async function load() {
     setLoading(true);
@@ -75,10 +207,6 @@ export default function VemoAdminDashboardClean() {
         [];
 
       setClients(rows);
-
-      if (rows.length > 0 && selectedIndex === "") {
-        setSelectedIndex("0");
-      }
 
       if (!res.ok || data?.error) {
         setNotice(data?.error || "Impossible de charger les clients.");
@@ -99,30 +227,47 @@ export default function VemoAdminDashboardClean() {
     load();
   }, []);
 
-  const filtered = useMemo(() => {
+  const visibleClients = useMemo(() => {
+    return hideTests ? clients.filter((client) => !isTestClient(client)) : clients;
+  }, [clients, hideTests]);
+
+  const selectedClient = useMemo(() => {
+    if (selectedIndex === "all") return undefined;
+    return visibleClients[Number(selectedIndex)];
+  }, [selectedIndex, visibleClients]);
+
+  const tableRows = useMemo(() => {
+    let rows = selectedClient ? [selectedClient] : visibleClients;
+
     const q = search.trim().toLowerCase();
-    if (!q) return clients;
 
-    return clients.filter((c) => {
-      return `${displayName(c)} ${c.payment_status || ""} ${c.dossier_status || ""} ${c.status || ""}`
-        .toLowerCase()
-        .includes(q);
-    });
-  }, [clients, search]);
+    if (q) {
+      rows = rows.filter((c) => {
+        return `${displayName(c)} ${c.dossier_number || ""} ${c.phone || ""} ${statusLabel(c.payment_status || c.status, locale, "payment")} ${statusLabel(c.dossier_status || c.status, locale, "dossier")}`
+          .toLowerCase()
+          .includes(q);
+      });
+    }
 
-  const selectedClient = selectedIndex !== "" ? clients[Number(selectedIndex)] : undefined;
+    return rows;
+  }, [visibleClients, selectedClient, search, locale]);
 
-  const paidCount = clients.filter((c) => String(c.payment_status || "").toLowerCase().includes("paid")).length;
-  const pendingCount = clients.filter((c) => {
-    const s = String(c.payment_status || "").toLowerCase();
-    return s.includes("pending") || s.includes("attente") || s.includes("verification");
+  const paidCount = visibleClients.filter((c) => {
+    const s = normalizeForSearch(c.payment_status || c.status);
+    return s.includes("paid") || s.includes("confirmed") || s.includes("payé");
+  }).length;
+
+  const pendingCount = visibleClients.filter((c) => {
+    const s = normalizeForSearch(c.payment_status || c.status);
+    return s.includes("pending") || s.includes("attente") || s.includes("verification") || s.includes("unpaid");
   }).length;
 
   function openClient(client?: ClientRow) {
-    const email = client ? clientEmail(client) : selectedClient ? clientEmail(selectedClient) : "";
+    const target = client || selectedClient;
+    const email = target ? clientEmail(target) : "";
 
     if (!email) {
-      setNotice("Ce dossier n’a pas d’identifiant client exploitable.");
+      setNotice(t.missingId);
       return;
     }
 
@@ -138,38 +283,64 @@ export default function VemoAdminDashboardClean() {
               VEMO <span className="text-[#F15A24]">TECH</span>
             </div>
             <div className="mt-1 text-[10px] font-black uppercase tracking-[0.34em] text-slate-400">
-              ADMIN SPACE
+              {t.adminSpace}
             </div>
           </div>
 
-          <button
-            onClick={load}
-            className="rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F2] hover:text-[#F15A24]"
-          >
-            Actualiser
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] p-1">
+              <button
+                onClick={() => setLocale("fr")}
+                className={`rounded-[12px] px-4 py-2 text-xs font-black transition ${locale === "fr" ? "bg-[#F15A24] text-white" : "text-[#123A63] hover:bg-white"}`}
+              >
+                FR
+              </button>
+              <button
+                onClick={() => setLocale("en")}
+                className={`rounded-[12px] px-4 py-2 text-xs font-black transition ${locale === "en" ? "bg-[#F15A24] text-white" : "text-[#123A63] hover:bg-white"}`}
+              >
+                EN
+              </button>
+            </div>
+
+            <button
+              onClick={load}
+              className="rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F2] hover:text-[#F15A24]"
+            >
+              {t.refresh}
+            </button>
+          </div>
         </div>
       </header>
 
       <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_24px_70px_rgba(18,58,99,0.08)]">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F15A24]">
-            Pilotage sécurisé
+            {t.secure}
           </p>
 
           <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <h1 className="text-4xl font-black tracking-[-0.06em] text-[#111827]">
-                Dossiers clients VEMO
+                {t.title}
               </h1>
               <p className="mt-3 max-w-2xl text-sm font-bold leading-7 text-slate-500">
-                Suivi des LLC, paiements, documents et échanges client/admin.
+                {t.subtitle}
               </p>
             </div>
 
-            <div className="hidden lg:block rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-black text-slate-400 lg:min-w-[320px]">
-              Recherche déplacée dans la sélection rapide
-            </div>
+            <label className="flex items-center gap-3 rounded-[18px] border border-[#E8E2DC] bg-[#FBFCFD] px-5 py-4 text-sm font-black text-[#123A63]">
+              <input
+                type="checkbox"
+                checked={hideTests}
+                onChange={(e) => {
+                  setHideTests(e.target.checked);
+                  setSelectedIndex("all");
+                }}
+                className="h-4 w-4 accent-[#F15A24]"
+              />
+              {t.hideTests}
+            </label>
           </div>
         </div>
 
@@ -181,36 +352,36 @@ export default function VemoAdminDashboardClean() {
 
         <div className="mt-6 grid gap-4 md:grid-cols-4">
           <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,0.045)]">
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">Clients</p>
-            <p className="mt-2 text-3xl font-black">{clients.length}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">{t.clients}</p>
+            <p className="mt-2 text-3xl font-black">{visibleClients.length}</p>
           </div>
           <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,0.045)]">
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">Payés</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">{t.paid}</p>
             <p className="mt-2 text-3xl font-black">{paidCount}</p>
           </div>
           <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,0.045)]">
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">En attente</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">{t.pending}</p>
             <p className="mt-2 text-3xl font-black">{pendingCount}</p>
           </div>
           <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,0.045)]">
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">Affichés</p>
-            <p className="mt-2 text-3xl font-black">{filtered.length}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">{t.shown}</p>
+            <p className="mt-2 text-3xl font-black">{tableRows.length}</p>
           </div>
         </div>
 
         <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
-          <div className="grid gap-4 xl:grid-cols-[1.05fr_0.85fr_170px]">
+          <div className="grid gap-4 xl:grid-cols-[1fr_1fr_170px]">
             <div>
               <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                Sélection rapide par nom LLC
+                {t.quickSelection}
               </label>
               <select
                 value={selectedIndex}
                 onChange={(e) => setSelectedIndex(e.target.value)}
                 className="h-[54px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
               >
-                <option value="">Sélectionner une LLC</option>
-                {clients.map((client, index) => (
+                <option value="all">{t.allClients}</option>
+                {visibleClients.map((client, index) => (
                   <option key={client.id || index} value={String(index)}>
                     {displayName(client)}
                   </option>
@@ -220,12 +391,12 @@ export default function VemoAdminDashboardClean() {
 
             <div>
               <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                Recherche rapide
+                {t.search}
               </label>
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Nom LLC, statut paiement, statut dossier..."
+                placeholder={t.searchPlaceholder}
                 className="h-[54px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
               />
             </div>
@@ -235,64 +406,54 @@ export default function VemoAdminDashboardClean() {
                 onClick={() => openClient()}
                 className="h-[54px] w-full rounded-[16px] bg-[#F15A24] px-5 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
               >
-                Ouvrir dossier →
+                {t.openFolder} →
               </button>
             </div>
           </div>
-
-          {selectedClient && (
-            <div className="mt-5 rounded-[1.4rem] border border-[#E8E2DC] bg-[#FBFCFD] p-4">
-              <div className="grid gap-4 md:grid-cols-[1.2fr_150px_180px_180px]">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Nom LLC</p>
-                  <p className="mt-1 truncate text-sm font-black text-[#123A63]">{displayName(selectedClient)}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Date création</p>
-                  <p className="mt-1 text-sm font-black text-[#123A63]">{fmtDate(selectedClient.created_at)}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Paiement</p>
-                  <div className="mt-1">{badge(selectedClient.payment_status || selectedClient.status, "payment")}</div>
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Dossier</p>
-                  <div className="mt-1">{badge(selectedClient.dossier_status || selectedClient.status, "dossier")}</div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="mt-6 overflow-hidden rounded-[2rem] border border-[#E8E2DC] bg-white shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
-          <div className="grid grid-cols-[minmax(240px,1.25fr)_140px_160px_170px_110px] bg-[#FBFCFD] px-6 py-4 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
-            <div>Nom LLC</div>
-            <div>Date création</div>
-            <div>Statut paiement</div>
-            <div>Statut dossier</div>
-            <div className="text-right">Action</div>
+          <div className="grid grid-cols-[130px_minmax(180px,1fr)_150px_145px_165px_165px_105px] bg-[#FBFCFD] px-5 py-4 text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">
+            <div>{t.no}</div>
+            <div>{t.llc}</div>
+            <div>{t.phone}</div>
+            <div>{t.created}</div>
+            <div>{t.payment}</div>
+            <div>{t.folder}</div>
+            <div className="text-right">{t.action}</div>
           </div>
 
           <div className="divide-y divide-[#E8E2DC]">
             {loading ? (
-              <div className="px-6 py-10 text-center text-sm font-black text-slate-500">Chargement...</div>
-            ) : filtered.length === 0 ? (
-              <div className="px-6 py-10 text-center text-sm font-black text-slate-500">Aucun dossier trouvé.</div>
+              <div className="px-6 py-10 text-center text-sm font-black text-slate-500">{t.loading}</div>
+            ) : tableRows.length === 0 ? (
+              <div className="px-6 py-10 text-center text-sm font-black text-slate-500">{t.empty}</div>
             ) : (
-              filtered.map((client, index) => (
-                <div key={client.id || index} className="grid grid-cols-[minmax(240px,1.25fr)_140px_160px_170px_110px] items-center px-6 py-4">
-                  <div>
-                    <p className="font-black text-[#111827]">{displayName(client)}</p>
+              tableRows.map((client, index) => (
+                <div
+                  key={client.id || index}
+                  className="grid grid-cols-[130px_minmax(180px,1fr)_150px_145px_165px_165px_105px] items-center px-5 py-4"
+                >
+                  <div className="truncate text-xs font-black text-[#123A63]">
+                    {client.dossier_number || "—"}
                   </div>
-                  <div className="text-sm font-black text-[#123A63]">{fmtDate(client.created_at)}</div>
-                  <div>{badge(client.payment_status || client.status, "payment")}</div>
-                  <div>{badge(client.dossier_status || client.status, "dossier")}</div>
+                  <div className="truncate font-black text-[#111827]">
+                    {displayName(client)}
+                  </div>
+                  <div className="truncate text-sm font-black text-slate-600">
+                    {client.phone || "—"}
+                  </div>
+                  <div className="text-sm font-black text-[#123A63]">
+                    {fmtDate(client.created_at)}
+                  </div>
+                  <div>{badge(client.payment_status || client.status, locale, "payment")}</div>
+                  <div>{badge(client.dossier_status || client.status, locale, "dossier")}</div>
                   <div className="text-right">
                     <button
                       onClick={() => openClient(client)}
                       className="inline-flex rounded-[14px] bg-[#F15A24] px-4 py-3 text-xs font-black text-white shadow-[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
                     >
-                      Gérer →
+                      {t.manage} →
                     </button>
                   </div>
                 </div>
