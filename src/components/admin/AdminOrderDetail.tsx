@@ -511,13 +511,13 @@ export default function AdminOrderDetail() {
                   <button
                   disabled={uploading}
                   type="submit"
-                  style={
+                  style={{
                     background: "#F15A24",
                     backgroundColor: "#F15A24",
                     backgroundImage: "none",
                     WebkitAppearance: "none",
                     appearance: "none",
-                  }
+                  }}
                   className="vemo-uploader-orange rounded-[16px] px-5 py-4 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.20)] transition hover:opacity-90 disabled:opacity-60"
                 >
                   {uploading ? "Upload..." : replaceDocumentId ? "Remplacer" : "Uploader"}
