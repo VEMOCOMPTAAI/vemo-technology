@@ -1,83 +1,72 @@
-import { NextResponse } from "next/server";
-import { verifyAdminRequest } from "@/lib/adminAuth";
-import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-export const runtime = "nodejs";
+function supabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-function checkAdmin(request: Request) {
-  return verifyAdminRequest(request);
+  if (!url || !key) {
+    throw new Error("Variables Supabase manquantes");
+  }
+
+  return createClient(url, key);
 }
 
-export async function POST(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const auth = checkAdmin(request);
+    const email = request.nextUrl.searchParams.get("email");
 
-    if (!auth.ok) {
-      return auth.response;
+    if (!email) {
+      return NextResponse.json({ messages: [] });
     }
 
+    const supabase = supabaseAdmin();
+
+    const { data, error } = await supabase
+      .from("client_messages")
+      .select("*")
+      .eq("client_email", email)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      return NextResponse.json({ messages: [], error: error.message }, { status: 200 });
+    }
+
+    return NextResponse.json({ messages: data || [] });
+  } catch (error: any) {
+    return NextResponse.json({ messages: [], error: error?.message || "Erreur messages" }, { status: 200 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
     const body = await request.json();
 
-    const clientEmail = String(body.clientEmail || "").trim().toLowerCase();
-    const orderId = String(body.orderId || "").trim();
-    const message = String(body.message || "").trim();
+    const email = body.email;
+    const message = body.message;
 
-    if (!clientEmail) {
-      return NextResponse.json(
-        { error: "Email client manquant." },
-        { status: 400 }
-      );
+    if (!email || !message) {
+      return NextResponse.json({ error: "Email ou message manquant" }, { status: 400 });
     }
 
-    if (!message || message.length < 3) {
-      return NextResponse.json(
-        { error: "Message trop court." },
-        { status: 400 }
-      );
-    }
-
-    const supabase = createSupabaseAdminClient();
+    const supabase = supabaseAdmin();
 
     const { data, error } = await supabase
       .from("client_messages")
       .insert({
-        order_id: orderId || null,
-        client_email: clientEmail,
-        sender: "Admin Vemo",
+        client_email: email,
+        sender: "admin",
         message,
-        message_type: "admin",
-        is_read: false,
       })
       .select("*")
       .single();
 
     if (error) {
-      return NextResponse.json(
-        {
-          error: "Impossible d'envoyer le message.",
-          details: error.message,
-        },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return NextResponse.json({
-      ok: true,
-      message: data,
-    });
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Erreur inconnue.";
-
-    return NextResponse.json(
-      {
-        error: "Impossible d'envoyer le message.",
-        details: message,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: data });
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || "Erreur envoi message" }, { status: 500 });
   }
 }
-
-
-

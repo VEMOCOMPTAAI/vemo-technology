@@ -1,15 +1,24 @@
-import { NextResponse } from "next/server";
-import { verifyAdminRequest } from "@/lib/adminAuth";
-import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import path from "path";
+import fs from "fs/promises";
+import crypto from "crypto";
 
 export const runtime = "nodejs";
 
-function checkAdmin(request: Request) {
-  return verifyAdminRequest(request);
+function supabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    throw new Error("Variables Supabase manquantes");
+  }
+
+  return createClient(url, key);
 }
 
 function cleanFileName(name: string) {
-  return String(name || "document")
+  return name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-zA-Z0-9._-]/g, "-")
@@ -17,252 +26,149 @@ function cleanFileName(name: string) {
     .toLowerCase();
 }
 
-function documentKeyFromTitle(title: string) {
-  const value = String(title || "").trim().toLowerCase();
-
-  if (
-    value === "company document" ||
-    value === "documents société" ||
-    value === "documents societe" ||
-    value === "formation document"
-  ) {
-    return "company_document";
-  }
-
-  if (value === "operating agreement") {
-    return "operating_agreement";
-  }
-
-  if (value === "ein letter" || value === "ein" || value === "ein / irs") {
-    return "ein_letter";
-  }
-
-  if (value.includes("address") || value.includes("adresse")) {
-    return "proof_of_address";
-  }
-
-  if (
-    value.includes("identity") ||
-    value.includes("identité") ||
-    value.includes("passport") ||
-    value.includes("passeport")
-  ) {
-    return "identity_document";
-  }
-
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
-}
-
-function cleanTitle(title: string) {
-  const key = documentKeyFromTitle(title);
-
-  if (key === "company_document") return "Company Document";
-  if (key === "operating_agreement") return "Operating Agreement";
-  if (key === "ein_letter") return "EIN Letter";
-  if (key === "proof_of_address") return "Justificatif d'adresse";
-  if (key === "identity_document") return "Pièce d'identité";
-
-  return title;
-}
-
-export async function POST(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const auth = checkAdmin(request);
+    const email = request.nextUrl.searchParams.get("email");
 
-    if (!auth.ok) {
-      return auth.response;
+    if (!email) {
+      return NextResponse.json({ documents: [] });
     }
 
-    const supabase = createSupabaseAdminClient();
+    const supabase = supabaseAdmin();
 
+    const { data, error } = await supabase
+      .from("client_documents")
+      .select("*")
+      .eq("client_email", email)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return NextResponse.json({ documents: [], error: error.message }, { status: 200 });
+    }
+
+    return NextResponse.json({ documents: data || [] });
+  } catch (error: any) {
+    return NextResponse.json({ documents: [], error: error?.message || "Erreur documents" }, { status: 200 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
     const form = await request.formData();
 
-    const file = form.get("file") as File | null;
-    const orderId = String(form.get("orderId") || "").trim();
-    const clientEmail = String(form.get("clientEmail") || "").trim().toLowerCase();
-    const rawTitle = String(form.get("title") || "").trim();
-    const adminComment = String(form.get("adminComment") || "").trim();
-    const existingDocumentId = String(form.get("documentId") || "").trim();
+    const email = String(form.get("email") || "");
+    const document_type = String(form.get("document_type") || "Autre document");
+    const replace_id = String(form.get("replace_id") || "");
+    const file = form.get("file");
 
-    if (!clientEmail) {
-      return NextResponse.json(
-        { error: "Email client manquant." },
-        { status: 400 }
-      );
+    if (!email) {
+      return NextResponse.json({ error: "Email client manquant" }, { status: 400 });
     }
 
-    if (!rawTitle) {
-      return NextResponse.json(
-        { error: "Titre du document manquant." },
-        { status: 400 }
-      );
+    if (!(file instanceof File)) {
+      return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
     }
 
-    if (!file) {
-      return NextResponse.json(
-        { error: "Fichier manquant." },
-        { status: 400 }
-      );
-    }
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const safeName = cleanFileName(file.name || "document.pdf");
+    const finalName = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}-${safeName}`;
 
-    const title = cleanTitle(rawTitle);
-    const documentKey = documentKeyFromTitle(rawTitle);
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "admin-documents");
+    await fs.mkdir(uploadDir, { recursive: true });
 
-    await supabase.storage.createBucket("client-documents", {
-      public: true,
-    }).catch(() => null);
+    const diskPath = path.join(uploadDir, finalName);
+    await fs.writeFile(diskPath, buffer);
 
-    const fileName = cleanFileName(file.name);
-    const safeEmail = clientEmail.replace(/[^a-zA-Z0-9@._-]/g, "-");
-    const safeOrder = orderId || "no-order";
-    const filePath = `${safeEmail}/${safeOrder}/${documentKey}/${Date.now()}-${fileName}`;
+    const file_url = `/uploads/admin-documents/${finalName}`;
+    const supabase = supabaseAdmin();
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const { error: uploadError } = await supabase.storage
-      .from("client-documents")
-      .upload(filePath, buffer, {
-        contentType: file.type || "application/octet-stream",
-        upsert: true,
-      });
-
-    if (uploadError) {
-      return NextResponse.json(
-        {
-          error: "Upload impossible.",
-          details: uploadError.message,
-        },
-        { status: 500 }
-      );
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from("client-documents")
-      .getPublicUrl(filePath);
-
-    const fileUrl = publicUrlData.publicUrl;
-
-    let targetDocumentId = existingDocumentId;
-
-    if (!targetDocumentId) {
-      let query = supabase
-        .from("client_documents")
-        .select("id")
-        .eq("client_email", clientEmail)
-        .eq("document_key", documentKey)
-        .limit(1);
-
-      if (orderId) {
-        query = query.eq("order_id", orderId);
-      }
-
-      const { data: existingDocument } = await query.maybeSingle();
-
-      if (existingDocument?.id) {
-        targetDocumentId = existingDocument.id;
-      }
-    }
-
-    let documentResult = null;
-
-    if (targetDocumentId) {
-      const { data: updatedDocument, error: updateError } = await supabase
+    if (replace_id) {
+      const { data, error } = await supabase
         .from("client_documents")
         .update({
-          title,
-          document_key: documentKey,
-          status: "completed",
-          required: false,
-          file_url: fileUrl,
-          file_path: filePath,
+          document_type,
+          title: document_type,
           file_name: file.name,
-          file_type: file.type,
-          file_size: file.size,
-          uploaded_by: "admin",
-          admin_comment: adminComment || "Document ajouté par l’équipe Vemo.",
+          file_url,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", targetDocumentId)
+        .eq("id", replace_id)
         .select("*")
         .single();
 
-      if (updateError) {
-        return NextResponse.json(
-          {
-            error: "Impossible de mettre à jour le document.",
-            details: updateError.message,
-          },
-          { status: 500 }
-        );
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
       }
 
-      documentResult = updatedDocument;
-    } else {
-      const { data: insertedDocument, error: insertError } = await supabase
-        .from("client_documents")
-        .insert({
-          order_id: orderId || null,
-          client_email: clientEmail,
-          title,
-          document_key: documentKey,
-          status: "completed",
-          required: false,
-          file_url: fileUrl,
-          file_path: filePath,
-          file_name: file.name,
-          file_type: file.type,
-          file_size: file.size,
-          uploaded_by: "admin",
-          admin_comment: adminComment || "Document ajouté par l’équipe Vemo.",
-          updated_at: new Date().toISOString(),
-        })
-        .select("*")
-        .single();
+      await supabase.from("client_messages").insert({
+        client_email: email,
+        sender: "admin",
+        message: `Document remplacé : ${document_type}`,
+      });
 
-      if (insertError) {
-        return NextResponse.json(
-          {
-            error: "Impossible d'ajouter le document.",
-            details: insertError.message,
-          },
-          { status: 500 }
-        );
-      }
+      return NextResponse.json({ document: data, replaced: true });
+    }
 
-      documentResult = insertedDocument;
+    const { data, error } = await supabase
+      .from("client_documents")
+      .insert({
+        client_email: email,
+        document_type,
+        title: document_type,
+        file_name: file.name,
+        file_url,
+        status: "uploaded",
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     await supabase.from("client_messages").insert({
-      order_id: orderId || null,
-      client_email: clientEmail,
-      sender: "Admin Vemo",
-      message: `Un document est disponible : ${title}.`,
-      message_type: "document",
-      is_read: false,
+      client_email: email,
+      sender: "admin",
+      message: `Nouveau document ajouté : ${document_type}`,
     });
 
-    return NextResponse.json({
-      ok: true,
-      document: documentResult,
-    });
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Erreur inconnue.";
-
-    return NextResponse.json(
-      {
-        error: "Impossible d'uploader le document.",
-        details: message,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ document: data, uploaded: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || "Erreur upload document" }, { status: 500 });
   }
 }
 
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const id = body.id;
+    const email = body.email;
 
+    if (!id) {
+      return NextResponse.json({ error: "ID document manquant" }, { status: 400 });
+    }
 
+    const supabase = supabaseAdmin();
+
+    const { error } = await supabase
+      .from("client_documents")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    if (email) {
+      await supabase.from("client_messages").insert({
+        client_email: email,
+        sender: "admin",
+        message: "Document supprimé du dossier.",
+      });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || "Erreur suppression document" }, { status: 500 });
+  }
+}

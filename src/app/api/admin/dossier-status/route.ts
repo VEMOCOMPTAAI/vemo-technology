@@ -1,139 +1,56 @@
-import { NextResponse } from "next/server";
-import { verifyAdminRequest } from "@/lib/adminAuth";
-import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-export const runtime = "nodejs";
+function supabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const STATUS_MAP: Record<string, { label: string; progress: number }> = {
-  payment_confirmed: {
-    label: "Paiement confirmé",
-    progress: 20,
-  },
-  verification: {
-    label: "Vérification des informations",
-    progress: 40,
-  },
-  documents_preparation: {
-    label: "Documents en préparation",
-    progress: 60,
-  },
-  ein_processing: {
-    label: "EIN en cours",
-    progress: 80,
-  },
-  completed: {
-    label: "Dossier terminé",
-    progress: 100,
-  },
-};
+  if (!url || !key) {
+    throw new Error("Variables Supabase manquantes");
+  }
 
-function checkAdmin(request: Request) {
-  return verifyAdminRequest(request);
+  return createClient(url, key);
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const auth = checkAdmin(request);
-
-    if (!auth.ok) {
-      return auth.response;
-    }
-
     const body = await request.json();
 
-    const orderId = String(body.orderId || "").trim();
-    const clientEmail = String(body.clientEmail || "").trim().toLowerCase();
-    const dossierStatus = String(body.dossierStatus || "").trim();
+    const email = body.email;
+    const payment_status = body.payment_status;
+    const account_status = body.account_status;
+    const dossier_status = body.dossier_status;
 
-    if (!STATUS_MAP[dossierStatus]) {
-      return NextResponse.json(
-        { error: "Statut de dossier invalide." },
-        { status: 400 }
-      );
+    if (!email) {
+      return NextResponse.json({ error: "Email client manquant" }, { status: 400 });
     }
 
-    if (!orderId && !clientEmail) {
-      return NextResponse.json(
-        { error: "orderId ou clientEmail requis." },
-        { status: 400 }
-      );
+    const supabase = supabaseAdmin();
+
+    const patch: Record<string, string> = {};
+    if (payment_status) patch.payment_status = payment_status;
+    if (account_status) patch.account_status = account_status;
+    if (dossier_status) patch.status = dossier_status;
+
+    const results: any[] = [];
+
+    for (const table of ["orders", "client_payments", "clients"]) {
+      try {
+        const { error } = await supabase.from(table).update(patch).eq("client_email", email);
+        results.push({ table, ok: !error, error: error?.message || null });
+      } catch (e: any) {
+        results.push({ table, ok: false, error: e?.message || "Erreur" });
+      }
     }
 
-    const supabase = createSupabaseAdminClient();
-
-    let targetOrderId = orderId;
-
-    if (!targetOrderId && clientEmail) {
-      const { data: latestOrder } = await supabase
-        .from("llc_orders")
-        .select("id")
-        .eq("customer_email", clientEmail)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      targetOrderId = latestOrder?.id || "";
-    }
-
-    if (!targetOrderId) {
-      return NextResponse.json(
-        { error: "Commande client introuvable." },
-        { status: 404 }
-      );
-    }
-
-    const next = STATUS_MAP[dossierStatus];
-
-    const { data: updatedOrder, error: updateError } = await supabase
-      .from("llc_orders")
-      .update({
-        dossier_status: dossierStatus,
-        dossier_status_label: next.label,
-        dossier_progress: next.progress,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", targetOrderId)
-      .select("*")
-      .single();
-
-    if (updateError) {
-      return NextResponse.json(
-        {
-          error: "Impossible de mettre à jour le statut du dossier.",
-          details: updateError.message,
-        },
-        { status: 500 }
-      );
-    }
-
-    if (clientEmail) {
-      await supabase.from("client_messages").insert({
-        order_id: targetOrderId,
-        client_email: clientEmail,
-        sender: "Admin Vemo",
-        message: `Mise à jour du dossier : ${next.label}.`,
-        message_type: "dossier_status",
-        is_read: false,
-      });
-    }
-
-    return NextResponse.json({
-      ok: true,
-      order: updatedOrder,
+    await supabase.from("client_messages").insert({
+      client_email: email,
+      sender: "admin",
+      message: `Statut mis à jour : ${payment_status || account_status || dossier_status}`,
     });
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Erreur inconnue.";
 
-    return NextResponse.json(
-      {
-        error: "Impossible de mettre à jour le statut du dossier.",
-        details: message,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: true, results });
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || "Erreur statut dossier" }, { status: 500 });
   }
 }
-
-
-
