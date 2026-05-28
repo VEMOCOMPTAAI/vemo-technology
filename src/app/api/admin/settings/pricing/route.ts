@@ -9,35 +9,7 @@ const filePath = path.join(process.cwd(), "data", "vemo-pricing.json");
 
 const defaultPricing = {
   currency: "USD",
-  packs: [
-    {
-      id: "starter",
-      name_fr: "Pack Starter",
-      name_en: "Starter Pack",
-      price: 249,
-      description_fr: "Création LLC avec accompagnement essentiel.",
-      description_en: "LLC formation with essential support.",
-      active: true,
-    },
-    {
-      id: "standard",
-      name_fr: "Pack Standard",
-      name_en: "Standard Pack",
-      price: 399,
-      description_fr: "Création LLC avec EIN, documents et suivi.",
-      description_en: "LLC formation with EIN, documents and tracking.",
-      active: true,
-    },
-    {
-      id: "premium",
-      name_fr: "Pack Premium",
-      name_en: "Premium Pack",
-      price: 599,
-      description_fr: "Accompagnement premium avec suivi prioritaire.",
-      description_en: "Premium support with priority tracking.",
-      active: true,
-    },
-  ],
+  packs: [],
   updated_at: null as string | null,
 };
 
@@ -50,6 +22,12 @@ async function readPricing() {
     await fs.writeFile(filePath, JSON.stringify(defaultPricing, null, 2));
     return defaultPricing;
   }
+}
+
+function arr(value: any) {
+  if (Array.isArray(value)) return value.map((x) => String(x || "").trim()).filter(Boolean);
+  if (typeof value === "string") return value.split("\n").map((x) => x.trim()).filter(Boolean);
+  return [];
 }
 
 export async function GET() {
@@ -72,12 +50,16 @@ export async function POST(request: NextRequest) {
 
     const packs = body.packs.map((pack: any) => ({
       id: String(pack.id || "").trim(),
+      state: String(pack.state || "").trim(),
       name_fr: String(pack.name_fr || "").trim(),
       name_en: String(pack.name_en || "").trim(),
       price: Number(pack.price || 0),
       description_fr: String(pack.description_fr || "").trim(),
       description_en: String(pack.description_en || "").trim(),
+      features_fr: arr(pack.features_fr),
+      features_en: arr(pack.features_en),
       active: Boolean(pack.active),
+      recommended: Boolean(pack.recommended)
     }));
 
     for (const pack of packs) {

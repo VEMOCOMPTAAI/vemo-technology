@@ -4,12 +4,16 @@ import { useEffect, useState } from "react";
 
 type Pack = {
   id: string;
+  state?: string;
   name_fr: string;
   name_en: string;
   price: number;
   description_fr: string;
   description_en: string;
+  features_fr?: string[];
+  features_en?: string[];
   active: boolean;
+  recommended?: boolean;
 };
 
 type Pricing = {
@@ -87,12 +91,16 @@ export default function VemoAdminSettingsPage() {
         ...prev.packs,
         {
           id: `pack_${Date.now()}`,
+          state: "New Mexico",
           name_fr: "Nouveau pack",
           name_en: "New pack",
           price: 0,
           description_fr: "",
           description_en: "",
+          features_fr: [],
+          features_en: [],
           active: true,
+          recommended: false,
         },
       ],
     }));
@@ -290,7 +298,7 @@ export default function VemoAdminSettingsPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                <div className="mt-6 grid gap-4 lg:grid-cols-5">
                   <label>
                     <span className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-400">
                       ID pack
@@ -304,6 +312,20 @@ export default function VemoAdminSettingsPage() {
 
                   <label>
                     <span className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-400">
+                      État
+                    </span>
+                    <select
+                      value={pack.state || "New Mexico"}
+                      onChange={(e) => updatePack(index, "state" as keyof Pack, e.target.value)}
+                      className="h-[52px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                    >
+                      <option value="New Mexico">New Mexico</option>
+                      <option value="Wyoming">Wyoming</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-400">
                       Prix
                     </span>
                     <input
@@ -313,6 +335,18 @@ export default function VemoAdminSettingsPage() {
                       onChange={(e) => updatePack(index, "price", Number(e.target.value))}
                       className="h-[52px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
                     />
+                  </label>
+
+                  <label className="flex items-end">
+                    <span className="flex h-[52px] w-full items-center gap-2 rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 text-sm font-black text-[#123A63]">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(pack.recommended)}
+                        onChange={(e) => updatePack(index, "recommended" as keyof Pack, e.target.checked)}
+                        className="h-4 w-4 accent-[#F15A24]"
+                      />
+                      Recommandé
+                    </span>
                   </label>
 
                   <div className="rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 py-3">
@@ -369,6 +403,30 @@ export default function VemoAdminSettingsPage() {
                       value={pack.description_en}
                       onChange={(e) => updatePack(index, "description_en", e.target.value)}
                       className="min-h-[96px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 py-3 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                    />
+                  </label>
+                </div>
+
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  <label>
+                    <span className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-400">
+                      Avantages FR — une ligne par avantage
+                    </span>
+                    <textarea
+                      value={(pack.features_fr || []).join("\n")}
+                      onChange={(e) => updatePack(index, "features_fr" as keyof Pack, e.target.value.split("\n").filter(Boolean) as any)}
+                      className="min-h-[140px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 py-3 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-400">
+                      Features EN — one line per feature
+                    </span>
+                    <textarea
+                      value={(pack.features_en || []).join("\n")}
+                      onChange={(e) => updatePack(index, "features_en" as keyof Pack, e.target.value.split("\n").filter(Boolean) as any)}
+                      className="min-h-[140px] w-full rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] px-4 py-3 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
                     />
                   </label>
                 </div>

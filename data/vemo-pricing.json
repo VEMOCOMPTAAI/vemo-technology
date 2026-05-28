@@ -2,31 +2,162 @@
   "currency": "USD",
   "packs": [
     {
-      "id": "starter",
-      "name_fr": "Pack Starter",
-      "name_en": "Starter Pack",
+      "id": "nm_starter",
+      "state": "New Mexico",
+      "name_fr": "New Mexico Starter",
+      "name_en": "New Mexico Starter",
+      "price": 129,
+      "description_fr": "Pack essentiel pour créer une LLC au New Mexico avec les frais de dépôt inclus.",
+      "description_en": "Essential package to form a New Mexico LLC with state filing fees included.",
+      "features_fr": [
+        "Préparation du dossier LLC",
+        "Documents de création LLC",
+        "Frais de dépôt de l’État inclus",
+        "Registered Agent offert la première année",
+        "Suivi administratif de base"
+      ],
+      "features_en": [
+        "LLC file preparation",
+        "LLC formation documents",
+        "State filing fees included",
+        "First year Registered Agent included",
+        "Basic administrative follow up"
+      ],
+      "active": true,
+      "recommended": false
+    },
+    {
+      "id": "nm_standard",
+      "state": "New Mexico",
+      "name_fr": "New Mexico Standard",
+      "name_en": "New Mexico Standard",
+      "price": 149,
+      "description_fr": "Pack recommandé pour créer une LLC au New Mexico avec EIN et Operating Agreement.",
+      "description_en": "Recommended package to form a New Mexico LLC with EIN and Operating Agreement.",
+      "features_fr": [
+        "Tout le Pack Starter",
+        "Demande EIN",
+        "Operating Agreement",
+        "Frais de dépôt de l’État inclus",
+        "Registered Agent offert la première année",
+        "Suivi administratif renforcé"
+      ],
+      "features_en": [
+        "Everything in Starter",
+        "EIN application",
+        "Operating Agreement",
+        "State filing fees included",
+        "First year Registered Agent included",
+        "Enhanced administrative follow up"
+      ],
+      "active": true,
+      "recommended": true
+    },
+    {
+      "id": "nm_premium",
+      "state": "New Mexico",
+      "name_fr": "New Mexico Premium",
+      "name_en": "New Mexico Premium",
+      "price": 199,
+      "description_fr": "Pack premium pour New Mexico avec préparation bancaire, paiements et accompagnement prioritaire.",
+      "description_en": "Premium New Mexico package with banking, payment setup preparation and priority support.",
+      "features_fr": [
+        "Tout le Pack Standard",
+        "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
+        "Form 5472 + Form 1120 offerts la première année",
+        "Frais de dépôt de l’État inclus",
+        "Support prioritaire",
+        "Accompagnement premium"
+      ],
+      "features_en": [
+        "Everything in Standard",
+        "Stripe, PayPal, Wise, Mercury or Payoneer preparation",
+        "First year Form 5472 + Form 1120 included",
+        "State filing fees included",
+        "Priority support",
+        "Premium guidance"
+      ],
+      "active": true,
+      "recommended": false
+    },
+    {
+      "id": "wy_starter",
+      "state": "Wyoming",
+      "name_fr": "Wyoming Starter",
+      "name_en": "Wyoming Starter",
+      "price": 179,
+      "description_fr": "Pack essentiel pour créer une LLC au Wyoming avec les frais de dépôt inclus.",
+      "description_en": "Essential package to form a Wyoming LLC with state filing fees included.",
+      "features_fr": [
+        "Préparation du dossier LLC",
+        "Documents de création LLC",
+        "Frais de dépôt de l’État inclus",
+        "Registered Agent offert la première année",
+        "Suivi administratif de base"
+      ],
+      "features_en": [
+        "LLC file preparation",
+        "LLC formation documents",
+        "State filing fees included",
+        "First year Registered Agent included",
+        "Basic administrative follow up"
+      ],
+      "active": true,
+      "recommended": false
+    },
+    {
+      "id": "wy_standard",
+      "state": "Wyoming",
+      "name_fr": "Wyoming Standard",
+      "name_en": "Wyoming Standard",
+      "price": 199,
+      "description_fr": "Pack recommandé pour créer une LLC au Wyoming avec EIN et Operating Agreement.",
+      "description_en": "Recommended package to form a Wyoming LLC with EIN and Operating Agreement.",
+      "features_fr": [
+        "Tout le Pack Starter",
+        "Demande EIN",
+        "Operating Agreement",
+        "Frais de dépôt de l’État inclus",
+        "Registered Agent offert la première année",
+        "Suivi administratif renforcé"
+      ],
+      "features_en": [
+        "Everything in Starter",
+        "EIN application",
+        "Operating Agreement",
+        "State filing fees included",
+        "First year Registered Agent included",
+        "Enhanced administrative follow up"
+      ],
+      "active": true,
+      "recommended": true
+    },
+    {
+      "id": "wy_premium",
+      "state": "Wyoming",
+      "name_fr": "Wyoming Premium",
+      "name_en": "Wyoming Premium",
       "price": 249,
-      "description_fr": "Création LLC avec accompagnement essentiel.",
-      "description_en": "LLC formation with essential support.",
-      "active": true
-    },
-    {
-      "id": "standard",
-      "name_fr": "Pack Standard",
-      "name_en": "Standard Pack",
-      "price": 399,
-      "description_fr": "Création LLC avec EIN, documents et suivi.",
-      "description_en": "LLC formation with EIN, documents and tracking.",
-      "active": true
-    },
-    {
-      "id": "premium",
-      "name_fr": "Pack Premium",
-      "name_en": "Premium Pack",
-      "price": 599,
-      "description_fr": "Accompagnement premium avec suivi prioritaire.",
-      "description_en": "Premium support with priority tracking.",
-      "active": true
+      "description_fr": "Pack premium pour Wyoming avec préparation bancaire, paiements et accompagnement prioritaire.",
+      "description_en": "Premium Wyoming package with banking, payment setup preparation and priority support.",
+      "features_fr": [
+        "Tout le Pack Standard",
+        "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
+        "Form 5472 + Form 1120 offerts la première année",
+        "Frais de dépôt de l’État inclus",
+        "Support prioritaire",
+        "Accompagnement premium"
+      ],
+      "features_en": [
+        "Everything in Standard",
+        "Stripe, PayPal, Wise, Mercury or Payoneer preparation",
+        "First year Form 5472 + Form 1120 included",
+        "State filing fees included",
+        "Priority support",
+        "Premium guidance"
+      ],
+      "active": true,
+      "recommended": false
     }
   ],
   "updated_at": null
