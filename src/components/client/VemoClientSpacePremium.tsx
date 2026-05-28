@@ -179,8 +179,9 @@ function documentActionUrl(doc: DocumentRow, mode: "view" | "download") {
 }
 
 function hasDocumentFile(doc: DocumentRow) {
-  return Boolean(doc.id || doc.file_url);
+  return Boolean(doc.id);
 }
+
 
 function DocumentIcon() {
   return (

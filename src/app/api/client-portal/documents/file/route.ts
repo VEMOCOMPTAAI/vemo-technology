@@ -41,6 +41,99 @@ function safeFileName(name: string) {
     .trim() || "document";
 }
 
+async function exists(filePath: string) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function findFileRecursive(dir: string, targetBaseName: string): Promise<string | null> {
+  try {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        const found = await findFileRecursive(full, targetBaseName);
+        if (found) return found;
+      } else {
+        const entryBase = entry.name.toLowerCase();
+        const targetBase = targetBaseName.toLowerCase();
+
+        if (entryBase === targetBase || entryBase.endsWith(`-${targetBase}`) || entryBase.includes(targetBase)) {
+          return full;
+        }
+      }
+    }
+  } catch {}
+
+  return null;
+}
+
+async function resolveLocalFile(fileUrl: string, fileName: string) {
+  const publicDir = path.join(process.cwd(), "public");
+
+  if (fileUrl && !fileUrl.startsWith("http://") && !fileUrl.startsWith("https://")) {
+    const cleanUrl = fileUrl.startsWith("/") ? fileUrl.slice(1) : fileUrl;
+    const directPath = path.join(publicDir, cleanUrl);
+
+    if (await exists(directPath)) return directPath;
+  }
+
+  let baseName = "";
+  try {
+    const url = fileUrl.startsWith("http") ? new URL(fileUrl) : null;
+    baseName = decodeURIComponent(path.basename(url ? url.pathname : fileUrl));
+  } catch {
+    baseName = decodeURIComponent(path.basename(fileUrl || ""));
+  }
+
+  const candidates = [
+    path.join(publicDir, "uploads", "admin-documents", baseName),
+    path.join(publicDir, "uploads", "client-documents", baseName),
+    path.join(publicDir, "uploads", "bank-transfers", baseName),
+    path.join(publicDir, "uploads", baseName),
+    path.join(publicDir, "uploads", "admin-documents", fileName),
+    path.join(publicDir, "uploads", "client-documents", fileName),
+  ];
+
+  for (const candidate of candidates) {
+    if (await exists(candidate)) return candidate;
+  }
+
+  if (baseName) {
+    const found = await findFileRecursive(path.join(publicDir, "uploads"), baseName);
+    if (found) return found;
+  }
+
+  if (fileName) {
+    const found = await findFileRecursive(path.join(publicDir, "uploads"), fileName);
+    if (found) return found;
+  }
+
+  return null;
+}
+
+async function respondBuffer(buffer: Buffer, fileName: string, mode: string) {
+  const disposition =
+    mode === "download"
+      ? `attachment; filename="${safeFileName(fileName)}"`
+      : `inline; filename="${safeFileName(fileName)}"`;
+
+  return new NextResponse(buffer, {
+    status: 200,
+    headers: {
+      "Content-Type": contentType(fileName),
+      "Content-Disposition": disposition,
+      "Cache-Control": "private, max-age=0, no-store",
+    },
+  });
+}
+
 export async function GET(request: NextRequest) {
   try {
     const id = String(request.nextUrl.searchParams.get("id") || "").trim();
@@ -59,7 +152,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error || !doc) {
-      return new NextResponse("Document introuvable.", { status: 404 });
+      return new NextResponse("Document introuvable dans la base.", { status: 404 });
     }
 
     const fileUrl = String(doc.file_url || doc.url || doc.public_url || "").trim();
@@ -69,33 +162,31 @@ export async function GET(request: NextRequest) {
       return new NextResponse("Ce document ne contient aucun fichier.", { status: 404 });
     }
 
+    const localFile = await resolveLocalFile(fileUrl, fileName);
+
+    if (localFile) {
+      const buffer = await fs.readFile(localFile);
+      return respondBuffer(buffer, fileName || path.basename(localFile), mode);
+    }
+
     if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
-      return NextResponse.redirect(fileUrl);
+      const remote = await fetch(fileUrl);
+
+      if (remote.ok) {
+        const arrayBuffer = await remote.arrayBuffer();
+        return respondBuffer(Buffer.from(arrayBuffer), fileName, mode);
+      }
+
+      return new NextResponse(
+        `Document trouvé en base, mais le fichier distant est inaccessible. Détail: ${remote.status} ${remote.statusText}. URL enregistrée: ${fileUrl}`,
+        { status: 404 }
+      );
     }
 
-    const cleanUrl = fileUrl.startsWith("/") ? fileUrl.slice(1) : fileUrl;
-    const absolutePath = path.join(process.cwd(), "public", cleanUrl);
-
-    try {
-      const buffer = await fs.readFile(absolutePath);
-
-      const disposition =
-        mode === "download"
-          ? `attachment; filename="${fileName}"`
-          : `inline; filename="${fileName}"`;
-
-      return new NextResponse(buffer, {
-        status: 200,
-        headers: {
-          "Content-Type": contentType(fileName || fileUrl),
-          "Content-Disposition": disposition,
-          "Cache-Control": "private, max-age=0, no-store",
-        },
-      });
-    } catch {
-      const redirectUrl = fileUrl.startsWith("/") ? fileUrl : `/${fileUrl}`;
-      return NextResponse.redirect(new URL(redirectUrl, request.url));
-    }
+    return new NextResponse(
+      `Document trouvé en base, mais fichier introuvable localement. URL enregistrée: ${fileUrl}`,
+      { status: 404 }
+    );
   } catch (error: any) {
     return new NextResponse(error?.message || "Erreur ouverture document.", {
       status: 500,
