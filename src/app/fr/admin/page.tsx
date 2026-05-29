@@ -361,9 +361,9 @@ export default function AdminFinalPage() {
                   <div className="flex flex-col gap-2">
                     <a
                       href={`/fr/admin/client?email=${encodeURIComponent(item.email || "")}`}
-                      className="rounded-[12px] border border-[#E6EDF5] px-3 py-2 text-center text-xs font-black text-[#123A63] transition hover:border-[#F15A24]"
+                      className="inline-flex h-[42px] min-w-[120px] items-center justify-center rounded-[13px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
                     >
-                      Espace
+                      Ouvrir
                     </a>
                   </div>
                 </div>
