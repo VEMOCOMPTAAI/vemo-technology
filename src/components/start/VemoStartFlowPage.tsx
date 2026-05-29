@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Elements, CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { VEMO_COUNTRIES, flagFromIso, type VemoCountry } from "@/lib/vemoCountries";
+import { VEMO_LLC_PACKS, getVemoLlcPackFeatures, getVemoLlcPackPrice } from "@/lib/vemoLlcPacks";
 
 type Lang = "fr" | "en";
 type PlanId = "" | "starter" | "standard" | "premium";
@@ -21,44 +22,13 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   : null;
 
-const plans: Plan[] = [
-  {
-    id: "starter",
-    label: "Starter",
-    subtitle: "Pour démarrer simplement votre dossier LLC.",
-    features: [
-      "Préparation du dossier LLC",
-      "Documents de création LLC",
-      "Registered Agent offert la première année",
-      "Suivi administratif de base",
-    ],
-  },
-  {
-    id: "standard",
-    label: "Standard",
-    subtitle: "La formule recommandée pour la plupart des non-résidents.",
-    features: [
-      "Tout le Pack Starter",
-      "Demande EIN",
-      "Operating Agreement",
-      "Registered Agent offert la première année",
-      "Suivi administratif renforcé",
-    ],
-    recommended: true,
-  },
-  {
-    id: "premium",
-    label: "Premium",
-    subtitle: "Accompagnement complet avec préparation bancaire, paiements et fiscalité.",
-    features: [
-      "Tout le Pack Standard",
-      "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
-      "Form 5472 + Form 1120 offerts la première année",
-      "Registered Agent offert la première année",
-      "Support prioritaire",
-    ],
-  },
-];
+const plans: Plan[] = VEMO_LLC_PACKS.map((pack) => ({
+  id: pack.id,
+  label: pack.label,
+  subtitle: pack.shortDescription,
+  features: pack.features,
+  recommended: pack.recommended,
+}));
 
 const activitySectors = [
   "E-commerce",
@@ -161,45 +131,11 @@ function textareaClass() {
 }
 
 function getPlanPrice(planId: string, state: string) {
-  const prices: Record<string, Record<string, number>> = {
-    starter: { "New Mexico": 129, Wyoming: 179 },
-    standard: { "New Mexico": 149, Wyoming: 199 },
-    premium: { "New Mexico": 199, Wyoming: 249 },
-  };
-  return prices[planId]?.[state] || 0;
+  return getVemoLlcPackPrice(planId, state);
 }
 
 function availableServices(planId: string, state: string) {
-  if (planId === "starter") {
-    return [
-      "Préparation du dossier LLC",
-      "Documents de création LLC",
-      "Registered Agent offert la première année",
-      "Suivi administratif de base",
-    ];
-  }
-
-  if (planId === "standard") {
-    return [
-      state === "Wyoming"
-        ? "Demande EIN — délai estimatif Wyoming : 3 à 7 jours ouvrables"
-        : "Demande EIN — délai estimatif New Mexico : 10 à 30 jours ouvrables",
-      "Operating Agreement",
-      "Registered Agent offert la première année",
-      "Suivi administratif renforcé",
-    ];
-  }
-
-  return [
-    state === "Wyoming"
-      ? "Demande EIN — délai estimatif Wyoming : 3 à 7 jours ouvrables"
-      : "Demande EIN — délai estimatif New Mexico : 10 à 30 jours ouvrables",
-    "Operating Agreement",
-    "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
-    "Form 5472 + Form 1120 offerts la première année",
-    "Registered Agent offert la première année",
-    "Support prioritaire",
-  ];
+  return getVemoLlcPackFeatures(planId, state);
 }
 
 function emailIsValid(email: string) {

@@ -35,7 +35,7 @@ const adminStatuses = [
 const documentTypes = [
   { value: "prepared_document", label: "Document préparé" },
   { value: "articles_of_organization", label: "Articles of Organization" },
-  { value: "operating_agreement", label: "Operating Agreement" },
+  { value: "operating_agreement", label: "Demande EIN" },
   { value: "ein_document", label: "Document EIN" },
   { value: "state_confirmation", label: "Confirmation État" },
   { value: "banking_document", label: "Document bancaire" },

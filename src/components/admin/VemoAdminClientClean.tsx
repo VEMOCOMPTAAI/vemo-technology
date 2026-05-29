@@ -40,7 +40,7 @@ type ClientInfo = {
 const docTypes = [
   "Company Document",
   "EIN",
-  "Operating Agreement",
+  "Demande EIN",
   "Reçu de paiement",
   "Certificat Registered Agent",
   "Banking",

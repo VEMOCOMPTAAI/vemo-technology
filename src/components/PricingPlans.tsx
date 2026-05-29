@@ -21,10 +21,10 @@ const plansFr: Plan[] = [
     price: "129 $",
     description: "Pour lancer simplement votre LLC au Nouveau-Mexique.",
     items: [
-      "Préparation du dossier LLC",
+      "Documents de création LLC",
       "Documents essentiels de la LLC",
       "Agent enregistré offert la 1re année",
-      "Suivi administratif de base",
+      "US Phone Number offert 3 mois",
     ],
     note: "Renouvellement agent enregistré : 129 $/an après la 1re année.",
     cta: "Choisir Starter",
@@ -38,7 +38,7 @@ const plansFr: Plan[] = [
     items: [
       "Tout le pack Starter",
       "Obtention de l’EIN",
-      "Operating Agreement",
+      "Demande EIN",
       "Agent enregistré offert la 1re année",
       "Suivi renforcé du dossier",
     ],
@@ -53,9 +53,9 @@ const plansFr: Plan[] = [
     description: "Pour un accompagnement premium et prioritaire.",
     items: [
       "Tout le pack Standard",
-      "Préparation Stripe / PayPal / Wise / Mercury / Payoneer",
+      "Assistance Stripe / PayPal / Wise / Mercury / Payoneer",
       "Assistance Form 5472 + Form 1120 — 1re année",
-      "Support prioritaire",
+      "Shopify offert 3 mois + nom de domaine 1 an",
       "Accompagnement premium de bout en bout",
     ],
     note: "Renouvellement agent enregistré : 129 $/an après la 1re année.",
@@ -87,7 +87,7 @@ const plansEn: Plan[] = [
     items: [
       "Everything in Starter",
       "EIN application",
-      "Operating Agreement",
+      "Demande EIN",
       "Registered Agent included for the 1st year",
       "Enhanced case follow-up",
     ],
