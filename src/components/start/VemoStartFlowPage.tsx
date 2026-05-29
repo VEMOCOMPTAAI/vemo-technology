@@ -164,12 +164,12 @@ function textareaClass() {
   return "min-h-[120px] w-full rounded-[16px] border border-[#E1E7EF] bg-white px-4 py-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10";
 }
 
-function getPlanPrice(planId: string, state: string) {
-  return getVemoLlcPackPrice(planId, state);
+function syncedPlanPrice(planId: string, state: string) {
+  return syncedPlanPrice(planId, state);
 }
 
-function availableServices(planId: string, state: string) {
-  return getVemoLlcPackFeatures(planId, state);
+function syncedPlanFeatures(planId: string, state: string) {
+  return syncedPlanFeatures(planId, state);
 }
 
 function visibleSelectableServices(services: string[]) {
@@ -501,6 +501,83 @@ function PaymentCardElement({
 }
 
 export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
+  // VEMO_PUBLIC_PACKS_RUNTIME_SYNC
+  const [publicPacks, setPublicPacks] = useState<any[]>([]);
+  const [publicRegisteredAgentRenewal, setPublicRegisteredAgentRenewal] = useState<Record<string, number>>({
+    "New Mexico": 35,
+    Wyoming: 25,
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/public/llc-packs", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!active || !data?.ok) return;
+
+        if (Array.isArray(data.packs)) {
+          setPublicPacks(data.packs);
+        }
+
+        if (data.registeredAgentRenewal) {
+          setPublicRegisteredAgentRenewal({
+            "New Mexico": Number(data.registeredAgentRenewal["New Mexico"] || 35),
+            Wyoming: Number(data.registeredAgentRenewal.Wyoming || 25),
+          });
+        }
+      })
+      .catch(() => null);
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const syncedPlans = useMemo(() => {
+    const source = publicPacks.length ? publicPacks : VEMO_LLC_PACKS;
+
+    return source.map((pack: any) => ({
+      id: pack.id,
+      label: pack.label,
+      description: pack.description || "",
+      recommended: Boolean(pack.recommended),
+      prices: pack.prices || {},
+      features: Array.isArray(pack.features) ? pack.features : [],
+    }));
+  }, [publicPacks]);
+
+  function syncedPlanPrice(planId: any, selectedState: any) {
+    return Number(
+      syncedPlans.find((plan: any) => plan.id === planId)?.prices?.[selectedState] || 0
+    );
+  }
+
+  function syncedPlanFeatures(planId: any, selectedState: any) {
+    const plan = syncedPlans.find((item: any) => item.id === planId);
+    if (!plan) return [];
+
+    const renewalPrice = Number(
+      publicRegisteredAgentRenewal?.[selectedState] ||
+      (selectedState === "Wyoming" ? 25 : 35)
+    );
+
+    return (Array.isArray(plan.features) ? plan.features : [])
+      .filter(Boolean)
+      .map((feature: string) => {
+        const clean = String(feature)
+          .replace(/\s*\(Renouvellement\s+\d+\s*USD\s*\/\s*an\)\s*/i, "")
+          .trim();
+
+        if (clean.toLowerCase().includes("registered agent offert")) {
+          return `${clean} (Renouvellement ${renewalPrice} USD / an)`;
+        }
+
+        return clean;
+      });
+  }
+
+
 
   // RUNTIME_EDITABLE_PACKS_PATCH
   const [runtimePacks, setRuntimePacks] = useState<any[]>([]);
