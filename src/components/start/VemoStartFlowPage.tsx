@@ -553,7 +553,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const services = selectedPlan ? availableServices(selectedPlan.id, state) : [];
   const selectableServices = visibleSelectableServices(services);
   const finalPrice = selectedPlan ? getPlanPrice(selectedPlan.id, state) : null;
-  const packName = selectedPlan ? `${state} ${selectedPlan.label}` : "";
+  const packName = selectedPlan ? `${state} ${selectedPlan?.label || "À choisir"}` : "";
   const progress = Math.round(((step + 1) / t.steps.length) * 100);
   const switchHref = lang === "fr" ? "/en/commencer" : "/fr/commencer";
 
