@@ -23,7 +23,9 @@
         "Registered Agent offert la première année",
         "Renouvellement Registered Agent : 35 USD / an",
         "US Phone Number offert 3 mois"
-      ]
+      ],
+      "registered_agent_renewal_usd": 35,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 35 USD / an"
     },
     {
       "id": "new_mexico_standard",
@@ -40,7 +42,9 @@
         "US Phone Number offert 3 mois",
         "Demande EIN",
         "Assistance Stripe + Mercury"
-      ]
+      ],
+      "registered_agent_renewal_usd": 35,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 35 USD / an"
     },
     {
       "id": "new_mexico_premium",
@@ -58,7 +62,9 @@
         "Assistance Stripe / PayPal",
         "Assistance Wise / Mercury / Payoneer",
         "Shopify offert 3 mois + nom de domaine 1 an"
-      ]
+      ],
+      "registered_agent_renewal_usd": 35,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 35 USD / an"
     },
     {
       "id": "wyoming_starter",
@@ -72,7 +78,9 @@
         "Registered Agent offert la première année",
         "Renouvellement Registered Agent : 25 USD / an",
         "US Phone Number offert 3 mois"
-      ]
+      ],
+      "registered_agent_renewal_usd": 25,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 25 USD / an"
     },
     {
       "id": "wyoming_standard",
@@ -89,7 +97,9 @@
         "US Phone Number offert 3 mois",
         "Demande EIN",
         "Assistance Stripe + Mercury"
-      ]
+      ],
+      "registered_agent_renewal_usd": 25,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 25 USD / an"
     },
     {
       "id": "wyoming_premium",
@@ -107,7 +117,9 @@
         "Assistance Stripe / PayPal",
         "Assistance Wise / Mercury / Payoneer",
         "Shopify offert 3 mois + nom de domaine 1 an"
-      ]
+      ],
+      "registered_agent_renewal_usd": 25,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 25 USD / an"
     }
   ]
 }

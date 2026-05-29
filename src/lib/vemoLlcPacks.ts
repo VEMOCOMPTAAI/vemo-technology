@@ -10,14 +10,14 @@ export type VemoLlcPack = {
   features: string[];
 };
 
+export function registeredAgentRenewalAmount(state: string) {
+  return state === "Wyoming" ? 25 : 35;
+}
+
 export function registeredAgentRenewalLabel(state: string) {
   return state === "Wyoming"
     ? "Renouvellement Registered Agent : 25 USD / an"
     : "Renouvellement Registered Agent : 35 USD / an";
-}
-
-export function registeredAgentRenewalAmount(state: string) {
-  return state === "Wyoming" ? 25 : 35;
 }
 
 export const VEMO_LLC_PACKS: VemoLlcPack[] = [
@@ -33,7 +33,7 @@ export const VEMO_LLC_PACKS: VemoLlcPack[] = [
       "Documents de création LLC",
       "Frais de dépôt de l’État inclus",
       "Registered Agent offert la première année",
-      "Renouvellement Registered Agent : 25 USD / 35 USD",
+      "REGISTERED_AGENT_RENEWAL",
       "US Phone Number offert 3 mois"
     ]
   },
@@ -50,7 +50,7 @@ export const VEMO_LLC_PACKS: VemoLlcPack[] = [
       "Documents de création LLC",
       "Frais de dépôt de l’État inclus",
       "Registered Agent offert la première année",
-      "Renouvellement Registered Agent : 25 USD / 35 USD",
+      "REGISTERED_AGENT_RENEWAL",
       "US Phone Number offert 3 mois",
       "Demande EIN",
       "Assistance Stripe + Mercury"
@@ -68,7 +68,7 @@ export const VEMO_LLC_PACKS: VemoLlcPack[] = [
       "Documents de création LLC",
       "Frais de dépôt de l’État inclus",
       "Registered Agent offert la première année",
-      "Renouvellement Registered Agent : 25 USD / 35 USD",
+      "REGISTERED_AGENT_RENEWAL",
       "US Phone Number offert 3 mois",
       "Demande EIN",
       "Assistance Stripe / PayPal",
@@ -91,7 +91,7 @@ export function getVemoLlcPackFeatures(id: string, state: string) {
   const pack = getVemoLlcPack(id);
 
   return pack.features.map((feature) => {
-    if (feature === "Renouvellement Registered Agent : 25 USD / 35 USD") {
+    if (feature === "REGISTERED_AGENT_RENEWAL") {
       return registeredAgentRenewalLabel(state);
     }
 
