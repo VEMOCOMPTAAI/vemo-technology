@@ -30,6 +30,41 @@ const plans: Plan[] = VEMO_LLC_PACKS.map((pack) => ({
   recommended: pack.recommended,
 }));
 
+const FORMULA_PREVIEW: Record<
+  "starter" | "standard" | "premium",
+  {
+    subtitle: string;
+    bullets: string[];
+  }
+> = {
+  starter: {
+    subtitle: "L’essentiel pour lancer votre LLC.",
+    bullets: [
+      "Création LLC",
+      "Frais de dépôt inclus",
+      "Registered Agent offert 1 an",
+      "US Phone Number offert 3 mois",
+    ],
+  },
+  standard: {
+    subtitle: "La formule recommandée pour la plupart des non-résidents.",
+    bullets: [
+      "Tout Starter +",
+      "Demande EIN",
+      "Assistance Stripe + Mercury",
+    ],
+  },
+  premium: {
+    subtitle: "L’offre complète pour structurer votre activité.",
+    bullets: [
+      "Tout Standard +",
+      "Assistance Stripe / PayPal",
+      "Assistance Wise / Mercury / Payoneer",
+      "Shopify offert 3 mois + nom de domaine 1 an",
+    ],
+  },
+};
+
 const activitySectors = [
   "E-commerce",
   "Services digitaux",
@@ -874,46 +909,72 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-3">
-                  {plans.map((plan) => (
-                    <button
-                      key={plan.id}
-                      type="button"
-                      onClick={() => setPlanId(plan.id)}
-                      className={`relative flex min-h-[410px] flex-col rounded-[1.6rem] border p-6 text-left transition ${
-                        planId === plan.id
-                          ? "border-[#F15A24] bg-white shadow-[0_18px_40px_rgba(18,58,99,.08)]"
-                          : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
-                      }`}
-                    >
-                      {plan.recommended && (
-                        <div className="mb-5 flex items-center justify-start">
-                          <span className="inline-flex h-[34px] items-center justify-center rounded-full border border-[#F15A24] bg-white px-4 text-[11px] font-black uppercase tracking-[0.08em] text-[#F15A24] shadow-none">
-                            {t.recommended}
+                  {plans.map((plan) => {
+                    const preview = FORMULA_PREVIEW[plan.id];
+                    const selected = planId === plan.id;
+
+                    return (
+                      <button
+                        key={plan.id}
+                        type="button"
+                        onClick={() => setPlanId(plan.id)}
+                        className={`relative flex min-h-[430px] flex-col rounded-[1.7rem] border bg-white p-6 text-left transition ${
+                          selected
+                            ? "border-[#F15A24] shadow-none"
+                            : "border-[#E3EAF2] hover:border-[#F15A24]/40"
+                        }`}
+                      >
+                        <div className="mb-5 flex h-[36px] items-center">
+                          {plan.recommended ? (
+                            <span className="inline-flex h-[34px] items-center justify-center rounded-full border border-[#F15A24] bg-white px-4 text-[10px] font-black uppercase tracking-[0.12em] text-[#F15A24] shadow-none">
+                              Recommandé
+                            </span>
+                          ) : null}
+                        </div>
+
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <h3 className="text-2xl font-black tracking-[-0.04em] text-[#123A63]">
+                              {plan.label}
+                            </h3>
+                            <div className="mt-3 text-[42px] font-black leading-none tracking-[-0.08em] text-[#123A63]">
+                              ${getPlanPrice(plan.id, state)}
+                            </div>
+                          </div>
+
+                          <span
+                            className={`mt-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-black ${
+                              selected
+                                ? "border-[#F15A24] bg-[#F15A24] text-white"
+                                : "border-[#B7C9DD] bg-white text-transparent"
+                            }`}
+                          >
+                            ✓
                           </span>
                         </div>
-                      )}
 
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="text-xl font-black text-[#111827]">{plan.label}</h3>
-                          <div className="mt-2 text-4xl font-black tracking-[-0.07em] text-[#123A63]">
-                            ${getPlanPrice(plan.id, state)}
-                          </div>
+                        <p className="mt-6 min-h-[84px] text-[15px] font-bold leading-7 text-slate-500">
+                          {preview.subtitle}
+                        </p>
+
+                        <div className="mt-auto space-y-3">
+                          {preview.bullets.map((item) => (
+                            <div
+                              key={item}
+                              className="flex items-start gap-3 rounded-[18px] border border-[#E5EDF6] bg-white px-4 py-3"
+                            >
+                              <span className="mt-[1px] text-sm font-black text-[#F15A24]">
+                                ✓
+                              </span>
+                              <span className="text-sm font-black leading-6 text-[#123A63]">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-                        <div className={`mt-2 h-5 w-5 rounded-full border ${
-                          planId === plan.id ? "border-[#F15A24] bg-[#F15A24]" : "border-[#B9C8D8]"
-                        }`} />
-                      </div>
-
-                      <p className="mt-5 min-h-[82px] text-sm font-bold leading-7 text-slate-500">{plan.subtitle}</p>
-
-                      <ul className="mt-5 flex-1 space-y-2">
-                        {plan.features.map((feature) => (
-                          <li key={feature} className="text-xs font-black text-[#123A63]">✓ {feature}</li>
-                        ))}
-                      </ul>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             )}
