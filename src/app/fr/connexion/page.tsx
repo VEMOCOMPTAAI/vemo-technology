@@ -207,7 +207,17 @@ export default function ClientLoginPage() {
               </div>
             ) : null}
 
-            <button
+            
+            <div className="flex justify-end">
+              <a
+                href="/fr/mot-de-passe-oublie"
+                className="text-sm font-black text-[#F15A24] transition hover:text-[#DB4F1C]"
+              >
+                Mot de passe oublié ?
+              </a>
+            </div>
+
+<button
               type="button"
               onClick={login}
               disabled={busy}
