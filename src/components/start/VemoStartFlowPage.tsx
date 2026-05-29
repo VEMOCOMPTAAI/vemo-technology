@@ -333,16 +333,29 @@ function PaymentCardElement({
   const [name, setName] = useState(billingName || "");
   const [emailValue, setEmailValue] = useState(billingEmail || "");
 
+  useEffect(() => {
+    setName(billingName || "");
+  }, [billingName]);
+
+  useEffect(() => {
+    setEmailValue(billingEmail || "");
+  }, [billingEmail]);
+
   async function pay() {
     if (!stripe || !elements) {
       setError("Stripe n’est pas encore prêt.");
       return;
     }
 
+    if (!amount || amount <= 0) {
+      setError("Montant invalide. Merci de choisir une formule avant le paiement.");
+      return;
+    }
+
     const card = elements.getElement(CardElement);
 
     if (!card) {
-      setError("Le formulaire carte est introuvable.");
+      setError("Le champ carte est introuvable.");
       return;
     }
 
@@ -455,7 +468,7 @@ function PaymentCardElement({
               Informations carte
             </p>
             <p className="text-sm font-bold text-[#123A63]">
-              Carte Visa, Mastercard, American Express...
+              Visa, Mastercard, American Express...
             </p>
           </div>
         </div>
@@ -464,6 +477,7 @@ function PaymentCardElement({
           <CardElement
             options={{
               hidePostalCode: true,
+              disableLink: true,
               style: {
                 base: {
                   fontSize: "16px",
@@ -492,8 +506,8 @@ function PaymentCardElement({
       <button
         type="button"
         onClick={pay}
-        disabled={busy || !stripe || !elements}
-        className="mt-6 h-[58px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white shadow-[0_16px_30px_rgba(241,90,36,.18)] transition hover:bg-[#DB4F1C] disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={busy || !stripe || !elements || !amount}
+        className="mt-6 h-[58px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {busy ? "Traitement du paiement..." : `Payer $${amount}`}
       </button>
@@ -601,6 +615,13 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       setManagerName(memberName);
     }
   }, [memberRole, memberName]);
+  useEffect(() => {
+    // AUTO_REDIRECT_PAYMENT_WITHOUT_PLAN
+    if (step === 9 && (!selectedPlan || !finalPrice)) {
+      setStep(1);
+    }
+  }, [step, selectedPlan, finalPrice]);
+
   function handlePhoneChange(value: string) {
     const country = findCountryByDial(value);
 
@@ -868,14 +889,13 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 <div className="mt-6 grid gap-5 md:grid-cols-2">
                   {["New Mexico", "Wyoming"].map((s) => {
                     const selected = state === s;
-                    const renewal = s === "Wyoming" ? "25 $ / an" : "35 $ / an";
 
                     return (
                       <button
                         key={s}
                         type="button"
                         onClick={() => setState(s)}
-                        className={`relative min-h-[260px] rounded-[1.8rem] border bg-white p-6 text-left transition ${
+                        className={`relative min-h-[220px] rounded-[1.8rem] border bg-white p-6 text-left transition ${
                           selected
                             ? "border-[#F15A24] shadow-[0_20px_48px_rgba(18,58,99,.10)]"
                             : "border-[#E3EAF2] shadow-[0_12px_28px_rgba(18,58,99,.04)] hover:border-[#F15A24]/40"
@@ -898,7 +918,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                           </div>
                         </div>
 
-                        <p className="mt-4 min-h-[72px] text-sm font-bold leading-7 text-slate-500">
+                        <p className="mt-4 text-sm font-bold leading-7 text-slate-500">
                           {s === "New Mexico"
                             ? "Confidentialité, coût optimisé et structure simple pour les entrepreneurs non-résidents."
                             : "État reconnu, image corporate plus forte et traitement généralement plus rapide."}
@@ -1322,7 +1342,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                             href="https://wa.me/"
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex h-[52px] min-w-[170px] items-center justify-center rounded-[16px] border border-[#F15A24] bg-white px-5 text-sm font-black text-[#F15A24] transition hover:bg-[#FFF4EE]"
+                            className="inline-flex h-[52px] min-w-[170px] items-center justify-center rounded-[16px] border border-[#F15A24] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
                           >
                             WhatsApp
                           </a>
@@ -1369,7 +1389,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                           type="button"
                           onClick={submitBankTransfer}
                           disabled={busy}
-                          className="mt-5 h-[58px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white shadow-[0_16px_30px_rgba(241,90,36,.18)] transition hover:bg-[#DB4F1C] disabled:cursor-not-allowed disabled:opacity-60"
+                          className="mt-5 h-[58px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {busy ? "Envoi du justificatif..." : "Uploader le justificatif et continuer →"}
                         </button>
