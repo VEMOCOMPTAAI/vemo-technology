@@ -172,6 +172,21 @@ function availableServices(planId: string, state: string) {
   return getVemoLlcPackFeatures(planId, state);
 }
 
+function visibleSelectableServices(services: string[]) {
+  const hiddenKeywords = [
+    "Documents de création LLC",
+    "Frais de dépôt",
+    "Renouvellement Registered Agent",
+    "Registered Agent offert",
+  ];
+
+  return services.filter((service) => {
+    return !hiddenKeywords.some((keyword) =>
+      service.toLowerCase().includes(keyword.toLowerCase())
+    );
+  });
+}
+
 function emailIsValid(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email.trim());
 }
@@ -536,6 +551,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const addressCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === addressCountryIso) || selectedCountry, [addressCountryIso, selectedCountry]);
 
   const services = selectedPlan ? availableServices(selectedPlan.id, state) : [];
+  const selectableServices = visibleSelectableServices(services);
   const finalPrice = selectedPlan ? getPlanPrice(selectedPlan.id, state) : null;
   const packName = selectedPlan ? `${state} ${selectedPlan.label}` : "";
   const progress = Math.round(((step + 1) / t.steps.length) * 100);
@@ -581,6 +597,15 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   }, [planId, state]);
 
   useEffect(() => {
+    // CLEAN_SELECTED_SERVICES_HIDDEN_ITEMS
+    setSelectedServices((prev) =>
+      prev.filter((service) => visibleSelectableServices([service]).length > 0)
+    );
+  }, [services.join("|")]);
+
+
+
+  useEffect(() => {
     if (memberRole === "Membre et Manager") {
       setManagerName(memberName);
     }
@@ -619,7 +644,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     if (step === 5 && (!memberName.trim() || !memberRole.trim())) return false;
     if (step === 5 && memberRole === "Membre" && !managerName.trim()) return false;
     if (step === 6 && (!address.trim() || !addressCity.trim() || !addressCountryIso.trim())) return false;
-    if (step === 7 && selectedServices.length === 0) return false;
+    if (step === 7 && selectableServices.length > 0 && selectedServices.length === 0) return false;
     if (step === 8 && !confirmSummary) return false;
     return true;
   }
@@ -1130,15 +1155,15 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
               <>
                 <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Services inclus</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Sélectionnez les services dont vous avez besoin parmi ceux disponibles dans le pack choisi : {selectedPlan?.label || "—"}.
+                  Sélectionnez les services à activer dans votre pack : {selectedPlan?.label || "—"}.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  {services.length === 0 ? (
+                  {selectableServices.length === 0 ? (
                     <div className="md:col-span-2 rounded-[1.3rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5 text-sm font-black text-slate-500">
-                      Choisissez d’abord une formule pour afficher les services disponibles.
+                      Aucun service supplémentaire à sélectionner pour cette formule.
                     </div>
-                  ) : services.map((service) => (
+                  ) : selectableServices.map((service) => (
                     <button
                       key={service}
                       type="button"
@@ -1426,7 +1451,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
               {[
                 ["État", state, "Inclus"],
                 ["Accompagnement", selectedPlan?.label || "À choisir", selectedPlan ? `$${finalPrice}` : "—"],
-                ["Services", selectedServices.length ? `${selectedServices.length} sélectionné(s)` : selectedPlan ? "À sélectionner" : "À choisir", "$0"],
+                ["Services", selectableServices.length ? (selectedServices.length ? `${selectedServices.length} sélectionné(s)` : "À sélectionner") : "Inclus dans la formule", "$0"],
               ].map(([key, value, price]) => (
                 <div key={key} className="flex items-start justify-between gap-4">
                   <div>
