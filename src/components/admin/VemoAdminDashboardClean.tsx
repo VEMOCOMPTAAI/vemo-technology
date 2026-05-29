@@ -289,23 +289,21 @@ export default function VemoAdminDashboardClean() {
 
           <div className="flex items-center gap-3">
             <div className="flex items-center border-r border-[#E8E2DC] pr-4">
-              <button
-                onClick={() => setLocale("fr")}
-                className={`px-2 text-sm font-black transition ${
-                  locale === "fr" ? "text-[#F15A24]" : "text-[#111827] hover:text-[#F15A24]"
-                }`}
-              >
-                FR
-              </button>
-              <span className="mx-1 text-slate-300">/</span>
-              <button
-                onClick={() => setLocale("en")}
-                className={`px-2 text-sm font-black transition ${
-                  locale === "en" ? "text-[#F15A24]" : "text-[#111827] hover:text-[#F15A24]"
-                }`}
-              >
-                EN
-              </button>
+              {locale === "fr" ? (
+                <button
+                  onClick={() => setLocale("en")}
+                  className="px-2 text-sm font-black text-[#111827] transition hover:text-[#F15A24]"
+                >
+                  EN
+                </button>
+              ) : (
+                <button
+                  onClick={() => setLocale("fr")}
+                  className="px-2 text-sm font-black text-[#111827] transition hover:text-[#F15A24]"
+                >
+                  FR
+                </button>
+              )}
             </div>
 
             <a
