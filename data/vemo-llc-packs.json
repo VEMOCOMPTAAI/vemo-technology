@@ -1,5 +1,8 @@
 {
-  "states": ["Wyoming", "New Mexico"],
+  "states": [
+    "Wyoming",
+    "New Mexico"
+  ],
   "registeredAgentRenewal": {
     "Wyoming": 25,
     "New Mexico": 35
@@ -11,8 +14,8 @@
       "description": "L’essentiel pour créer votre LLC.",
       "recommended": false,
       "prices": {
-        "Wyoming": 300,
-        "New Mexico": 250
+        "Wyoming": 179,
+        "New Mexico": 129
       },
       "features": [
         "Documents de création LLC",
@@ -27,8 +30,8 @@
       "description": "La formule recommandée pour démarrer sérieusement.",
       "recommended": true,
       "prices": {
-        "Wyoming": 600,
-        "New Mexico": 550
+        "Wyoming": 199,
+        "New Mexico": 149
       },
       "features": [
         "Documents de création LLC",
@@ -45,8 +48,8 @@
       "description": "L’offre complète pour structurer votre activité.",
       "recommended": false,
       "prices": {
-        "Wyoming": 1000,
-        "New Mexico": 950
+        "Wyoming": 249,
+        "New Mexico": 199
       },
       "features": [
         "Documents de création LLC",

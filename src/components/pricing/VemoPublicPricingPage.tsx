@@ -1,296 +1,230 @@
-"use client";
+import Link from "next/link";
+import { VEMO_LLC_PACKS, getVemoLlcPackFeatures, getVemoLlcPackPrice } from "@/lib/vemoLlcPacks";
 
-import { useEffect, useMemo, useState } from "react";
+type Locale = "fr" | "en";
+type PackId = "starter" | "standard" | "premium";
+type StateName = "New Mexico" | "Wyoming";
 
-type Lang = "fr" | "en";
+const PACK_ORDER: PackId[] = ["starter", "standard", "premium"];
+const STATE_ORDER: StateName[] = ["New Mexico", "Wyoming"];
 
-type Pack = {
-  id: string;
-  state?: string;
-  name_fr: string;
-  name_en: string;
-  price: number;
-  description_fr: string;
-  description_en: string;
-  features_fr?: string[];
-  features_en?: string[];
-  active: boolean;
-  recommended?: boolean;
-};
-
-type Pricing = {
-  currency: string;
-  packs: Pack[];
-  updated_at?: string | null;
-};
-
-const emptyPricing: Pricing = {
-  currency: "USD",
-  packs: [],
-  updated_at: null,
-};
-
-const content = {
+const LABELS = {
   fr: {
-    eyebrow: "Tarifs VEMO",
-    title: "Choisissez votre pack LLC",
-    subtitle:
-      "Des packs clairs pour créer votre LLC aux États-Unis avec frais de dépôt inclus, suivi administratif et accompagnement VEMO.",
-    all: "Tous",
-    nm: "New Mexico",
-    wy: "Wyoming",
-    recommended: "Recommandé",
-    start: "Commencer",
-    fees: "Frais de dépôt inclus",
-    empty: "Aucun pack disponible pour le moment.",
-    loading: "Chargement des packs...",
+    pageTitle: "Tarifs LLC",
+    pageSubtitle:
+      "Choisissez la formule adaptée à votre projet. Les offres New Mexico et Wyoming sont affichées séparément pour une lecture plus claire.",
+    states: {
+      "New Mexico": "New Mexico",
+      Wyoming: "Wyoming",
+    },
+    descriptions: {
+      starter: "L’essentiel pour créer votre LLC.",
+      standard: "La formule recommandée pour démarrer sérieusement.",
+      premium: "L’offre complète pour structurer votre activité.",
+    },
+    cta: "Commencer",
+    renewalTitle: "Renouvellement Registered Agent",
+    renewalWy: "Wyoming : 25 USD / an",
+    renewalNm: "New Mexico : 35 USD / an",
+    included: "Inclus dans le pack",
   },
   en: {
-    eyebrow: "VEMO Pricing",
-    title: "Choose your LLC package",
-    subtitle:
-      "Clear packages to form your US LLC with frais de dépôt inclus, administrative tracking and VEMO support.",
-    all: "All",
-    nm: "New Mexico",
-    wy: "Wyoming",
-    recommended: "Recommended",
-    start: "Start",
-    fees: "Frais de dépôt inclus",
-    empty: "No package available yet.",
-    loading: "Loading packages...",
+    pageTitle: "LLC Pricing",
+    pageSubtitle:
+      "Choose the plan that fits your project. New Mexico and Wyoming offers are displayed separately for better clarity.",
+    states: {
+      "New Mexico": "New Mexico",
+      Wyoming: "Wyoming",
+    },
+    descriptions: {
+      starter: "Essential offer to launch your LLC.",
+      standard: "Recommended offer to start with stronger support.",
+      premium: "Complete offer to structure your business.",
+    },
+    cta: "Start now",
+    renewalTitle: "Registered Agent Renewal",
+    renewalWy: "Wyoming: 25 USD / year",
+    renewalNm: "New Mexico: 35 USD / year",
+    included: "Included in the plan",
   },
-};
+} as const;
 
-function packName(pack: Pack, lang: Lang) {
-  return lang === "fr" ? pack.name_fr : pack.name_en;
-}
-
-function packDescription(pack: Pack, lang: Lang) {
-  return lang === "fr" ? pack.description_fr : pack.description_en;
-}
-
-function packFeatures(pack: Pack, lang: Lang) {
-  return lang === "fr" ? pack.features_fr || [] : pack.features_en || [];
-}
-
-function stateSlug(state?: string) {
-  const s = String(state || "").toLowerCase();
-  if (s.includes("wyoming")) return "wyoming";
-  return "new-mexico";
-}
-
-function stateLabel(state?: string) {
-  return state || "LLC";
-}
-
-export default function VemoPublicPricingPage({ lang = "fr" }: { lang?: Lang }) {
-  const [pricing, setPricing] = useState<Pricing>(emptyPricing);
-  const [loading, setLoading] = useState(true);
-  const [stateFilter, setStateFilter] = useState<"all" | "New Mexico" | "Wyoming">("all");
-
-  const t = content[lang];
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/pricing", { cache: "no-store" });
-        const data = await res.json().catch(() => null);
-        setPricing(data?.pricing || emptyPricing);
-      } catch {
-        setPricing(emptyPricing);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, []);
-
-  const packs = useMemo(() => {
-    return (pricing.packs || [])
-      .filter((pack) => pack.active)
-      .filter((pack) => stateFilter === "all" || pack.state === stateFilter);
-  }, [pricing.packs, stateFilter]);
-
-  function startUrl(pack: Pack) {
-    const base = lang === "fr" ? "/fr/commencer" : "/en/commencer";
-    const params = new URLSearchParams({
-      pack: pack.id,
-      packName: packName(pack, lang),
-      state: stateSlug(pack.state),
-      amount: String(pack.price),
-      currency: pricing.currency || "USD",
-    });
-
-    return `${base}?${params.toString()}`;
+function safePrice(packId: string, state: string) {
+  try {
+    const value = getVemoLlcPackPrice(packId as any, state as any);
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue : 0;
+  } catch {
+    return 0;
   }
+}
+
+function safeFeatures(packId: string, state: string) {
+  try {
+    const byState = getVemoLlcPackFeatures(packId as any, state as any);
+    if (Array.isArray(byState) && byState.length) return byState;
+  } catch {}
+  try {
+    const generic = getVemoLlcPackFeatures(packId as any);
+    if (Array.isArray(generic) && generic.length) return generic;
+  } catch {}
+  const pack = (VEMO_LLC_PACKS as any[]).find((item) => item.id === packId);
+  if (Array.isArray(pack?.features)) return pack.features;
+  if (Array.isArray(pack?.included)) return pack.included;
+  if (Array.isArray(pack?.services)) return pack.services;
+  return [];
+}
+
+function cleanFeatures(features: string[]) {
+  return features
+    .filter(Boolean)
+    .filter(
+      (item) =>
+        !/renouvellement registered agent/i.test(item) &&
+        !/registered agent renewal/i.test(item)
+    )
+    .slice(0, 7);
+}
+
+function buildHref(locale: Locale, packId: PackId, state: StateName, price: number) {
+  const stateSlug = state === "New Mexico" ? "new-mexico" : "wyoming";
+  const packName =
+    state === "New Mexico"
+      ? `New Mexico ${packId.charAt(0).toUpperCase() + packId.slice(1)}`
+      : `Wyoming ${packId.charAt(0).toUpperCase() + packId.slice(1)}`;
+
+  return `/${locale === "fr" ? "fr/commencer" : "en/start"}?pack=${stateSlug}_${packId}&packName=${encodeURIComponent(
+    packName
+  )}&state=${stateSlug}&amount=${price}&currency=USD`;
+}
+
+function PackCard({
+  locale,
+  packId,
+  state,
+}: {
+  locale: Locale;
+  packId: PackId;
+  state: StateName;
+}) {
+  const t = LABELS[locale];
+  const price = safePrice(packId, state);
+  const features = cleanFeatures(safeFeatures(packId, state));
+  const title = packId.charAt(0).toUpperCase() + packId.slice(1);
+  const isRecommended = packId === "standard";
 
   return (
-    <main className="min-h-screen bg-[#F7FAFC] text-[#111827]">
-      <header className="border-b border-[#E8E2DC] bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <a href={lang === "fr" ? "/fr" : "/en"} className="leading-none">
-            <div className="text-[28px] font-black tracking-[-0.06em] text-[#123A63]">
-              VEMO<span className="text-[#F15A24]">TECH</span>
-            </div>
-            <div className="mt-1 text-[10px] font-black uppercase tracking-[0.34em] text-slate-400">
-              US LLC SERVICES
-            </div>
-          </a>
-
-          <div className="flex items-center gap-3">
-            <div className="flex items-center border-r border-[#E8E2DC] pr-4">
-              {lang === "fr" ? (
-                <a
-                  href="/en/pricing"
-                  className="px-2 text-sm font-black text-[#111827] transition hover:text-[#F15A24]"
-                >
-                  EN
-                </a>
-              ) : (
-                <a
-                  href="/fr/tarifs"
-                  className="px-2 text-sm font-black text-[#111827] transition hover:text-[#F15A24]"
-                >
-                  FR
-                </a>
-              )}
-            </div>
+    <div className="rounded-[28px] border border-[#E7EEF6] bg-white p-6">
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[12px] font-black uppercase tracking-[0.22em] text-[#8DA2BD]">
+            {t.states[state]}
           </div>
+          <h3 className="mt-2 text-[36px] font-black leading-none text-[#123A63]">
+            {title}
+          </h3>
+          <p className="mt-4 text-[16px] font-semibold leading-8 text-[#5B7191]">
+            {t.descriptions[packId]}
+          </p>
         </div>
-      </header>
 
-      <section className="relative overflow-hidden px-6 py-14">
-        <div className="absolute inset-0 opacity-[0.32] [background-image:linear-gradient(to_right,#e6eaf0_1px,transparent_1px),linear-gradient(to_bottom,#e6eaf0_1px,transparent_1px)] [background-size:54px_54px]" />
-
-        <div className="relative mx-auto max-w-7xl">
-          <div className="mx-auto max-w-4xl text-center">
-            <div className="inline-flex rounded-full border border-[#FFD2C2] bg-[#FFF7F1] px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#F15A24]">
-              {t.eyebrow}
-            </div>
-
-            <h1 className="mt-5 text-4xl font-black leading-[1.05] tracking-[-0.07em] text-[#111827] md:text-6xl">
-              {t.title}
-            </h1>
-
-            <p className="mx-auto mt-5 max-w-3xl text-base font-bold leading-8 text-slate-600 md:text-lg">
-              {t.subtitle}
-            </p>
+        {isRecommended ? (
+          <div className="shrink-0 rounded-full border border-[#F15A24] bg-white px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
+            {locale === "fr" ? "Recommandé" : "Recommended"}
           </div>
+        ) : null}
+      </div>
 
-          <div className="mt-8 flex justify-center">
-            <div className="inline-flex rounded-[18px] border border-[#E8E2DC] bg-white p-1 shadow-[0_12px_28px_rgba(18,58,99,0.06)]">
-              {[
-                ["all", t.all],
-                ["New Mexico", t.nm],
-                ["Wyoming", t.wy],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  onClick={() => setStateFilter(value as any)}
-                  className={`rounded-[14px] px-5 py-3 text-sm font-black transition ${
-                    stateFilter === value
-                      ? "bg-[#F15A24] text-white shadow-[0_12px_26px_rgba(241,90,36,.18)]"
-                      : "text-[#123A63] hover:bg-[#FFF7F1] hover:text-[#F15A24]"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-10">
-            {loading ? (
-              <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-10 text-center text-sm font-black text-slate-500">
-                {t.loading}
-              </div>
-            ) : packs.length === 0 ? (
-              <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-10 text-center text-sm font-black text-slate-500">
-                {t.empty}
-              </div>
-            ) : (
-              <div className="grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {packs.map((pack) => {
-                  const features = packFeatures(pack, lang);
-
-                  return (
-                    <article
-                      key={pack.id}
-                      className={`relative flex min-h-[620px] flex-col overflow-hidden rounded-[2rem] border bg-white p-6 shadow-[0_20px_48px_rgba(18,58,99,0.07)] transition hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(18,58,99,0.10)] ${
-                        pack.recommended ? "border-[#F15A24]" : "border-[#E8E2DC]"
-                      }`}
-                    >
-                      <div className="min-h-[150px]">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
-                              {stateLabel(pack.state)}
-                            </div>
-
-                            <h2 className="mt-3 text-2xl font-black tracking-[-0.055em] text-[#111827]">
-                              {packName(pack, lang)}
-                            </h2>
-                          </div>
-
-                          {pack.recommended && (
-                            <div className="shrink-0 rounded-full bg-[#FFF7F1] px-3 py-2 text-[10px] font-black uppercase tracking-[0.10em] text-[#F15A24] ring-1 ring-[#FFD2C2]">
-                              {t.recommended}
-                            </div>
-                          )}
-                        </div>
-
-                        <p className="mt-4 line-clamp-3 text-sm font-bold leading-7 text-slate-600">
-                          {packDescription(pack, lang)}
-                        </p>
-                      </div>
-
-                      <div className="mt-5 rounded-[1.35rem] border border-[#E8E2DC] bg-[#FBFCFD] p-5">
-                        <div className="flex items-end justify-between gap-3">
-                          <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-                              Prix
-                            </p>
-                            <div className="mt-1 flex items-end gap-1">
-                              <span className="text-4xl font-black tracking-[-0.08em] text-[#123A63]">
-                                ${pack.price}
-                              </span>
-                              <span className="mb-1 text-xs font-black text-slate-400">
-                                {pricing.currency || "USD"}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="rounded-full border border-[#FFD2C2] bg-[#FFF7F1] px-3 py-2 text-[11px] font-black text-[#F15A24]">
-                            {t.fees}
-                          </div>
-                        </div>
-                      </div>
-
-                      <ul className="mt-6 min-h-[230px] flex-1 space-y-3">
-                        {features.map((feature, index) => (
-                          <li key={index} className="flex gap-3 text-sm font-bold leading-6 text-slate-700">
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFF7F1] text-xs font-black text-[#F15A24]">
-                              ✓
-                            </span>
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <a
-                        href={startUrl(pack)}
-                        className="mt-auto flex min-h-[52px] items-center justify-center rounded-[16px] bg-[#F15A24] px-6 text-sm font-black text-white shadow-[0_14px_30px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
-                      >
-                        {t.start} →
-                      </a>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+      <div className="mb-6 rounded-[20px] border border-[#E7EEF6] bg-white px-5 py-4">
+        <div className="text-[13px] font-bold uppercase tracking-[0.18em] text-[#8DA2BD]">
+          {t.included}
         </div>
+        <div className="mt-3 text-[40px] font-black leading-none text-[#F15A24]">
+          {price} USD
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {features.map((feature) => (
+          <div
+            key={feature}
+            className="flex items-start gap-3 rounded-[18px] border border-[#E7EEF6] bg-white px-4 py-3"
+          >
+            <span className="mt-[2px] text-[14px] font-black text-[#F15A24]">✓</span>
+            <span className="text-[15px] font-bold leading-6 text-[#123A63]">{feature}</span>
+          </div>
+        ))}
+      </div>
+
+      <Link
+        href={buildHref(locale, packId, state, price)}
+        className="mt-6 inline-flex w-full items-center justify-center rounded-[18px] border border-[#F15A24] bg-[#F15A24] px-5 py-4 text-[15px] font-black text-white transition hover:opacity-95"
+      >
+        {t.cta}
+      </Link>
+    </div>
+  );
+}
+
+export default function VemoPublicPricingPage({ locale = "fr" }: { locale?: Locale }) {
+  const t = LABELS[locale];
+
+  return (
+    <main className="min-h-screen bg-white">
+      <section className="mx-auto w-full max-w-7xl px-6 py-14 md:px-8">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="text-[12px] font-black uppercase tracking-[0.24em] text-[#F15A24]">
+            {locale === "fr" ? "Tarifs" : "Pricing"}
+          </div>
+          <h1 className="mt-4 text-[44px] font-black leading-tight text-[#111827] md:text-[56px]">
+            {t.pageTitle}
+          </h1>
+          <p className="mx-auto mt-5 max-w-3xl text-[18px] leading-8 text-[#5B7191]">
+            {t.pageSubtitle}
+          </p>
+        </div>
+
+        <div className="mt-14 space-y-14">
+          {STATE_ORDER.map((state) => (
+            <section key={state}>
+              <div className="mb-6 flex items-center justify-between gap-4">
+                <h2 className="text-[32px] font-black text-[#123A63]">{t.states[state]}</h2>
+                <div className="h-px flex-1 bg-[#E7EEF6]" />
+              </div>
+
+              <div className="grid gap-6 lg:grid-cols-3">
+                {PACK_ORDER.map((packId) => (
+                  <PackCard key={`${state}-${packId}`} locale={locale} state={state} packId={packId} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+
+        <section className="mt-14 rounded-[28px] border border-[#E7EEF6] bg-white p-6 md:p-8">
+          <h3 className="text-[28px] font-black text-[#123A63]">{t.renewalTitle}</h3>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-[22px] border border-[#E7EEF6] bg-white p-5">
+              <div className="text-[12px] font-black uppercase tracking-[0.20em] text-[#8DA2BD]">
+                Wyoming
+              </div>
+              <div className="mt-3 text-[28px] font-black text-[#F15A24]">25 USD</div>
+              <div className="mt-2 text-[15px] font-semibold text-[#5B7191]">
+                {locale === "fr" ? "Par an" : "Per year"}
+              </div>
+            </div>
+
+            <div className="rounded-[22px] border border-[#E7EEF6] bg-white p-5">
+              <div className="text-[12px] font-black uppercase tracking-[0.20em] text-[#8DA2BD]">
+                New Mexico
+              </div>
+              <div className="mt-3 text-[28px] font-black text-[#F15A24]">35 USD</div>
+              <div className="mt-2 text-[15px] font-semibold text-[#5B7191]">
+                {locale === "fr" ? "Par an" : "Per year"}
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </main>
   );
