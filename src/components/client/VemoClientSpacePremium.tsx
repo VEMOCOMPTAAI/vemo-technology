@@ -43,6 +43,7 @@ const copy = {
     title: "Votre dossier LLC",
     subtitle: "Suivez l’avancement de votre dossier, consultez vos documents et échangez avec l’équipe VEMO.",
     logout: "Déconnexion",
+    refresh: "Actualiser",
     documents: "Documents",
     messages: "Messages",
     overview: "Vue dossier",
@@ -72,6 +73,7 @@ const copy = {
     title: "Your LLC file",
     subtitle: "Track your file progress, view your documents and communicate with the VEMO team.",
     logout: "Log out",
+    refresh: "Refresh",
     documents: "Documents",
     messages: "Messages",
     overview: "File overview",
@@ -183,6 +185,7 @@ function hasDocumentFile(doc: DocumentRow) {
 }
 
 
+
 function DocumentIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -241,6 +244,7 @@ export default function VemoClientSpacePremium({ lang = "fr" }: { lang?: Lang })
 
       setProfile(profileData?.profile || { email: currentEmail, client_email: currentEmail });
       setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
+      if (Array.isArray(docsData?.documents)) console.table(docsData.documents);
       setMessages(Array.isArray(messagesData?.messages) ? messagesData.messages : []);
 
       if (profileData?.error) setError(profileData.error);
@@ -313,8 +317,15 @@ export default function VemoClientSpacePremium({ lang = "fr" }: { lang?: Lang })
               EN
             </a>
             <button
-              onClick={logout}
+              onClick={() => loadAll(clientEmail)}
               className="rounded-[16px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F1] hover:text-[#F15A24]"
+            >
+              {t.refresh}
+            </button>
+
+            <button
+              onClick={logout}
+              className="rounded-[16px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.16)] transition hover:bg-[#D94A1B]"
             >
               {t.logout}
             </button>

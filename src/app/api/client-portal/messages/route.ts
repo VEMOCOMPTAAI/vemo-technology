@@ -15,6 +15,26 @@ function supabaseAdmin() {
   return createClient(url, key);
 }
 
+function cleanText(value: any) {
+  return String(value || "").trim();
+}
+
+function uniqueMessages(rows: any[]) {
+  const seen = new Set<string>();
+  const result: any[] = [];
+
+  for (const row of rows || []) {
+    const key = `${cleanText(row.sender).toLowerCase()}::${cleanText(row.message).toLowerCase()}`;
+
+    if (seen.has(key)) continue;
+
+    seen.add(key);
+    result.push(row);
+  }
+
+  return result;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const email = String(request.nextUrl.searchParams.get("email") || "").trim().toLowerCase();
@@ -39,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      messages: data || [],
+      messages: uniqueMessages(data || []),
     });
   } catch (error: any) {
     return NextResponse.json({
