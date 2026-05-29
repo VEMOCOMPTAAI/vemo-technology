@@ -60,6 +60,10 @@ export default function AdminFinalPage() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState("");
   const [message, setMessage] = useState("");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadTitle, setUploadTitle] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [documentClientEmail, setDocumentClientEmail] = useState("");
 
   async function load() {
     setLoading(true);
@@ -102,6 +106,53 @@ export default function AdminFinalPage() {
       return matchesQuery && matchesSelected;
     });
   }, [items, query, selectedEmail]);
+
+
+  async function uploadClientDocument() {
+    setMessage("");
+
+    const targetEmail = documentClientEmail || selectedEmail;
+
+    if (!targetEmail) {
+      setMessage("Sélectionne d’abord un client.");
+      return;
+    }
+
+    if (!uploadFile) {
+      setMessage("Choisis un document à uploader.");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const form = new FormData();
+      form.append("email", targetEmail);
+      form.append("client_email", targetEmail);
+      form.append("title", uploadTitle || uploadFile.name);
+      form.append("file", uploadFile);
+
+      const res = await fetch("/api/admin/client-portal/documents", {
+        method: "POST",
+        body: form,
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.ok === false) {
+        setMessage(data?.error || "Erreur upload document.");
+        return;
+      }
+
+      setUploadFile(null);
+      setUploadTitle("");
+      setMessage("Document uploadé. Il sera visible dans l’espace client.");
+    } catch (e: any) {
+      setMessage(e?.message || "Erreur upload document.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function updateStatus(item: AdminItem, patch: Partial<AdminItem>) {
     setSavingId(item.id);
@@ -247,7 +298,65 @@ export default function AdminFinalPage() {
             </div>
           ) : null}
 
-          <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[#E6EDF5]">
+          
+          <div className="mt-6 rounded-[1.5rem] border border-[#E6EDF5] bg-white p-5">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-[22px] font-black tracking-[-0.04em] text-[#111827]">
+                  Documents client
+                </h2>
+                <p className="mt-1 text-sm font-semibold text-slate-500">
+                  Uploadez ici les documents qui apparaîtront dans l’espace client.
+                </p>
+              </div>
+
+              <a
+                href={selectedEmail ? `/fr/espace-client?email=${encodeURIComponent(selectedEmail)}` : "/fr/espace-client"}
+                className="inline-flex h-[44px] items-center rounded-[14px] border border-[#E6EDF5] bg-white px-4 text-xs font-black text-[#123A63] transition hover:border-[#F15A24]"
+              >
+                Voir espace client
+              </a>
+            </div>
+
+            <div className="mt-5 grid gap-3 lg:grid-cols-[0.85fr_1fr_1fr_auto]">
+              <select
+                value={documentClientEmail || selectedEmail}
+                onChange={(e) => setDocumentClientEmail(e.target.value)}
+                className="h-[50px] rounded-[15px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+              >
+                <option value="">Choisir client</option>
+                {uniqueClients.map((item) => (
+                  <option key={item.email} value={item.email}>
+                    {item.llcName} — {item.email}
+                  </option>
+                ))}
+              </select>
+
+              <input
+                value={uploadTitle}
+                onChange={(e) => setUploadTitle(e.target.value)}
+                placeholder="Titre document : Articles of Organization, EIN, Operating Agreement..."
+                className="h-[50px] rounded-[15px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
+              />
+
+              <input
+                type="file"
+                onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                className="h-[50px] rounded-[15px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
+              />
+
+              <button
+                type="button"
+                onClick={uploadClientDocument}
+                disabled={uploading}
+                className="h-[50px] rounded-[15px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:opacity-60"
+              >
+                {uploading ? "Upload..." : "Uploader"}
+              </button>
+            </div>
+          </div>
+
+<div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[#E6EDF5]">
             <div className="grid grid-cols-[1.4fr_0.9fr_0.8fr_0.8fr_1fr_1fr_0.8fr] bg-[#F8FAFC] px-4 py-3 text-[11px] font-black uppercase tracking-[0.13em] text-slate-400">
               <div>Client / LLC</div>
               <div>Formule</div>
