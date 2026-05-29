@@ -601,8 +601,13 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                           ? "Confidentialité, coût optimisé et structure simple pour non-résidents."
                           : "État reconnu, image corporate plus forte et traitement généralement plus rapide."}
                       </p>
-                      <div className="mt-5 rounded-full border border-[#F15A24] bg-white px-4 py-2 text-sm font-black text-[#F15A24]">
-                        Frais de dépôt inclus
+                      <div className="mt-5 rounded-[14px] border border-[#E3EAF2] bg-[#F8FAFC] px-4 py-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
+                          Registered Agent renewal
+                        </p>
+                        <p className="mt-1 text-sm font-black text-[#123A63]">
+                          {s === "Wyoming" ? "25 $ / an" : "35 $ / an"}
+                        </p>
                       </div>
                     </button>
                   ))}

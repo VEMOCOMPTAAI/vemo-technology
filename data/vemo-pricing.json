@@ -24,7 +24,10 @@
         "Basic administrative follow up"
       ],
       "active": true,
-      "recommended": false
+      "recommended": false,
+      "registered_agent_renewal_usd": 35,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 35 $ / an",
+      "registered_agent_renewal_label_en": "Registered Agent renewal: $35/year"
     },
     {
       "id": "nm_standard",
@@ -51,7 +54,10 @@
         "Enhanced administrative follow up"
       ],
       "active": true,
-      "recommended": true
+      "recommended": true,
+      "registered_agent_renewal_usd": 35,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 35 $ / an",
+      "registered_agent_renewal_label_en": "Registered Agent renewal: $35/year"
     },
     {
       "id": "nm_premium",
@@ -78,7 +84,10 @@
         "Priority support"
       ],
       "active": true,
-      "recommended": false
+      "recommended": false,
+      "registered_agent_renewal_usd": 35,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 35 $ / an",
+      "registered_agent_renewal_label_en": "Registered Agent renewal: $35/year"
     },
     {
       "id": "wy_starter",
@@ -103,7 +112,10 @@
         "Basic administrative follow up"
       ],
       "active": true,
-      "recommended": false
+      "recommended": false,
+      "registered_agent_renewal_usd": 25,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 25 $ / an",
+      "registered_agent_renewal_label_en": "Registered Agent renewal: $25/year"
     },
     {
       "id": "wy_standard",
@@ -130,7 +142,10 @@
         "Enhanced administrative follow up"
       ],
       "active": true,
-      "recommended": true
+      "recommended": true,
+      "registered_agent_renewal_usd": 25,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 25 $ / an",
+      "registered_agent_renewal_label_en": "Registered Agent renewal: $25/year"
     },
     {
       "id": "wy_premium",
@@ -157,7 +172,10 @@
         "Priority support"
       ],
       "active": true,
-      "recommended": false
+      "recommended": false,
+      "registered_agent_renewal_usd": 25,
+      "registered_agent_renewal_label_fr": "Renouvellement Registered Agent : 25 $ / an",
+      "registered_agent_renewal_label_en": "Registered Agent renewal: $25/year"
     }
   ],
   "updated_at": null
