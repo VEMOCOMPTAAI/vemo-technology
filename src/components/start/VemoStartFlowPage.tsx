@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { VEMO_COUNTRIES, flagFromIso, type VemoCountry } from "@/lib/vemoCountries";
 
 type Lang = "fr" | "en";
-type PaymentMethod = "card" | "bank_transfer";
+type PaiementMethod = "card" | "bank_transfer";
 
 type Plan = {
   id: "starter" | "standard" | "premium";
@@ -17,7 +17,7 @@ type Plan = {
 const plans: Plan[] = [
   {
     id: "starter",
-    label: "Starter",
+    label: "Démarrerer",
     subtitle: "Pour démarrer simplement votre dossier LLC.",
     features: [
       "Préparation du dossier LLC",
@@ -31,7 +31,7 @@ const plans: Plan[] = [
     label: "Standard",
     subtitle: "La formule recommandée pour la plupart des non-résidents.",
     features: [
-      "Tout le Pack Starter",
+      "Tout le Pack Démarrerer",
       "Demande EIN",
       "Operating Agreement",
       "Registered Agent offert la première année",
@@ -99,32 +99,32 @@ const content = {
     ],
   },
   en: {
-    home: "Home",
-    pricing: "Pricing",
+    home: "Accueil",
+    pricing: "Tarifs",
     faq: "FAQ",
     contact: "Contact",
-    start: "Start",
+    start: "Démarrer",
     next: "Continue",
     back: "← Back",
-    summary: "Summary",
+    summary: "Résumé",
     progress: "Progress",
-    company: "Your LLC company",
-    estimated: "Estimated total",
+    company: "Votre société LLC",
+    estimated: "Total estimé",
     finalNote: "The final amount may be adjusted depending on the services actually required.",
-    included: "Included",
+    included: "Inclus",
     toComplete: "To complete",
     recommended: "Recommended",
     steps: [
-      "State",
-      "Package",
-      "LLC name",
+      "État",
+      "Formule",
+      "Nom LLC",
       "Activity",
-      "Account",
-      "Members",
-      "Address",
+      "Compte",
+      "Membres",
+      "Adresse",
       "Services",
-      "Summary",
-      "Payment",
+      "Résumé",
+      "Paiement",
     ],
   },
 };
@@ -184,6 +184,31 @@ function emailIsValid(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email.trim());
 }
 
+
+function countryDisplayName(country: VemoCountry) {
+  const names: Record<string, string> = {
+    MA: "Maroc",
+    DZ: "Algérie",
+    FR: "France",
+    AE: "Émirats arabes unis",
+    SA: "Arabie saoudite",
+    US: "États-Unis",
+    GB: "Royaume-Uni",
+    ES: "Espagne",
+    IT: "Italie",
+    DE: "Allemagne",
+    BE: "Belgique",
+    NL: "Pays-Bas",
+    PT: "Portugal",
+    TR: "Turquie",
+    TN: "Tunisie",
+    EG: "Égypte",
+    CA: "Canada"
+  };
+
+  return names[country.iso] || country.name;
+}
+
 function phoneIsValid(phone: string) {
   const digits = phone.replace(/\D/g, "");
   return digits.length >= 6 && digits.length <= 15;
@@ -241,16 +266,14 @@ function CountryPicker({
         }`}
       >
         {compact ? (
-          <span className="flex items-center gap-2">
+          <span className="flex items-center justify-center gap-2">
             <span>{flagFromIso(selected.iso)}</span>
             <span>{selected.dial}</span>
           </span>
         ) : (
-          <span className="flex items-center justify-between gap-3">
-            <span className="truncate">
-              {flagFromIso(selected.iso)} {selected.name}
-            </span>
-            <span className="text-slate-400">{selected.dial}</span>
+          <span className="flex items-center gap-2">
+            <span>{flagFromIso(selected.iso)}</span>
+            <span className="truncate">{countryDisplayName(selected)}</span>
           </span>
         )}
       </button>
@@ -260,7 +283,7 @@ function CountryPicker({
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher pays ou indicatif..."
+            placeholder="Rechercher un pays ou un indicatif..."
             className="h-11 w-full rounded-[13px] border border-[#E1E7EF] bg-[#F8FAFC] px-3 text-sm font-bold outline-none focus:border-[#F15A24]"
           />
 
@@ -277,9 +300,11 @@ function CountryPicker({
                 className="flex w-full items-center justify-between rounded-[12px] px-3 py-2 text-left text-sm font-black text-[#123A63] hover:bg-[#F8FAFC]"
               >
                 <span className="truncate">
-                  {flagFromIso(country.iso)} {country.name}
+                  {flagFromIso(country.iso)} {countryDisplayName(country)}
                 </span>
-                <span className="ml-3 text-slate-400">{country.dial}</span>
+                {compact ? (
+                  <span className="ml-3 text-slate-400">{country.dial}</span>
+                ) : null}
               </button>
             ))}
           </div>
@@ -289,7 +314,7 @@ function CountryPicker({
   );
 }
 
-export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
+export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const t = content[lang];
 
   const [step, setStep] = useState(0);
@@ -315,12 +340,12 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const [memberCountryIso, setMemberCountryIso] = useState("MA");
   const [memberRole, setMemberRole] = useState("Membre");
   const [managerName, setManagerName] = useState("");
-  const [address, setAddress] = useState("");
-  const [addressCity, setAddressCity] = useState("");
-  const [addressPostalCode, setAddressPostalCode] = useState("");
-  const [addressCountryIso, setAddressCountryIso] = useState("MA");
-  const [confirmSummary, setConfirmSummary] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
+  const [address, setAdresse] = useState("");
+  const [addressCity, setAdresseCity] = useState("");
+  const [addressPostalCode, setAdressePostalCode] = useState("");
+  const [addressCountryIso, setAdresseCountryIso] = useState("MA");
+  const [confirmRésumé, setConfirmRésumé] = useState(false);
+  const [paymentMethod, setPaiementMethod] = useState<PaiementMethod>("card");
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -359,7 +384,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     const params = new URLSearchParams(window.location.search);
 
     const qPack = params.get("pack");
-    const qState = params.get("state");
+    const qÉtat = params.get("state");
     const qEmail = params.get("email");
     const qName = params.get("name");
     const qLlc = params.get("llc");
@@ -368,8 +393,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       setPlanId(slugPlanToPlan(qPack) as any);
     }
 
-    if (qState?.toLowerCase().includes("wyoming")) setState("Wyoming");
-    if (qState?.toLowerCase().includes("new")) setState("New Mexico");
+    if (qÉtat?.toLowerCase().includes("wyoming")) setState("Wyoming");
+    if (qÉtat?.toLowerCase().includes("new")) setState("New Mexico");
 
     if (qPack) setPackId(qPack);
     if (qEmail) setEmail(qEmail);
@@ -388,7 +413,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
   useEffect(() => {
     if (!memberCountryIso || memberCountryIso === "MA") setMemberCountryIso(countryIso);
-    if (!addressCountryIso || addressCountryIso === "MA") setAddressCountryIso(countryIso);
+    if (!addressCountryIso || addressCountryIso === "MA") setAdresseCountryIso(countryIso);
   }, [countryIso]);
 
   function handlePhoneChange(value: string) {
@@ -410,7 +435,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     if (step === 4 && (!fullName.trim() || !emailIsValid(email) || !phoneIsValid(phone))) return false;
     if (step === 5 && (!memberName.trim() || !managerName.trim() || !memberRole.trim())) return false;
     if (step === 6 && (!address.trim() || !addressCity.trim() || !addressCountryIso.trim())) return false;
-    if (step === 8 && !confirmSummary) return false;
+    if (step === 8 && !confirmRésumé) return false;
     return true;
   }
 
@@ -423,7 +448,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     }
 
     if (!fullName.trim() || !emailIsValid(email) || !llcName.trim() || !phoneIsValid(phone)) {
-      setError(lang === "fr" ? "Merci de vérifier le nom, l’email, le téléphone et le nom LLC." : "Please check the name, email, phone and LLC name.");
+      setError(lang === "fr" ? "Merci de vérifier le nom, l’email, le téléphone et le nom LLC." : "Please check the name, email, phone and Nom LLC.");
       return;
     }
 
@@ -440,8 +465,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
           full_name: fullName,
           email,
           phone: `${phoneCountry.dial} ${phone}`.trim(),
-          phone_country: phoneCountry.name,
-          country: selectedCountry.name,
+          phone_country: phoneCountry.iso === 'MA' ? 'Maroc' : phoneCountry.name,
+          country: selectedCountry.iso === 'MA' ? 'Maroc' : selectedCountry.name,
           llc_name: `${llcName} ${designator}`.trim(),
           llc_name_raw: llcName,
           llc_designator: designator,
@@ -455,15 +480,15 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
           activity_sector: activitySector,
           activity_description: activityDescription,
           member_name: memberName,
-          member_country: memberCountry.name,
+          member_country: memberCountry.iso === 'MA' ? 'Maroc' : memberCountry.name,
           member_role: memberRole,
           manager_name: managerName,
           address,
           address_city: addressCity,
           address_postal_code: addressPostalCode,
-          address_country: addressCountry.name,
+          address_country: addressCountry.iso === 'MA' ? 'Maroc' : addressCountry.name,
           services,
-          summary_confirmed: confirmSummary,
+          summary_confirmed: confirmRésumé,
         }),
       });
 
@@ -524,7 +549,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 <span className="text-[#111827]">Technology</span>
               </div>
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                US LLC pour non-résidents
+                LLC US pour non-résidents
               </div>
             </div>
           </a>
@@ -573,7 +598,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 <div className={`mb-1 flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black ${
                   step === index ? "bg-[#F15A24] text-white" : "bg-[#EDF3F8] text-[#123A63]"
                 }`}>
-                  {String(index + 1).padStart(2, "0")}
+                  {String(index + 1).padDémarrer(2, "0")}
                 </div>
                 <div className="text-[11px] font-black">{label}</div>
               </button>
@@ -584,14 +609,14 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
         <div className="mt-7 grid gap-7 lg:grid-cols-[1.1fr_0.68fr]">
           <section className="rounded-[2rem] border border-[#E3EAF2] bg-white p-8 shadow-[0_24px_70px_rgba(18,58,99,0.08)]">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F15A24]">
-              Étape {String(step + 1).padStart(2, "0")}
+              Étape {String(step + 1).padDémarrer(2, "0")}
             </p>
 
             {step === 0 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Choisissez l’État LLC</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Choisissez l’État de création</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  L’État doit être choisi avant la formule, car les prix et les délais peuvent changer.
+                  L’État de création doit être choisi avant la formule, car les prix et les délais peuvent changer.
                 </p>
 
                 <div className="mt-6 grid gap-5 md:grid-cols-2">
@@ -613,7 +638,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         <div className="flex items-start justify-between gap-4">
                           <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-                              État LLC
+                              État de création
                             </p>
                             <h3 className="mt-2 text-2xl font-black tracking-[-0.04em] text-[#123A63]">
                               {s}
@@ -641,7 +666,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                           <div className="rounded-[1.1rem] border border-[#E3EAF2] bg-[#F8FAFC] px-4 py-3">
                             <div className="flex items-center justify-between gap-3">
                               <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                                Registered Agent renewal
+                                Renouvellement Registered Agent
                               </span>
                               <span className="text-sm font-black text-[#123A63]">
                                 {renewal}
@@ -794,7 +819,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
                   <div>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Téléphone / WhatsApp</span>
-                    <div className="grid grid-cols-[132px_1fr] gap-3">
+                    <div className="grid grid-cols-[118px_1fr] gap-3">
                       <CountryPicker
                         label=""
                         valueIso={phoneCountryIso}
@@ -805,7 +830,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         value={phone}
                         onChange={(e) => handlePhoneChange(e.target.value)}
                         className={`${inputClass()} ${phone && !phoneIsValid(phone) ? "border-red-300" : ""}`}
-                        placeholder="651983600 ou +213..."
+                        placeholder="651980076"
                       />
                     </div>
                     {phone && !phoneIsValid(phone) && (
@@ -878,7 +903,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Adresse</span>
                     <input
                       value={address}
-                      onChange={(e) => setAddress(e.target.value)}
+                      onChange={(e) => setAdresse(e.target.value)}
                       className={inputClass()}
                       placeholder="Adresse complète"
                     />
@@ -888,7 +913,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Ville</span>
                     <input
                       value={addressCity}
-                      onChange={(e) => setAddressCity(e.target.value)}
+                      onChange={(e) => setAdresseCity(e.target.value)}
                       className={inputClass()}
                     />
                   </label>
@@ -897,7 +922,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Code postal</span>
                     <input
                       value={addressPostalCode}
-                      onChange={(e) => setAddressPostalCode(e.target.value)}
+                      onChange={(e) => setAdressePostalCode(e.target.value)}
                       className={inputClass()}
                     />
                   </label>
@@ -905,7 +930,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                   <CountryPicker
                     label="Pays"
                     valueIso={addressCountryIso}
-                    onChange={(country) => setAddressCountryIso(country.iso)}
+                    onChange={(country) => setAdresseCountryIso(country.iso)}
                   />
                 </div>
               </>
@@ -952,16 +977,16 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     ["Activité", activityDescription],
                     ["Client", fullName],
                     ["Email", email],
-                    ["Pays du client", selectedCountry.name],
+                    ["Pays du client", (selectedCountry.iso === 'MA' ? 'Maroc' : selectedCountry.name)],
                     ["Téléphone", `${phoneCountry.dial} ${phone}`],
                     ["Membre principal", memberName],
-                    ["Pays du membre", memberCountry.name],
+                    ["Pays du membre", (memberCountry.iso === 'MA' ? 'Maroc' : memberCountry.name)],
                     ["Rôle", memberRole],
                     ["Manager", managerName],
                     ["Adresse", address],
                     ["Ville", addressCity],
                     ["Code postal", addressPostalCode],
-                    ["Pays adresse", addressCountry.name],
+                    ["Pays adresse", (addressCountry.iso === 'MA' ? 'Maroc' : addressCountry.name)],
                   ].map(([k, v]) => (
                     <div key={k} className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{k}</p>
@@ -973,8 +998,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 <label className="mt-6 flex gap-4 rounded-[1.5rem] border border-[#E3EAF2] bg-white p-5 text-sm font-black leading-7 text-[#123A63]">
                   <input
                     type="checkbox"
-                    checked={confirmSummary}
-                    onChange={(e) => setConfirmSummary(e.target.checked)}
+                    checked={confirmRésumé}
+                    onChange={(e) => setConfirmRésumé(e.target.checked)}
                     className="mt-1 h-4 w-4 shrink-0 accent-[#F15A24]"
                   />
                   <span>
@@ -994,24 +1019,24 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("card")}
+                    onClick={() => setPaiementMethod("card")}
                     className={`rounded-[1.5rem] border p-6 text-left transition ${
                       paymentMethod === "card" ? "border-[#F15A24] bg-white" : "border-[#E3EAF2] bg-white"
                     }`}
                   >
-                    <div className="text-2xl font-black text-[#123A63]">💳 Credit card</div>
+                    <div className="text-2xl font-black text-[#123A63]">💳 Carte bancaire</div>
                     <p className="mt-3 text-sm font-bold text-slate-500">Paiement en ligne sécurisé.</p>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod("bank_transfer")}
+                    onClick={() => setPaiementMethod("bank_transfer")}
                     className={`rounded-[1.5rem] border p-6 text-left transition ${
                       paymentMethod === "bank_transfer" ? "border-[#F15A24] bg-white" : "border-[#E3EAF2] bg-white"
                     }`}
                   >
-                    <div className="text-2xl font-black text-[#123A63]">🏦 Virement</div>
-                    <p className="mt-3 text-sm font-bold text-slate-500">Upload justificatif puis vérification admin.</p>
+                    <div className="text-2xl font-black text-[#123A63]">🏦 Virement bancaire</div>
+                    <p className="mt-3 text-sm font-bold text-slate-500">Upload du justificatif puis vérification admin.</p>
                   </button>
                 </div>
               </>
