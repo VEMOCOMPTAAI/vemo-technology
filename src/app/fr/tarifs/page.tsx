@@ -23,52 +23,6 @@ const renewalFallback: Record<StateName, number> = {
   Wyoming: 25,
 };
 
-const fallbackPacks: Pack[] = [
-  {
-    id: "starter",
-    label: "Starter",
-    description: "L’essentiel pour créer votre LLC.",
-    prices: { "New Mexico": 129, Wyoming: 179 },
-    features: [
-      "Documents de création LLC",
-      "Frais de dépôt de l’État inclus",
-      "Registered Agent offert la première année",
-      "US Phone Number offert 3 mois",
-    ],
-  },
-  {
-    id: "standard",
-    label: "Standard",
-    description: "La formule recommandée pour démarrer sérieusement.",
-    recommended: true,
-    prices: { "New Mexico": 149, Wyoming: 199 },
-    features: [
-      "Documents de création LLC",
-      "Frais de dépôt de l’État inclus",
-      "Registered Agent offert la première année",
-      "US Phone Number offert 3 mois",
-      "Demande EIN",
-      "Assistance Stripe + Mercury",
-    ],
-  },
-  {
-    id: "premium",
-    label: "Premium",
-    description: "L’offre complète pour structurer votre activité.",
-    prices: { "New Mexico": 199, Wyoming: 249 },
-    features: [
-      "Documents de création LLC",
-      "Frais de dépôt de l’État inclus",
-      "Registered Agent offert la première année",
-      "US Phone Number offert 3 mois",
-      "Demande EIN",
-      "Assistance Stripe / PayPal",
-      "Assistance Wise / Mercury / Payoneer",
-      "Shopify offert 3 mois + nom de domaine 1 an",
-    ],
-  },
-];
-
 function stateSlug(state: StateName) {
   return state === "New Mexico" ? "new-mexico" : "wyoming";
 }
@@ -82,25 +36,26 @@ function startHref(pack: Pack, state: StateName) {
   )}&state=${slug}&amount=${price}&currency=USD`;
 }
 
-function cleanFeatureList(features: string[]) {
-  return features
+function displayFeatures(features: string[], renewalPrice: number) {
+  return (Array.isArray(features) ? features : [])
     .filter(Boolean)
-    .filter((feature) => {
+    .filter((feature) => !feature.toLowerCase().includes("renouvellement registered agent"))
+    .map((feature) => {
       const lower = feature.toLowerCase();
-      return (
-        !lower.includes("documents de création llc") &&
-        !lower.includes("frais de dépôt") &&
-        !lower.includes("registered agent offert") &&
-        !lower.includes("renouvellement registered agent")
-      );
-    })
-    .slice(0, 4);
+
+      if (lower.includes("registered agent offert")) {
+        return `${feature} (Renouvellement ${renewalPrice} USD / an)`;
+      }
+
+      return feature;
+    });
 }
 
 export default function TarifsPage() {
   const [selectedState, setSelectedState] = useState<StateName>("New Mexico");
-  const [packs, setPacks] = useState<Pack[]>(fallbackPacks);
+  const [packs, setPacks] = useState<Pack[]>([]);
   const [renewal, setRenewal] = useState<Record<StateName, number>>(renewalFallback);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -110,7 +65,7 @@ export default function TarifsPage() {
       .then((data) => {
         if (!active || !data?.ok) return;
 
-        if (Array.isArray(data.packs) && data.packs.length) {
+        if (Array.isArray(data.packs)) {
           setPacks(data.packs);
         }
 
@@ -121,7 +76,10 @@ export default function TarifsPage() {
           });
         }
       })
-      .catch(() => null);
+      .catch(() => null)
+      .finally(() => {
+        if (active) setLoading(false);
+      });
 
     return () => {
       active = false;
@@ -130,7 +88,13 @@ export default function TarifsPage() {
 
   const orderedPacks = useMemo(() => {
     const order: PackId[] = ["starter", "standard", "premium"];
-    return [...packs].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+
+    return [...packs].sort((a, b) => {
+      const ai = order.indexOf(a.id);
+      const bi = order.indexOf(b.id);
+
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
   }, [packs]);
 
   return (
@@ -171,13 +135,13 @@ export default function TarifsPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-[1040px] px-6 py-9">
+      <section className="mx-auto max-w-[1020px] px-6 py-8">
         <div className="text-center">
           <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#F15A24]">
             Tarifs
           </p>
 
-          <h1 className="mt-2 text-[40px] font-black tracking-[-0.07em] text-[#111827]">
+          <h1 className="mt-2 text-[38px] font-black tracking-[-0.07em] text-[#111827]">
             Packs LLC
           </h1>
 
@@ -199,16 +163,28 @@ export default function TarifsPage() {
           </div>
         </div>
 
-        <div className="mx-auto mt-8 grid max-w-[980px] gap-4 lg:grid-cols-3">
+        {loading ? (
+          <div className="mt-8 rounded-[18px] border border-[#E8EEF6] bg-white px-5 py-5 text-center text-sm font-bold text-slate-500">
+            Chargement des paramètres...
+          </div>
+        ) : null}
+
+        {!loading && orderedPacks.length === 0 ? (
+          <div className="mt-8 rounded-[18px] border border-[#E8EEF6] bg-white px-5 py-5 text-center text-sm font-bold text-slate-500">
+            Aucun pack configuré dans les paramètres.
+          </div>
+        ) : null}
+
+        <div className="mx-auto mt-8 grid max-w-[960px] gap-4 lg:grid-cols-3">
           {orderedPacks.map((pack) => {
             const price = Number(pack.prices?.[selectedState] || 0);
             const renewalPrice = renewal[selectedState] || renewalFallback[selectedState];
-            const features = cleanFeatureList(pack.features || []);
+            const features = displayFeatures(pack.features || [], renewalPrice);
 
             return (
               <article
                 key={`${selectedState}-${pack.id}`}
-                className={`flex min-h-[430px] flex-col rounded-[22px] border bg-white p-4 ${
+                className={`flex flex-col rounded-[22px] border bg-white p-4 ${
                   pack.recommended ? "border-[#F15A24]" : "border-[#E4ECF5]"
                 }`}
               >
@@ -228,7 +204,7 @@ export default function TarifsPage() {
                   {pack.label}
                 </h2>
 
-                <p className="mt-2 min-h-[42px] text-[12px] font-semibold leading-5 text-slate-600">
+                <p className="mt-2 min-h-[38px] text-[12px] font-semibold leading-5 text-slate-600">
                   {pack.description}
                 </p>
 
@@ -242,18 +218,6 @@ export default function TarifsPage() {
                 </div>
 
                 <div className="mt-3 space-y-1.5">
-                                    <div className="flex items-start gap-2 rounded-[12px] border border-[#E8EEF6] bg-white px-3 py-2">
-                    <span className="mt-[1px] text-[11px] font-black text-[#F15A24]">
-                      ✓
-                    </span>
-                    <span className="text-[11.5px] font-bold leading-4 text-[#123A63]">
-                      Registered Agent offert la première année{" "}
-                      <span className="font-black text-[#123A63]">
-                        (Renouvellement {renewalPrice} USD / an)
-                      </span>
-                    </span>
-                  </div>
-
                   {features.map((feature) => (
                     <div
                       key={feature}
@@ -269,7 +233,7 @@ export default function TarifsPage() {
                   ))}
                 </div>
 
-                <div className="mt-auto pt-4">
+                <div className="mt-4">
                   <a
                     href={startHref(pack, selectedState)}
                     className="inline-flex h-[43px] w-full items-center justify-center rounded-[13px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C]"

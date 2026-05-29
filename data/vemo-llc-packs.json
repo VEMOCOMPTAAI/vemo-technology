@@ -1,7 +1,7 @@
 {
   "states": [
-    "Wyoming",
-    "New Mexico"
+    "New Mexico",
+    "Wyoming"
   ],
   "registeredAgentRenewal": {
     "Wyoming": 25,
@@ -20,7 +20,7 @@
       "features": [
         "Documents de création LLC",
         "Frais de dépôt de l’État inclus",
-        "Registered Agent offert la première année",
+        "Registered Agent offert la première année (Renouvellement 35 USD / an)",
         "US Phone Number offert 3 mois"
       ]
     },
@@ -36,7 +36,7 @@
       "features": [
         "Documents de création LLC",
         "Frais de dépôt de l’État inclus",
-        "Registered Agent offert la première année",
+        "Registered Agent offert la première année (Renouvellement 35 USD / an)",
         "US Phone Number offert 3 mois",
         "Demande EIN",
         "Assistance Stripe + Mercury"
@@ -54,7 +54,7 @@
       "features": [
         "Documents de création LLC",
         "Frais de dépôt de l’État inclus",
-        "Registered Agent offert la première année",
+        "Registered Agent offert la première année (Renouvellement 35 USD / an)",
         "US Phone Number offert 3 mois",
         "Demande EIN",
         "Assistance Stripe / PayPal",
