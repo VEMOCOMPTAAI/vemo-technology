@@ -39,6 +39,7 @@ export default function AdminClientPage() {
   const [messageContent, setMessageContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [savingDoc, setSavingDoc] = useState(false);
+  const [replacingDocId, setReplacingDocId] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -114,6 +115,78 @@ export default function AdminClientPage() {
       await loadClientData();
     } finally {
       setSavingDoc(false);
+    }
+  }
+
+
+  async function replaceDocument(docId: string, file: File) {
+    setNotice("");
+
+    if (!email) {
+      setNotice("Email client introuvable.");
+      return;
+    }
+
+    if (!file) {
+      setNotice("Choisis un fichier.");
+      return;
+    }
+
+    setReplacingDocId(docId);
+
+    try {
+      const form = new FormData();
+      form.append("email", email);
+      form.append("client_email", email);
+      form.append("replace_id", docId);
+      form.append("title", file.name);
+      form.append("file", file);
+
+      const res = await fetch("/api/admin/client-portal/documents", {
+        method: "POST",
+        body: form,
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.ok === false) {
+        setNotice(data?.error || "Erreur remplacement document.");
+        return;
+      }
+
+      setNotice("Document remplacé.");
+      await loadClientData();
+    } finally {
+      setReplacingDocId("");
+    }
+  }
+
+  async function deleteDocument(docId: string) {
+    setNotice("");
+
+    const confirmed = window.confirm("Supprimer ce document ?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch("/api/admin/client-portal/documents", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: docId }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.ok === false) {
+        setNotice(data?.error || "Erreur suppression document.");
+        return;
+      }
+
+      setNotice("Document supprimé.");
+      await loadClientData();
+    } catch (e: any) {
+      setNotice(e?.message || "Erreur suppression document.");
     }
   }
 
@@ -253,6 +326,7 @@ export default function AdminClientPage() {
                 documents.map((doc, index) => {
                   const url = doc.public_url || doc.url || "";
                   const title = doc.title || doc.name || doc.filename || `Document ${index + 1}`;
+                  const docId = String(doc.id || "");
 
                   return (
                     <div
@@ -263,22 +337,53 @@ export default function AdminClientPage() {
                         <div>
                           <p className="text-sm font-black text-[#123A63]">{title}</p>
                           <p className="mt-1 text-xs font-bold text-slate-400">
+                            {doc.filename || "Document client"}
+                          </p>
+                          <p className="mt-1 text-xs font-bold text-slate-400">
                             {doc.created_at
                               ? new Date(doc.created_at).toLocaleString("fr-FR")
                               : ""}
                           </p>
                         </div>
 
-                        {url ? (
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="rounded-[12px] bg-[#F15A24] px-4 py-2 text-xs font-black text-white transition hover:bg-[#DB4F1C]"
+                        <div className="flex items-center gap-2">
+                          {url ? (
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Ouvrir"
+                              className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] bg-[#F15A24] text-white transition hover:bg-[#DB4F1C]"
+                            >
+                              ↗
+                            </a>
+                          ) : null}
+
+                          <label
+                            title="Remplacer"
+                            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-[13px] border border-[#E6EDF5] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
                           >
-                            Ouvrir
-                          </a>
-                        ) : null}
+                            {replacingDocId === docId ? "…" : "↻"}
+                            <input
+                              type="file"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file && docId) replaceDocument(docId, file);
+                                e.currentTarget.value = "";
+                              }}
+                            />
+                          </label>
+
+                          <button
+                            type="button"
+                            title="Supprimer"
+                            onClick={() => docId && deleteDocument(docId)}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#FAD7CC] bg-[#FFF7F4] text-[#F15A24] transition hover:bg-[#F15A24] hover:text-white"
+                          >
+                            ×
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
