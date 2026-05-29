@@ -312,8 +312,14 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const [phone, setPhone] = useState("");
 
   const [memberName, setMemberName] = useState("");
+  const [memberCountryIso, setMemberCountryIso] = useState("MA");
+  const [memberRole, setMemberRole] = useState("Membre");
   const [managerName, setManagerName] = useState("");
   const [address, setAddress] = useState("");
+  const [addressCity, setAddressCity] = useState("");
+  const [addressPostalCode, setAddressPostalCode] = useState("");
+  const [addressCountryIso, setAddressCountryIso] = useState("MA");
+  const [confirmSummary, setConfirmSummary] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
 
   const [busy, setBusy] = useState(false);
@@ -330,6 +336,14 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const phoneCountry = useMemo(() => {
     return VEMO_COUNTRIES.find((c) => c.iso === phoneCountryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!;
   }, [phoneCountryIso]);
+
+  const memberCountry = useMemo(() => {
+    return VEMO_COUNTRIES.find((c) => c.iso === memberCountryIso) || selectedCountry;
+  }, [memberCountryIso, selectedCountry]);
+
+  const addressCountry = useMemo(() => {
+    return VEMO_COUNTRIES.find((c) => c.iso === addressCountryIso) || selectedCountry;
+  }, [addressCountryIso, selectedCountry]);
 
   const finalPrice = useMemo(() => {
     return getPlanPrice(selectedPlan.id, state);
@@ -369,6 +383,11 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     if (!managerName && fullName) setManagerName(fullName);
   }, [fullName, memberName, managerName]);
 
+  useEffect(() => {
+    if (!memberCountryIso || memberCountryIso === "MA") setMemberCountryIso(countryIso);
+    if (!addressCountryIso || addressCountryIso === "MA") setAddressCountryIso(countryIso);
+  }, [countryIso]);
+
   function handlePhoneChange(value: string) {
     const country = findCountryByDial(value);
 
@@ -385,8 +404,9 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     if (step === 2 && !llcName.trim()) return false;
     if (step === 3 && (!activitySector.trim() || !activityDescription.trim())) return false;
     if (step === 4 && (!fullName.trim() || !emailIsValid(email) || !phoneIsValid(phone))) return false;
-    if (step === 5 && (!memberName.trim() || !managerName.trim())) return false;
-    if (step === 6 && !address.trim()) return false;
+    if (step === 5 && (!memberName.trim() || !managerName.trim() || !memberRole.trim())) return false;
+    if (step === 6 && (!address.trim() || !addressCity.trim() || !addressCountryIso.trim())) return false;
+    if (step === 8 && !confirmSummary) return false;
     return true;
   }
 
@@ -426,9 +446,15 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
           activity_sector: activitySector,
           activity_description: activityDescription,
           member_name: memberName,
+          member_country: memberCountry.name,
+          member_role: memberRole,
           manager_name: managerName,
           address,
+          address_city: addressCity,
+          address_postal_code: addressPostalCode,
+          address_country: addressCountry.name,
           services,
+          summary_confirmed: confirmSummary,
         }),
       });
 
@@ -747,19 +773,49 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 5 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Membres et manager</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Membre principal</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Le nom du client est proposé automatiquement comme membre et manager.
+                  Renseignez les informations du propriétaire ou membre principal. Le nom du client est suggéré automatiquement.
                 </p>
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                <div className="mt-6 grid gap-4 md:grid-cols-[1fr_1fr_220px]">
                   <label>
-                    <span className="mb-2 block text-sm font-black text-[#123A63]">Membre principal</span>
-                    <input value={memberName} onChange={(e) => setMemberName(e.target.value)} className={inputClass()} />
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Nom du membre</span>
+                    <input
+                      value={memberName}
+                      onChange={(e) => setMemberName(e.target.value)}
+                      className={inputClass()}
+                      placeholder="Nom complet"
+                    />
                   </label>
+
+                  <CountryPicker
+                    label="Pays"
+                    valueIso={memberCountryIso}
+                    onChange={(country) => setMemberCountryIso(country.iso)}
+                  />
+
                   <label>
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Rôle</span>
+                    <select
+                      value={memberRole}
+                      onChange={(e) => setMemberRole(e.target.value)}
+                      className={inputClass()}
+                    >
+                      <option value="Membre">Membre</option>
+                      <option value="Manager">Manager</option>
+                      <option value="Membre et Manager">Membre et Manager</option>
+                    </select>
+                  </label>
+
+                  <label className="md:col-span-3">
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Manager</span>
-                    <input value={managerName} onChange={(e) => setManagerName(e.target.value)} className={inputClass()} />
+                    <input
+                      value={managerName}
+                      onChange={(e) => setManagerName(e.target.value)}
+                      className={inputClass()}
+                      placeholder="Nom du manager"
+                    />
                   </label>
                 </div>
               </>
@@ -767,13 +823,45 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 6 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Adresse</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Adresse du client</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Adresse de résidence ou adresse administrative principale.
+                  Adresse utilisée pour le dossier et la facturation. Le pays est suggéré depuis les informations du propriétaire.
                 </p>
 
-                <div className="mt-6">
-                  <textarea value={address} onChange={(e) => setAddress(e.target.value)} className={textareaClass()} placeholder="Adresse complète..." />
+                <div className="mt-6 grid gap-4 md:grid-cols-3">
+                  <label className="md:col-span-3">
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Adresse</span>
+                    <input
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className={inputClass()}
+                      placeholder="Adresse complète"
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Ville</span>
+                    <input
+                      value={addressCity}
+                      onChange={(e) => setAddressCity(e.target.value)}
+                      className={inputClass()}
+                    />
+                  </label>
+
+                  <label>
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Code postal</span>
+                    <input
+                      value={addressPostalCode}
+                      onChange={(e) => setAddressPostalCode(e.target.value)}
+                      className={inputClass()}
+                    />
+                  </label>
+
+                  <CountryPicker
+                    label="Pays"
+                    valueIso={addressCountryIso}
+                    onChange={(country) => setAddressCountryIso(country.iso)}
+                  />
                 </div>
               </>
             )}
@@ -801,6 +889,9 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
             {step === 8 && (
               <>
                 <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Résumé avant paiement</h1>
+                <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
+                  Vérifiez les informations avant de continuer vers le paiement sécurisé.
+                </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   {[
@@ -812,9 +903,16 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     ["Activité", activityDescription],
                     ["Client", fullName],
                     ["Email", email],
-                    ["Pays", selectedCountry.name],
+                    ["Pays du client", selectedCountry.name],
                     ["Téléphone", `${phoneCountry.dial} ${phone}`],
-                    ["Membre / Manager", `${memberName} / ${managerName}`],
+                    ["Membre principal", memberName],
+                    ["Pays du membre", memberCountry.name],
+                    ["Rôle", memberRole],
+                    ["Manager", managerName],
+                    ["Adresse", address],
+                    ["Ville", addressCity],
+                    ["Code postal", addressPostalCode],
+                    ["Pays adresse", addressCountry.name],
                   ].map(([k, v]) => (
                     <div key={k} className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{k}</p>
@@ -822,6 +920,18 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     </div>
                   ))}
                 </div>
+
+                <label className="mt-6 flex gap-4 rounded-[1.5rem] border border-[#E3EAF2] bg-white p-5 text-sm font-black leading-7 text-[#123A63]">
+                  <input
+                    type="checkbox"
+                    checked={confirmSummary}
+                    onChange={(e) => setConfirmSummary(e.target.checked)}
+                    className="mt-1 h-4 w-4 shrink-0 accent-[#F15A24]"
+                  />
+                  <span>
+                    Je confirme que les informations fournies sont correctes et j’accepte de continuer vers le paiement sécurisé.
+                  </span>
+                </label>
               </>
             )}
 

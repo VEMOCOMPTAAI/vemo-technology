@@ -49,6 +49,12 @@ async function safeInsert(supabase: any, table: string, payload: any) {
       "llc_designator",
       "activity_sector",
       "activity_description",
+      "member_country",
+      "member_role",
+      "address_city",
+      "address_postal_code",
+      "address_country",
+      "summary_confirmed",
       "package_name",
       "amount",
       "currency",
@@ -94,6 +100,13 @@ export async function POST(request: NextRequest) {
     const currency = clean(body.currency || "USD").toUpperCase();
     const paymentMethod = clean(body.payment_method || "card");
     const lang = clean(body.lang || "fr");
+
+    const memberCountry = clean(body.member_country);
+    const memberRole = clean(body.member_role);
+    const addressCity = clean(body.address_city);
+    const addressPostalCode = clean(body.address_postal_code);
+    const addressCountry = clean(body.address_country);
+    const summaryConfirmed = Boolean(body.summary_confirmed);
 
     if (!email || !email.includes("@")) {
       return NextResponse.json({ ok: false, error: "Email client invalide." }, { status: 400 });
