@@ -647,19 +647,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                                 {renewal}
                               </span>
                             </div>
-                          </div>
-
-                          <div className="rounded-[1.1rem] border border-[#E3EAF2] bg-white px-4 py-3">
-                            <div className="flex items-center justify-between gap-3">
-                              <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                                Frais de dépôt
-                              </span>
-                              <span className="text-sm font-black text-emerald-700">
-                                Inclus
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                          </div>                        </div>
                       </button>
                     );
                   })}
