@@ -65,7 +65,7 @@ export default function PaymentPendingVerificationPage() {
         return;
       }
 
-      setMessage("Un email de confirmation a été envoyé. Confirmez votre email avant d’accéder à votre espace client.");
+      setMessage("Email de confirmation envoyé.");
     } catch (e: any) {
       setError(e?.message || "Erreur pendant la création de l’espace client.");
     } finally {
@@ -163,15 +163,6 @@ export default function PaymentPendingVerificationPage() {
               Créez votre espace client pour suivre le paiement, consulter les messages VEMO et recevoir vos documents.
             </p>
 
-            <div className="mt-5 rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-4">
-              <p className="text-sm font-black text-[#123A63]">
-                Confirmation email obligatoire
-              </p>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-                Après création du compte, un email de confirmation sera envoyé. L’accès à l’espace client sera possible uniquement après confirmation.
-              </p>
-            </div>
-
             <div className="mt-6 space-y-4">
               <label className="block">
                 <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
@@ -237,7 +228,7 @@ export default function PaymentPendingVerificationPage() {
               href={`/fr/espace-client?email=${encodeURIComponent(email)}`}
               className="mt-4 inline-flex h-[52px] w-full items-center justify-center rounded-[18px] border border-[#E6EDF5] bg-white text-sm font-black text-[#123A63] transition hover:border-[#F15A24]"
             >
-              J’ai confirmé mon email / accéder à mon espace
+              Se connecter
             </a>
           </div>
         </div>
