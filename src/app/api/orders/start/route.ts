@@ -44,6 +44,11 @@ async function safeInsert(supabase: any, table: string, payload: any) {
       "full_name",
       "llc_name",
       "phone",
+      "phone_country",
+      "llc_alternative_name",
+      "llc_designator",
+      "activity_sector",
+      "activity_description",
       "package_name",
       "amount",
       "currency",
@@ -75,6 +80,11 @@ export async function POST(request: NextRequest) {
     const email = clean(body.email || body.client_email).toLowerCase();
     const fullName = clean(body.full_name || body.client_name);
     const llcName = clean(body.llc_name);
+    const llcAlternativeName = clean(body.llc_alternative_name);
+    const llcDesignator = clean(body.llc_designator);
+    const activitySector = clean(body.activity_sector);
+    const activityDescription = clean(body.activity_description);
+    const phoneCountry = clean(body.phone_country);
     const phone = clean(body.phone);
     const country = clean(body.country);
     const state = clean(body.state);
