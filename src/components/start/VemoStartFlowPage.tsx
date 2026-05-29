@@ -43,7 +43,6 @@ const FORMULA_PREVIEW: Record<
       "Création LLC",
       "Frais de dépôt inclus",
       "Registered Agent offert 1 an",
-      "US Phone Number offert 3 mois",
     ],
   },
   standard: {
@@ -58,12 +57,12 @@ const FORMULA_PREVIEW: Record<
     subtitle: "L’offre complète pour structurer votre activité.",
     bullets: [
       "Tout Standard +",
-      "Assistance Stripe / PayPal",
-      "Assistance Wise / Mercury / Payoneer",
-      "Shopify offert 3 mois + nom de domaine 1 an",
+      "Outils de paiement internationaux",
+      "Shopify offert 3 mois + domaine 1 an",
     ],
   },
 };
+
 
 const activitySectors = [
   "E-commerce",
@@ -777,18 +776,13 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     <main className="min-h-screen bg-[#F5F8FB] text-[#111827]">
       <header className="border-b border-[#E3EAF2] bg-white">
         <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
-          <a href={lang === "fr" ? "/fr" : "/en"} className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[13px] bg-[#123A63] text-sm font-black text-white">
-              V
+          <a href={lang === "fr" ? "/fr" : "/en"} className="group inline-flex flex-col">
+            <div className="text-[28px] font-black uppercase leading-none tracking-[-0.06em]">
+              <span className="text-[#123A63]">VEMO</span>
+              <span className="text-[#F15A24]">TECH</span>
             </div>
-            <div>
-              <div className="text-lg font-black tracking-[-0.04em]">
-                <span className="text-[#123A63]">Vemo</span>{" "}
-                <span className="text-[#111827]">Technology</span>
-              </div>
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                LLC US POUR NON-RÉSIDENTS
-              </div>
+            <div className="mt-2 text-[10px] font-black uppercase tracking-[0.34em] text-slate-500">
+              US LLC POUR NON-RÉSIDENTS
             </div>
           </a>
 
@@ -903,7 +897,9 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 1 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Choisissez votre formule</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">
+                  Choisissez votre formule
+                </h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
                   Les prix affichés sont adaptés à l’État sélectionné : {state}.
                 </p>
@@ -918,32 +914,23 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         key={plan.id}
                         type="button"
                         onClick={() => setPlanId(plan.id)}
-                        className={`relative flex min-h-[430px] flex-col rounded-[1.7rem] border bg-white p-6 text-left transition ${
+                        className={`flex min-h-[350px] flex-col rounded-[1.45rem] border bg-white p-5 text-left transition ${
                           selected
                             ? "border-[#F15A24] shadow-none"
-                            : "border-[#E3EAF2] hover:border-[#F15A24]/40"
+                            : "border-[#DCE7F3] hover:border-[#F15A24]/45"
                         }`}
                       >
-                        <div className="mb-5 flex h-[36px] items-center">
-                          {plan.recommended ? (
-                            <span className="inline-flex h-[34px] items-center justify-center rounded-full border border-[#F15A24] bg-white px-4 text-[10px] font-black uppercase tracking-[0.12em] text-[#F15A24] shadow-none">
-                              Recommandé
-                            </span>
-                          ) : null}
-                        </div>
-
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <h3 className="text-2xl font-black tracking-[-0.04em] text-[#123A63]">
-                              {plan.label}
-                            </h3>
-                            <div className="mt-3 text-[42px] font-black leading-none tracking-[-0.08em] text-[#123A63]">
-                              ${getPlanPrice(plan.id, state)}
-                            </div>
+                        <div className="mb-4 flex items-center justify-between gap-3">
+                          <div className="min-h-[30px]">
+                            {plan.recommended ? (
+                              <span className="inline-flex h-[30px] items-center rounded-full border border-[#F15A24] bg-white px-3 text-[10px] font-black uppercase tracking-[0.14em] text-[#F15A24]">
+                                Recommandé
+                              </span>
+                            ) : null}
                           </div>
 
                           <span
-                            className={`mt-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-black ${
+                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-black ${
                               selected
                                 ? "border-[#F15A24] bg-[#F15A24] text-white"
                                 : "border-[#B7C9DD] bg-white text-transparent"
@@ -953,20 +940,25 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                           </span>
                         </div>
 
-                        <p className="mt-6 min-h-[84px] text-[15px] font-bold leading-7 text-slate-500">
+                        <h3 className="text-[20px] font-black tracking-[-0.04em] text-[#123A63]">
+                          {plan.label}
+                        </h3>
+
+                        <div className="mt-2 text-[36px] font-black leading-none tracking-[-0.06em] text-[#123A63]">
+                          ${getPlanPrice(plan.id, state)}
+                        </div>
+
+                        <p className="mt-4 min-h-[76px] text-[14px] font-bold leading-6 text-slate-500">
                           {preview.subtitle}
                         </p>
 
-                        <div className="mt-auto space-y-3">
+                        <div className="mt-5 space-y-3">
                           {preview.bullets.map((item) => (
-                            <div
-                              key={item}
-                              className="flex items-start gap-3 rounded-[18px] border border-[#E5EDF6] bg-white px-4 py-3"
-                            >
-                              <span className="mt-[1px] text-sm font-black text-[#F15A24]">
+                            <div key={item} className="flex items-start gap-2">
+                              <span className="mt-[2px] text-[13px] font-black text-[#F15A24]">
                                 ✓
                               </span>
-                              <span className="text-sm font-black leading-6 text-[#123A63]">
+                              <span className="text-[14px] font-black leading-5 text-[#123A63]">
                                 {item}
                               </span>
                             </div>
