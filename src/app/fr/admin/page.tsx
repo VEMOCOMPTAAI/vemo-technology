@@ -4,176 +4,287 @@ import { useEffect, useMemo, useState } from "react";
 
 export const dynamic = "force-dynamic";
 
-type AdminItem = {
-  id: string;
-  source: string;
-  email: string;
-  clientEmail: string;
-  llcName: string;
-  clientName?: string;
-  state?: string;
+type AdminOrder = {
+  id?: string;
+  order_id?: string;
+  client_name?: string;
+  client_email?: string;
+  email?: string;
+  llc_name?: string;
+  llcName?: string;
+  company_name?: string;
+  pack?: string;
   plan?: string;
-  amount?: number | string | null;
+  formula?: string;
+  state?: string;
+  amount?: number;
+  price?: number;
+  total?: number;
+  currency?: string;
+  payment_status?: string;
   paymentStatus?: string;
+  dossier_status?: string;
   dossierStatus?: string;
-  createdAt?: string;
+  status?: string;
+  created_at?: string;
 };
 
-const PAYMENT_STATUSES = [
-  ["pending_verification", "En vérification"],
-  ["payment_verified", "Paiement validé"],
-  ["payment_rejected", "Paiement rejeté"],
-  ["paid", "Payé"],
-];
+function pickOrders(payload: any): AdminOrder[] {
+  if (Array.isArray(payload)) return payload;
 
-const DOSSIER_STATUSES = [
-  ["pending", "En attente"],
-  ["email_confirmation_required", "Email à confirmer"],
-  ["in_progress", "En traitement"],
-  ["missing_information", "Informations manquantes"],
-  ["documents_ready", "Documents prêts"],
-  ["completed", "Terminé"],
-];
+  const candidates = [
+    payload?.orders,
+    payload?.data,
+    payload?.items,
+    payload?.dossiers,
+    payload?.clients,
+    payload?.payments,
+  ];
 
-function labelStatus(value?: string) {
-  const v = String(value || "").toLowerCase();
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) return candidate;
+  }
 
-  const all = [...PAYMENT_STATUSES, ...DOSSIER_STATUSES];
-  const found = all.find(([key]) => key === v);
-  if (found) return found[1];
-
-  if (!value) return "En attente";
-  return String(value).replaceAll("_", " ").replaceAll("-", " ");
+  return [];
 }
 
-function money(value?: number | string | null) {
-  if (value === null || value === undefined || value === "") return "—";
-  const n = Number(value);
-  if (!Number.isFinite(n)) return String(value);
-  return `${n.toLocaleString("fr-FR")} USD`;
+function normalizeOrder(item: AdminOrder) {
+  const email = String(item.client_email || item.email || "").trim().toLowerCase();
+
+  const llcName =
+    item.llc_name ||
+    item.llcName ||
+    item.company_name ||
+    item.client_name ||
+    "Dossier LLC";
+
+  const formula = item.pack || item.plan || item.formula || "—";
+  const state = item.state || "—";
+
+  const amount = Number(item.amount || item.price || item.total || 0);
+  const currency = item.currency || "USD";
+
+  const paymentStatus =
+    item.payment_status || item.paymentStatus || item.status || "En vérification";
+
+  const dossierStatus =
+    item.dossier_status || item.dossierStatus || "En attente";
+
+  return {
+    ...item,
+    email,
+    llcName,
+    formula,
+    state,
+    amount,
+    currency,
+    paymentStatus,
+    dossierStatus,
+  };
 }
 
 export default function AdminFinalPage() {
-  const [items, setItems] = useState<AdminItem[]>([]);
-  const [query, setQuery] = useState("");
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
+  const [search, setSearch] = useState("");
   const [selectedEmail, setSelectedEmail] = useState("");
   const [loading, setLoading] = useState(true);
-  const [savingId, setSavingId] = useState("");
   const [message, setMessage] = useState("");
 
-  async function load() {
+  async function loadOrders() {
     setLoading(true);
     setMessage("");
 
-    try {
-      const res = await fetch("/api/admin/final-dashboard", { cache: "no-store" });
-      const data = await res.json().catch(() => null);
-      setItems(Array.isArray(data?.items) ? data.items : []);
-    } catch {
-      setItems([]);
-    } finally {
-      setLoading(false);
+    const endpoints = [
+      "/api/admin/orders",
+      "/api/admin/dashboard",
+      "/api/admin/clients",
+    ];
+
+    for (const endpoint of endpoints) {
+      try {
+        const res = await fetch(endpoint, { cache: "no-store" });
+        const data = await res.json().catch(() => null);
+
+        const found = pickOrders(data).map(normalizeOrder);
+
+        if (found.length > 0) {
+          setOrders(found);
+          setLoading(false);
+          return;
+        }
+      } catch {}
     }
+
+    setOrders([]);
+    setLoading(false);
   }
 
   useEffect(() => {
-    load();
+    loadOrders();
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+  const normalizedOrders = useMemo(() => {
+    return orders.map(normalizeOrder);
+  }, [orders]);
 
-    return items.filter((item) => {
-      const text = [
-        item.llcName,
-        item.email,
-        item.clientName,
-        item.state,
-        item.plan,
-        item.paymentStatus,
-        item.dossierStatus,
-      ]
-        .join(" ")
-        .toLowerCase();
+  const uniqueClients = useMemo(() => {
+    const map = new Map<string, any>();
 
-      const matchesQuery = !q || text.includes(q);
-      const matchesSelected = !selectedEmail || item.email === selectedEmail;
+    for (const order of normalizedOrders) {
+      if (!order.email) continue;
 
-      return matchesQuery && matchesSelected;
+      if (!map.has(order.email)) {
+        map.set(order.email, {
+          email: order.email,
+          llcName: order.llcName,
+        });
+      }
+    }
+
+    return Array.from(map.values());
+  }, [normalizedOrders]);
+
+  const filteredOrders = useMemo(() => {
+    const q = search.trim().toLowerCase();
+
+    return normalizedOrders.filter((order) => {
+      const matchesSearch =
+        !q ||
+        [
+          order.email,
+          order.llcName,
+          order.formula,
+          order.state,
+          order.paymentStatus,
+          order.dossierStatus,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(q);
+
+      const matchesClient = !selectedEmail || order.email === selectedEmail;
+
+      return matchesSearch && matchesClient;
     });
-  }, [items, query, selectedEmail]);
-  async function updateStatus(item: AdminItem, patch: Partial<AdminItem>) {
-    setSavingId(item.id);
+  }, [normalizedOrders, search, selectedEmail]);
+
+  const stats = useMemo(() => {
+    const total = normalizedOrders.length;
+
+    const paymentsToCheck = normalizedOrders.filter((order) =>
+      String(order.paymentStatus || "")
+        .toLowerCase()
+        .includes("vérification")
+    ).length;
+
+    const inProgress = normalizedOrders.filter((order) =>
+      String(order.dossierStatus || "")
+        .toLowerCase()
+        .includes("traitement")
+    ).length;
+
+    const done = normalizedOrders.filter((order) =>
+      String(order.dossierStatus || "")
+        .toLowerCase()
+        .includes("termin")
+    ).length;
+
+    return { total, paymentsToCheck, inProgress, done };
+  }, [normalizedOrders]);
+
+  async function updateStatus(
+    order: any,
+    field: "payment_status" | "dossier_status",
+    value: string
+  ) {
     setMessage("");
 
-    try {
-      const res = await fetch("/api/admin/final-update", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: item.id,
-          email: item.email,
-          paymentStatus: patch.paymentStatus,
-          dossierStatus: patch.dossierStatus,
-        }),
-      });
+    const id = order.id || order.order_id;
 
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || data?.ok === false) {
-        setMessage(data?.error || "Erreur mise à jour.");
-        return;
-      }
-
-      setItems((prev) =>
-        prev.map((row) =>
-          row.id === item.id
-            ? {
-                ...row,
-                ...patch,
-              }
-            : row
-        )
-      );
-
-      setMessage("Statut mis à jour.");
-    } finally {
-      setSavingId("");
+    if (!id) {
+      setMessage("ID dossier introuvable.");
+      return;
     }
+
+    const endpoints = ["/api/admin/orders", "/api/admin/dossiers/status"];
+
+    for (const endpoint of endpoints) {
+      try {
+        const res = await fetch(endpoint, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id,
+            order_id: id,
+            [field]: value,
+          }),
+        });
+
+        if (res.ok) {
+          setOrders((prev) =>
+            prev.map((item) => {
+              const itemId = item.id || item.order_id;
+
+              if (itemId !== id) return item;
+
+              return {
+                ...item,
+                [field]: value,
+              };
+            })
+          );
+
+          setMessage("Statut mis à jour.");
+          return;
+        }
+      } catch {}
+    }
+
+    setMessage("Statut modifié localement. Route API à finaliser.");
+    setOrders((prev) =>
+      prev.map((item) => {
+        const itemId = item.id || item.order_id;
+
+        if (itemId !== id) return item;
+
+        return {
+          ...item,
+          [field]: value,
+        };
+      })
+    );
   }
 
-  const uniqueClients = Array.from(
-    new Map(items.filter((i) => i.email).map((i) => [i.email, i])).values()
-  );
-
   return (
-    <main className="min-h-screen bg-[#F5F8FB] px-6 py-8 text-[#111827]">
-      <section className="mx-auto max-w-7xl">
-        <header className="rounded-[2rem] border border-[#E6EDF5] bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.05)]">
-          <div className="flex flex-wrap items-center justify-between gap-5">
-            <a href="/fr" className="inline-flex flex-col">
+    <main className="min-h-screen bg-[#F5F7FA] text-[#111827]">
+      <section className="mx-auto max-w-[1280px] px-6 py-8">
+        <div className="rounded-[2rem] bg-white p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
               <div className="text-[30px] font-black uppercase leading-none tracking-[-0.06em]">
                 <span className="text-[#123A63]">VEMO</span>
                 <span className="text-[#F15A24]">TECH</span>
               </div>
-              <div className="mt-2 text-[10px] font-black uppercase tracking-[0.34em] text-slate-500">
-                ADMIN
-              </div>
-            </a>
 
-            <div className="flex flex-wrap gap-3">
+              <p className="mt-3 text-[10px] font-black uppercase tracking-[0.34em] text-slate-500">
+                Admin
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
               <a
                 href="/fr/admin/parametres"
-                className="inline-flex h-[48px] items-center rounded-[15px] border border-[#E6EDF5] bg-white px-5 text-sm font-black text-[#123A63] transition hover:border-[#F15A24]"
+                className="inline-flex h-[46px] items-center justify-center rounded-[15px] border border-[#E6EDF5] bg-white px-5 text-sm font-black text-[#123A63] transition hover:border-[#F15A24]"
               >
                 Paramètres packs
               </a>
+
               <button
                 type="button"
-                onClick={load}
-                className="inline-flex h-[48px] items-center rounded-[15px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
+                onClick={loadOrders}
+                className="inline-flex h-[46px] items-center justify-center rounded-[15px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
               >
                 Actualiser
               </button>
@@ -181,198 +292,196 @@ export default function AdminFinalPage() {
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-4">
-            <div className="rounded-[1.4rem] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
-              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+            <div className="rounded-[20px] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                 Dossiers
               </p>
-              <p className="mt-2 text-3xl font-black text-[#123A63]">{items.length}</p>
+              <p className="mt-3 text-[28px] font-black text-[#123A63]">
+                {stats.total}
+              </p>
             </div>
 
-            <div className="rounded-[1.4rem] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
-              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+            <div className="rounded-[20px] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                 Paiements à vérifier
               </p>
-              <p className="mt-2 text-3xl font-black text-[#123A63]">
-                {items.filter((i) => String(i.paymentStatus).includes("pending")).length}
+              <p className="mt-3 text-[28px] font-black text-[#123A63]">
+                {stats.paymentsToCheck}
               </p>
             </div>
 
-            <div className="rounded-[1.4rem] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
-              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+            <div className="rounded-[20px] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                 En traitement
               </p>
-              <p className="mt-2 text-3xl font-black text-[#123A63]">
-                {items.filter((i) => String(i.dossierStatus).includes("progress")).length}
+              <p className="mt-3 text-[28px] font-black text-[#123A63]">
+                {stats.inProgress}
               </p>
             </div>
 
-            <div className="rounded-[1.4rem] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
-              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+            <div className="rounded-[20px] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                 Terminés
               </p>
-              <p className="mt-2 text-3xl font-black text-[#123A63]">
-                {items.filter((i) => String(i.dossierStatus).includes("completed")).length}
+              <p className="mt-3 text-[28px] font-black text-[#123A63]">
+                {stats.done}
               </p>
             </div>
           </div>
-        </header>
+        </div>
 
-        <section className="mt-7 rounded-[2rem] border border-[#E6EDF5] bg-white p-6 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
-          <div className="grid gap-4 lg:grid-cols-[1fr_0.7fr]">
+        <div className="mt-6 rounded-[2rem] bg-white p-6">
+          <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
             <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher : nom LLC, email, statut..."
-              className="h-[54px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
+              className="h-[54px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
             />
 
             <select
               value={selectedEmail}
               onChange={(e) => setSelectedEmail(e.target.value)}
-              className="h-[54px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none transition focus:border-[#F15A24]"
+              className="h-[54px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
             >
               <option value="">Tous les clients</option>
-              {uniqueClients.map((item) => (
-                <option key={item.email} value={item.email}>
-                  {item.llcName} — {item.email}
+              {uniqueClients.map((client) => (
+                <option key={client.email} value={client.email}>
+                  {client.llcName} — {client.email}
                 </option>
               ))}
             </select>
           </div>
 
           {message ? (
-            <div className="mt-5 rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-3 text-sm font-black text-[#123A63]">
+            <div className="mt-4 rounded-[15px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-3 text-sm font-black text-[#123A63]">
               {message}
             </div>
           ) : null}
 
-          
-          <div className="mt-6 rounded-[1.5rem] border border-[#E6EDF5] bg-white p-5">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h2 className="text-[22px] font-black tracking-[-0.04em] text-[#111827]">
-                  Documents client
-                </h2>
-                <p className="mt-1 text-sm font-semibold text-slate-500">
-                  Uploadez ici les documents qui apparaîtront dans l’espace client.
-                </p>
-              </div>
+          <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[#E6EDF5]">
+            <table className="w-full border-collapse text-left">
+              <thead className="bg-[#F8FAFC]">
+                <tr>
+                  <th className="px-4 py-4 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    Client / LLC
+                  </th>
+                  <th className="px-4 py-4 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    Formule
+                  </th>
+                  <th className="px-4 py-4 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    État
+                  </th>
+                  <th className="px-4 py-4 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    Montant
+                  </th>
+                  <th className="px-4 py-4 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    Paiement
+                  </th>
+                  <th className="px-4 py-4 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    Dossier
+                  </th>
+                  <th className="px-4 py-4 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
 
-              <a
-                href={selectedEmail ? `/fr/admin/client?email=${encodeURIComponent(selectedEmail)}` : "/fr/admin/client"}
-                className="inline-flex h-[44px] items-center justify-center rounded-[14px] bg-[#F15A24] px-5 text-xs font-black text-white transition hover:bg-[#DB4F1C]"
-              >
-                Voir espace client
-              </a>
-            </div>
-
-            <div className="mt-5 grid gap-3 lg:grid-cols-[0.85fr_1fr_1fr_auto]">
-              <select
-                className="h-[50px] rounded-[15px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
-              >
-                <option value="">Choisir client</option>
-                {uniqueClients.map((item) => (
-                  <option key={item.email} value={item.email}>
-                    {item.llcName} — {item.email}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                value={uploadTitle}
-                onChange={(e) => setUploadTitle(e.target.value)}
-                placeholder="Titre document : Articles of Organization, EIN, Operating Agreement..."
-                className="h-[50px] rounded-[15px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
-              />
-
-              <input
-                type="file"
-                onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                className="h-[50px] rounded-[15px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
-              />
-
-              <button
-                type="button"
-                onClick={uploadClientDocument}
-                disabled={uploading}
-                className="h-[50px] rounded-[15px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:opacity-60"
-              >
-                {uploading ? "Upload..." : "Uploader"}
-              </button>
-            </div>
-          </div>
-
-<div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[#E6EDF5]">
-            <div className="grid grid-cols-[1.4fr_0.9fr_0.8fr_0.8fr_1fr_1fr_0.8fr] bg-[#F8FAFC] px-4 py-3 text-[11px] font-black uppercase tracking-[0.13em] text-slate-400">
-              <div>Client / LLC</div>
-              <div>Formule</div>
-              <div>État</div>
-              <div>Montant</div>
-              <div>Paiement</div>
-              <div>Dossier</div>
-              <div>Actions</div>
-            </div>
-
-            {loading ? (
-              <div className="px-4 py-8 text-sm font-bold text-slate-500">Chargement...</div>
-            ) : filtered.length ? (
-              filtered.map((item) => (
-                <div
-                  key={`${item.source}-${item.id}-${item.email}`}
-                  className="grid grid-cols-[1.4fr_0.9fr_0.8fr_0.8fr_1fr_1fr_0.8fr] items-center gap-3 border-t border-[#E6EDF5] px-4 py-4 text-sm"
-                >
-                  <div>
-                    <p className="font-black text-[#123A63]">{item.llcName}</p>
-                    <p className="mt-1 text-xs font-bold text-slate-500">{item.email || "—"}</p>
-                  </div>
-
-                  <div className="font-black text-[#123A63]">{item.plan || "—"}</div>
-                  <div className="font-bold text-slate-600">{item.state || "—"}</div>
-                  <div className="font-black text-[#123A63]">{money(item.amount)}</div>
-
-                  <select
-                    value={item.paymentStatus || "pending_verification"}
-                    disabled={savingId === item.id}
-                    onChange={(e) => updateStatus(item, { paymentStatus: e.target.value })}
-                    className="h-[42px] rounded-[12px] border border-[#E6EDF5] bg-white px-3 text-xs font-black text-[#123A63] outline-none focus:border-[#F15A24]"
-                  >
-                    {PAYMENT_STATUSES.map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={item.dossierStatus || "pending"}
-                    disabled={savingId === item.id}
-                    onChange={(e) => updateStatus(item, { dossierStatus: e.target.value })}
-                    className="h-[42px] rounded-[12px] border border-[#E6EDF5] bg-white px-3 text-xs font-black text-[#123A63] outline-none focus:border-[#F15A24]"
-                  >
-                    {DOSSIER_STATUSES.map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-
-                  <div className="flex flex-col gap-2">
-                    <a
-                      href={`/fr/admin/client?email=${encodeURIComponent(item.email || "")}`}
-                      className="inline-flex h-[42px] min-w-[120px] items-center justify-center rounded-[13px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-4 py-10 text-center text-sm font-bold text-slate-500"
                     >
-                      Ouvrir
-                    </a>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="px-4 py-8 text-sm font-bold text-slate-500">
-                Aucun dossier trouvé.
-              </div>
-            )}
+                      Chargement...
+                    </td>
+                  </tr>
+                ) : filteredOrders.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-4 py-10 text-center text-sm font-bold text-slate-500"
+                    >
+                      Aucun dossier trouvé.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredOrders.map((order, index) => {
+                    const id = order.id || order.order_id || `${order.email}-${index}`;
+                    const openHref = order.email
+                      ? `/fr/admin/client?email=${encodeURIComponent(order.email)}`
+                      : "/fr/admin/client";
+
+                    return (
+                      <tr key={id} className="border-t border-[#E6EDF5]">
+                        <td className="px-4 py-4">
+                          <p className="text-sm font-black text-[#123A63]">
+                            {order.llcName}
+                          </p>
+                          <p className="mt-1 text-xs font-bold text-slate-500">
+                            {order.email || "Email non renseigné"}
+                          </p>
+                        </td>
+
+                        <td className="px-4 py-4 text-sm font-bold text-[#123A63]">
+                          {order.formula}
+                        </td>
+
+                        <td className="px-4 py-4 text-sm font-bold text-[#123A63]">
+                          {order.state}
+                        </td>
+
+                        <td className="px-4 py-4 text-sm font-black text-[#123A63]">
+                          {order.amount ? `${order.amount} ${order.currency}` : "—"}
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <select
+                            value={order.paymentStatus}
+                            onChange={(e) =>
+                              updateStatus(order, "payment_status", e.target.value)
+                            }
+                            className="h-[42px] rounded-[13px] border border-[#E6EDF5] bg-white px-3 text-xs font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+                          >
+                            <option>En vérification</option>
+                            <option>Payé</option>
+                            <option>Refusé</option>
+                            <option>Remboursé</option>
+                          </select>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <select
+                            value={order.dossierStatus}
+                            onChange={(e) =>
+                              updateStatus(order, "dossier_status", e.target.value)
+                            }
+                            className="h-[42px] rounded-[13px] border border-[#E6EDF5] bg-white px-3 text-xs font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+                          >
+                            <option>En attente</option>
+                            <option>En traitement</option>
+                            <option>Documents demandés</option>
+                            <option>Terminé</option>
+                          </select>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <a
+                            href={openHref}
+                            className="inline-flex h-[42px] min-w-[120px] items-center justify-center rounded-[13px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
+                          >
+                            Ouvrir
+                          </a>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
-        </section>
+        </div>
       </section>
     </main>
   );
