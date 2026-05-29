@@ -494,7 +494,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     if (step === 3 && (!activitySector.trim() || !activityDescription.trim())) return false;
     if (step === 4 && (!fullName.trim() || !emailIsValid(email) || !phoneIsValid(phone))) return false;
     if (step === 5 && (!memberName.trim() || !memberRole.trim())) return false;
-    if (step === 5 && memberRole !== "Membre et Manager" && !managerName.trim()) return false;
+    if (step === 5 && memberRole === "Membre" && !managerName.trim()) return false;
     if (step === 6 && (!address.trim() || !addressCity.trim() || !addressCountryIso.trim())) return false;
     if (step === 7 && selectedServices.length === 0) return false;
     if (step === 8 && !confirmSummary) return false;
@@ -506,7 +506,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       throw new Error("Merci de choisir une formule.");
     }
 
-    const manager = memberRole === "Membre et Manager" ? memberName : managerName;
+    const manager = memberRole === "Membre" ? managerName : memberName;
 
     const res = await fetch("/api/orders/start", {
       method: "POST",
@@ -800,21 +800,21 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       key={plan.id}
                       type="button"
                       onClick={() => setPlanId(plan.id)}
-                      className={`relative flex min-h-[340px] flex-col rounded-[1.6rem] border p-5 text-left transition ${
+                      className={`relative flex min-h-[370px] flex-col rounded-[1.6rem] border p-6 text-left transition ${
                         planId === plan.id
                           ? "border-[#F15A24] bg-white shadow-[0_18px_40px_rgba(18,58,99,.08)]"
                           : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
                       }`}
                     >
                       {plan.recommended && (
-                        <span className="absolute right-4 top-4 rounded-full bg-[#F15A24] px-3 py-1 text-[10px] font-black uppercase text-white">
+                        <span className="absolute right-5 top-5 rounded-[10px] border border-[#F15A24]/20 bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-[#F15A24] shadow-[0_8px_18px_rgba(18,58,99,.06)]">
                           {t.recommended}
                         </span>
                       )}
 
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-xl font-black text-[#111827]">{plan.label}</h3>
+                          <h3 className="pr-28 text-xl font-black text-[#111827]">{plan.label}</h3>
                           <div className="mt-2 text-4xl font-black tracking-[-0.07em] text-[#123A63]">
                             ${getPlanPrice(plan.id, state)}
                           </div>
@@ -824,7 +824,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         }`} />
                       </div>
 
-                      <p className="mt-4 min-h-[72px] text-sm font-bold leading-6 text-slate-500">{plan.subtitle}</p>
+                      <p className="mt-5 min-h-[82px] text-sm font-bold leading-7 text-slate-500">{plan.subtitle}</p>
 
                       <ul className="mt-5 flex-1 space-y-2">
                         {plan.features.map((feature) => (
@@ -898,7 +898,16 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Nom complet</span>
-                    <input value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass()} />
+                    <input
+                      value={fullName}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFullName(value);
+                        setMemberName(value);
+                        if (memberRole !== "Membre") setManagerName(value);
+                      }}
+                      className={inputClass()}
+                    />
                   </label>
 
                   <label>
@@ -945,7 +954,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     </select>
                   </label>
 
-                  {memberRole !== "Membre et Manager" ? (
+                  {memberRole === "Membre" ? (
                     <label className="md:col-span-3">
                       <span className="mb-2 block text-sm font-black text-[#123A63]">Manager</span>
                       <input value={managerName} onChange={(e) => setManagerName(e.target.value)} className={inputClass()} placeholder="Nom du manager" />
@@ -1000,13 +1009,22 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       key={service}
                       type="button"
                       onClick={() => toggleService(service)}
-                      className={`min-h-[66px] rounded-[1.3rem] border p-4 text-left text-sm font-black transition ${
+                      className={`flex min-h-[70px] items-center gap-3 rounded-[1.3rem] border bg-white p-4 text-left text-sm font-black text-[#123A63] transition ${
                         selectedServices.includes(service)
-                          ? "border-[#F15A24] bg-white text-[#F15A24] shadow-[0_12px_28px_rgba(18,58,99,.06)]"
-                          : "border-[#E3EAF2] bg-white text-[#123A63] hover:border-[#F15A24]/40"
+                          ? "border-[#E3EAF2] shadow-[0_12px_28px_rgba(18,58,99,.06)]"
+                          : "border-[#E3EAF2] hover:border-[#F15A24]/40"
                       }`}
                     >
-                      {selectedServices.includes(service) ? "✓ " : "+ "} {service}
+                      <span
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-black ${
+                          selectedServices.includes(service)
+                            ? "border-[#F15A24] bg-white text-[#F15A24]"
+                            : "border-[#D6E0EA] bg-[#F8FAFC] text-slate-400"
+                        }`}
+                      >
+                        {selectedServices.includes(service) ? "✓" : "+"}
+                      </span>
+                      <span>{service}</span>
                     </button>
                   ))}
                 </div>
@@ -1035,7 +1053,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     ["Membre principal", memberName],
                     ["Pays du membre", countryDisplayName(memberCountry, lang)],
                     ["Rôle", memberRole],
-                    ["Manager", memberRole === "Membre et Manager" ? memberName : managerName],
+                    ["Manager", memberRole === "Membre" ? managerName : memberName],
                     ["Adresse", address],
                     ["Ville", addressCity],
                     ["Code postal", addressPostalCode],
@@ -1077,12 +1095,27 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       setPaymentMethod("card");
                       setClientSecret("");
                     }}
-                    className={`min-h-[138px] rounded-[1.5rem] border p-6 text-left transition ${
-                      paymentMethod === "card" ? "border-[#F15A24] bg-white shadow-[0_14px_30px_rgba(18,58,99,.08)]" : "border-[#E3EAF2] bg-white"
+                    className={`group flex min-h-[132px] items-start gap-4 rounded-[1.5rem] border bg-white p-5 text-left transition ${
+                      paymentMethod === "card"
+                        ? "border-[#F15A24] shadow-[0_16px_34px_rgba(18,58,99,.08)]"
+                        : "border-[#E3EAF2] hover:border-[#F15A24]/40 hover:shadow-[0_12px_28px_rgba(18,58,99,.06)]"
                     }`}
                   >
-                    <div className="text-2xl font-black text-[#123A63]">💳 Carte bancaire</div>
-                    <p className="mt-3 text-sm font-bold text-slate-500">Paiement Stripe sécurisé directement dans cette page.</p>
+                    <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border text-xl ${
+                      paymentMethod === "card"
+                        ? "border-[#F15A24]/20 bg-white text-[#F15A24]"
+                        : "border-[#E3EAF2] bg-[#F8FAFC] text-[#123A63]"
+                    }`}>
+                      💳
+                    </span>
+                    <span>
+                      <span className="block text-xl font-black tracking-[-0.04em] text-[#123A63]">
+                        Carte bancaire
+                      </span>
+                      <span className="mt-2 block text-sm font-bold leading-6 text-slate-500">
+                        Paiement Stripe sécurisé, intégré directement dans cette page.
+                      </span>
+                    </span>
                   </button>
 
                   <button
@@ -1091,17 +1124,32 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       setPaymentMethod("bank_transfer");
                       setClientSecret("");
                     }}
-                    className={`min-h-[138px] rounded-[1.5rem] border p-6 text-left transition ${
-                      paymentMethod === "bank_transfer" ? "border-[#F15A24] bg-white shadow-[0_14px_30px_rgba(18,58,99,.08)]" : "border-[#E3EAF2] bg-white"
+                    className={`group flex min-h-[132px] items-start gap-4 rounded-[1.5rem] border bg-white p-5 text-left transition ${
+                      paymentMethod === "bank_transfer"
+                        ? "border-[#F15A24] shadow-[0_16px_34px_rgba(18,58,99,.08)]"
+                        : "border-[#E3EAF2] hover:border-[#F15A24]/40 hover:shadow-[0_12px_28px_rgba(18,58,99,.06)]"
                     }`}
                   >
-                    <div className="text-2xl font-black text-[#123A63]">🏦 Virement bancaire</div>
-                    <p className="mt-3 text-sm font-bold text-slate-500">WhatsApp + upload du justificatif avant vérification admin.</p>
+                    <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border text-xl ${
+                      paymentMethod === "bank_transfer"
+                        ? "border-[#F15A24]/20 bg-white text-[#F15A24]"
+                        : "border-[#E3EAF2] bg-[#F8FAFC] text-[#123A63]"
+                    }`}>
+                      🏦
+                    </span>
+                    <span>
+                      <span className="block text-xl font-black tracking-[-0.04em] text-[#123A63]">
+                        Virement bancaire
+                      </span>
+                      <span className="mt-2 block text-sm font-bold leading-6 text-slate-500">
+                        WhatsApp, upload du justificatif, puis vérification admin.
+                      </span>
+                    </span>
                   </button>
                 </div>
 
                 {paymentMethod === "card" ? (
-                  <div className="mt-6 rounded-[1.5rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5">
+                  <div className="mt-6 rounded-[1.5rem] border border-[#E3EAF2] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,.04)]">
                     {!clientSecret ? (
                       <>
                         <p className="text-sm font-bold leading-7 text-slate-600">
@@ -1127,7 +1175,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     )}
                   </div>
                 ) : (
-                  <div className="mt-6 rounded-[1.5rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5">
+                  <div className="mt-6 rounded-[1.5rem] border border-[#E3EAF2] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,.04)]">
                     <div className="grid gap-4 md:grid-cols-[1fr_180px]">
                       <div>
                         <p className="text-sm font-black text-[#123A63]">Envoyer le justificatif de virement</p>
