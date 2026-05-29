@@ -19,11 +19,14 @@ function supabaseAdmin() {
 
 function pick(row: any, keys: string[]) {
   for (const key of keys) {
-    if (row?.[key] !== undefined && row?.[key] !== null && String(row[key]).trim() !== "") {
-      return row[key];
-    }
+    const value = row?.[key];
+    if (value !== undefined && value !== null && String(value).trim() !== "") return value;
   }
   return "";
+}
+
+function cleanStatus(value: any) {
+  return String(value || "non défini").replace(/[_-]+/g, " ").trim();
 }
 
 function getEmail(row: any) {
@@ -36,7 +39,7 @@ function getEmail(row: any) {
       "user_email",
       "owner_email",
     ])
-  );
+  ).trim().toLowerCase();
 }
 
 function getLLCName(row: any) {
@@ -52,72 +55,49 @@ function getLLCName(row: any) {
       "client_name",
       "full_name",
     ])
-  );
-}
-
-function getPhone(row: any) {
-  return String(
-    pick(row, [
-      "phone",
-      "phone_number",
-      "client_phone",
-      "customer_phone",
-      "telephone",
-      "tel",
-      "mobile",
-      "whatsapp",
-    ])
-  );
-}
-
-function getDossierNumber(row: any) {
-  return String(
-    pick(row, [
-      "dossier_number",
-      "dossier_no",
-      "dossier_ref",
-      "reference",
-      "order_number",
-      "order_ref",
-      "file_number",
-      "case_number",
-      "number",
-    ])
-  );
-}
-
-function getCreatedAt(row: any) {
-  return (
-    pick(row, [
-      "created_at",
-      "createdAt",
-      "order_date",
-      "payment_date",
-      "date",
-      "updated_at",
-    ]) || null
-  );
-}
-
-function cleanStatus(value: any) {
-  const raw = String(value || "non défini").trim();
-  if (!raw) return "non défini";
-  return raw.replace(/[_-]+/g, " ");
+  ).trim();
 }
 
 function normalize(row: any, source: string, index: number) {
   const email = getEmail(row);
   const llcName = getLLCName(row);
-  const dossierNumber = getDossierNumber(row);
 
   return {
     id: row?.id || `${source}-${email || llcName || index}`,
     source,
     email,
     client_email: email,
-    dossier_number: dossierNumber,
+    dossier_number: String(
+      pick(row, [
+        "dossier_number",
+        "dossier_no",
+        "dossier_ref",
+        "reference",
+        "order_number",
+        "order_ref",
+        "file_number",
+        "case_number",
+        "number",
+      ])
+    ).trim(),
     llc_name: llcName || "Sans nom LLC",
-    phone: getPhone(row),
+    full_name: String(pick(row, ["full_name", "client_name", "name", "customer_name"])).trim(),
+    phone: String(
+      pick(row, [
+        "phone",
+        "phone_number",
+        "client_phone",
+        "customer_phone",
+        "telephone",
+        "tel",
+        "mobile",
+        "whatsapp",
+      ])
+    ).trim(),
+    state: String(pick(row, ["state", "llc_state", "jurisdiction"])).trim(),
+    package_name: String(pick(row, ["package_name", "pack_name", "selected_pack", "plan"])).trim(),
+    amount: pick(row, ["amount", "price", "total"]),
+    currency: String(pick(row, ["currency"]) || "USD").trim(),
     payment_status: cleanStatus(
       pick(row, [
         "payment_status",
@@ -136,20 +116,28 @@ function normalize(row: any, source: string, index: number) {
         "status",
       ])
     ),
-    created_at: getCreatedAt(row),
+    created_at:
+      pick(row, [
+        "created_at",
+        "createdAt",
+        "order_date",
+        "payment_date",
+        "date",
+        "updated_at",
+      ]) || null,
     raw: row,
   };
 }
 
 async function safeSelect(supabase: any, table: string) {
   try {
-    const withOrder = await supabase
+    const ordered = await supabase
       .from(table)
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (!withOrder.error) {
-      return { table, rows: withOrder.data || [], error: null };
+    if (!ordered.error) {
+      return { table, rows: ordered.data || [], error: null };
     }
 
     const plain = await supabase.from(table).select("*");
@@ -158,7 +146,7 @@ async function safeSelect(supabase: any, table: string) {
       return { table, rows: plain.data || [], error: null };
     }
 
-    return { table, rows: [], error: plain.error.message || withOrder.error.message };
+    return { table, rows: [], error: plain.error.message || ordered.error.message };
   } catch (e: any) {
     return { table, rows: [], error: e?.message || "Erreur inconnue" };
   }
@@ -166,12 +154,20 @@ async function safeSelect(supabase: any, table: string) {
 
 function makeDossierNumber(createdAt: string | null, index: number) {
   let year = new Date().getFullYear();
+
   if (createdAt) {
     const d = new Date(createdAt);
     if (!Number.isNaN(d.getTime())) year = d.getFullYear();
   }
 
   return `VEMO-${year}-${String(index + 1).padStart(5, "0")}`;
+}
+
+function betterValue(oldValue: any, newValue: any) {
+  if (oldValue !== undefined && oldValue !== null && String(oldValue).trim() !== "" && oldValue !== "non défini") {
+    return oldValue;
+  }
+  return newValue;
 }
 
 export async function GET() {
@@ -185,6 +181,7 @@ export async function GET() {
       "client_orders",
       "llc_orders",
       "llc_clients",
+      "client_accounts",
       "profiles",
     ];
 
@@ -195,11 +192,9 @@ export async function GET() {
       source.rows.forEach((row: any, index: number) => {
         const item = normalize(row, source.table, index);
 
-        if (!item.email && (!item.llc_name || item.llc_name === "Sans nom LLC")) {
-          return;
-        }
+        if (!item.email && (!item.llc_name || item.llc_name === "Sans nom LLC")) return;
 
-        const key = item.email || item.llc_name;
+        const key = item.email || item.llc_name.toLowerCase();
         const existing = merged.get(key);
 
         if (!existing) {
@@ -209,20 +204,16 @@ export async function GET() {
 
         merged.set(key, {
           ...existing,
-          llc_name:
-            existing.llc_name && existing.llc_name !== "Sans nom LLC"
-              ? existing.llc_name
-              : item.llc_name,
-          phone: existing.phone || item.phone,
-          dossier_number: existing.dossier_number || item.dossier_number,
-          payment_status:
-            item.payment_status !== "non défini"
-              ? item.payment_status
-              : existing.payment_status,
-          dossier_status:
-            item.dossier_status !== "non défini"
-              ? item.dossier_status
-              : existing.dossier_status,
+          dossier_number: betterValue(existing.dossier_number, item.dossier_number),
+          llc_name: betterValue(existing.llc_name !== "Sans nom LLC" ? existing.llc_name : "", item.llc_name),
+          full_name: betterValue(existing.full_name, item.full_name),
+          phone: betterValue(existing.phone, item.phone),
+          state: betterValue(existing.state, item.state),
+          package_name: betterValue(existing.package_name, item.package_name),
+          amount: betterValue(existing.amount, item.amount),
+          currency: betterValue(existing.currency, item.currency),
+          payment_status: betterValue(existing.payment_status, item.payment_status),
+          dossier_status: betterValue(existing.dossier_status, item.dossier_status),
           created_at: existing.created_at || item.created_at,
           raw: { ...existing.raw, ...item.raw },
         });

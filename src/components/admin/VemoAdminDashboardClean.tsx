@@ -10,7 +10,12 @@ type ClientRow = {
   client_email?: string;
   dossier_number?: string;
   llc_name?: string;
+  full_name?: string;
   phone?: string;
+  state?: string;
+  package_name?: string;
+  amount?: string | number;
+  currency?: string;
   payment_status?: string;
   dossier_status?: string;
   status?: string;
@@ -22,24 +27,27 @@ const text = {
     adminSpace: "ESPACE ADMIN",
     secure: "Pilotage sécurisé",
     title: "Dossiers clients VEMO",
-    subtitle: "Vue premium des dossiers LLC, paiements, statuts et actions administratives.",
+    subtitle: "Sélectionnez un client, suivez son paiement, ses documents, ses messages et son avancement.",
     refresh: "Actualiser",
+    settings: "Paramètres",
     clients: "Clients",
     paid: "Payés",
     pending: "En attente",
     shown: "Affichés",
-    quickSelection: "Sélection rapide par nom LLC",
+    quickSelection: "Sélection client",
     allClients: "Tous les clients",
-    search: "Recherche rapide",
+    search: "Recherche",
     searchPlaceholder: "Nom LLC, numéro dossier, téléphone, statut...",
     hideTests: "Masquer les dossiers test",
     openFolder: "Ouvrir dossier",
     no: "N° dossier",
     llc: "Nom LLC",
+    client: "Client",
     phone: "Téléphone",
+    pack: "Pack",
     created: "Date création",
-    payment: "Statut paiement",
-    folder: "Statut dossier",
+    payment: "Paiement",
+    folder: "Dossier",
     action: "Action",
     manage: "Gérer",
     loading: "Chargement...",
@@ -50,24 +58,27 @@ const text = {
     adminSpace: "ADMIN SPACE",
     secure: "Secure management",
     title: "VEMO client files",
-    subtitle: "Premium overview of LLC files, payments, statuses and admin actions.",
+    subtitle: "Select a client, track payment, documents, messages and file progress.",
     refresh: "Refresh",
+    settings: "Settings",
     clients: "Clients",
     paid: "Paid",
     pending: "Pending",
     shown: "Shown",
-    quickSelection: "Quick selection by LLC name",
+    quickSelection: "Client selection",
     allClients: "All clients",
-    search: "Quick search",
+    search: "Search",
     searchPlaceholder: "LLC name, file number, phone, status...",
     hideTests: "Hide test files",
     openFolder: "Open file",
     no: "File no.",
     llc: "LLC name",
+    client: "Client",
     phone: "Phone",
+    pack: "Package",
     created: "Created",
-    payment: "Payment status",
-    folder: "File status",
+    payment: "Payment",
+    folder: "File",
     action: "Action",
     manage: "Manage",
     loading: "Loading...",
@@ -108,44 +119,26 @@ function statusLabel(value: string | undefined, locale: Locale, type: "payment" 
     if (raw.includes("paid") || raw.includes("payé") || raw.includes("payment confirmed") || raw.includes("confirmed")) {
       return locale === "fr" ? "Paiement confirmé" : "Payment confirmed";
     }
-
-    if (raw.includes("unpaid")) {
-      return locale === "fr" ? "Non payé" : "Unpaid";
-    }
-
+    if (raw.includes("unpaid")) return locale === "fr" ? "Non payé" : "Unpaid";
     if (raw.includes("pending") || raw.includes("attente") || raw.includes("verification") || raw.includes("vérification")) {
       return locale === "fr" ? "En attente de vérification" : "Pending verification";
     }
-
     if (raw.includes("reject") || raw.includes("rejet") || raw.includes("refus")) {
       return locale === "fr" ? "Paiement rejeté" : "Payment rejected";
     }
-
-    if (raw.includes("sent")) {
-      return locale === "fr" ? "Envoyé" : "Sent";
-    }
+    if (raw.includes("sent")) return locale === "fr" ? "Envoyé" : "Sent";
   }
 
   if (type === "dossier") {
-    if (raw.includes("in progress") || raw.includes("progress") || raw.includes("cours")) {
-      return locale === "fr" ? "En cours" : "In progress";
-    }
-
-    if (raw.includes("completed") || raw.includes("done") || raw.includes("termine") || raw.includes("terminé")) {
-      return locale === "fr" ? "Terminé" : "Completed";
-    }
-
-    if (raw.includes("payment confirmed") || raw.includes("confirmed")) {
-      return locale === "fr" ? "Paiement confirmé" : "Payment confirmed";
-    }
-
-    if (raw.includes("pending") || raw.includes("attente") || raw.includes("verification")) {
-      return locale === "fr" ? "En attente" : "Pending";
-    }
-
-    if (raw.includes("sent")) {
-      return locale === "fr" ? "Envoyé" : "Sent";
-    }
+    if (raw.includes("new")) return locale === "fr" ? "Nouveau dossier" : "New file";
+    if (raw.includes("in progress") || raw.includes("progress") || raw.includes("cours")) return locale === "fr" ? "En cours" : "In progress";
+    if (raw.includes("waiting client")) return locale === "fr" ? "En attente client" : "Waiting for client";
+    if (raw.includes("documents received")) return locale === "fr" ? "Documents reçus" : "Documents received";
+    if (raw.includes("completed") || raw.includes("done") || raw.includes("termine") || raw.includes("terminé")) return locale === "fr" ? "Terminé" : "Completed";
+    if (raw.includes("suspended")) return locale === "fr" ? "Suspendu" : "Suspended";
+    if (raw.includes("payment confirmed") || raw.includes("confirmed")) return locale === "fr" ? "Paiement confirmé" : "Payment confirmed";
+    if (raw.includes("pending") || raw.includes("attente") || raw.includes("verification")) return locale === "fr" ? "En attente" : "Pending";
+    if (raw.includes("sent")) return locale === "fr" ? "Envoyé" : "Sent";
   }
 
   return raw
@@ -156,15 +149,15 @@ function statusLabel(value: string | undefined, locale: Locale, type: "payment" 
 }
 
 function badge(value: string | undefined, locale: Locale, type: "payment" | "dossier") {
-  const label = statusLabel(value, locale, type).replace(/[-_]/g, " ");
+  const label = statusLabel(value, locale, type);
   const low = normalizeForSearch(value);
 
   const cls =
     low.includes("paid") || low.includes("confirmed") || low.includes("payé") || low.includes("valid") || low.includes("completed")
       ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-      : low.includes("pending") || low.includes("attente") || low.includes("verification") || low.includes("progress")
+      : low.includes("pending") || low.includes("attente") || low.includes("verification") || low.includes("progress") || low.includes("unpaid")
       ? "border-amber-200 bg-amber-50 text-amber-700"
-      : low.includes("reject") || low.includes("rejet") || low.includes("refus")
+      : low.includes("reject") || low.includes("rejet") || low.includes("refus") || low.includes("suspended")
       ? "border-red-200 bg-red-50 text-red-700"
       : "border-slate-200 bg-slate-50 text-slate-600";
 
@@ -176,8 +169,33 @@ function badge(value: string | undefined, locale: Locale, type: "payment" | "dos
 }
 
 function isTestClient(client: ClientRow) {
-  const haystack = `${client.llc_name || ""} ${client.dossier_number || ""}`.toLowerCase();
+  const haystack = `${client.llc_name || ""} ${client.full_name || ""} ${client.dossier_number || ""}`.toLowerCase();
   return haystack.includes("test") || haystack.includes("demo") || haystack.includes("dossier llc") || haystack.includes("sans nom");
+}
+
+function ActionIcon({ type }: { type: "open" | "settings" | "refresh" }) {
+  if (type === "settings") {
+    return (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" stroke="currentColor" strokeWidth="2.1" />
+        <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.06.06a2.1 2.1 0 0 1-2.97 2.97l-.06-.06A1.8 1.8 0 0 0 14.8 19.6a1.8 1.8 0 0 0-1.08 1.65V21.4a2.1 2.1 0 0 1-4.2 0v-.09A1.8 1.8 0 0 0 8.4 19.6a1.8 1.8 0 0 0-1.98.36l-.06.06a2.1 2.1 0 0 1-2.97-2.97l.06-.06A1.8 1.8 0 0 0 3.8 15a1.8 1.8 0 0 0-1.65-1.08H2.1a2.1 2.1 0 0 1 0-4.2h.09A1.8 1.8 0 0 0 3.8 8.4a1.8 1.8 0 0 0-.36-1.98l-.06-.06a2.1 2.1 0 0 1 2.97-2.97l.06.06A1.8 1.8 0 0 0 8.4 3.8 1.8 1.8 0 0 0 9.48 2.1V2a2.1 2.1 0 0 1 4.2 0v.09A1.8 1.8 0 0 0 14.8 3.8a1.8 1.8 0 0 0 1.98-.36l.06-.06a2.1 2.1 0 0 1 2.97 2.97l-.06.06A1.8 1.8 0 0 0 19.4 8.4a1.8 1.8 0 0 0 1.65 1.08h.09a2.1 2.1 0 0 1 0 4.2h-.09A1.8 1.8 0 0 0 19.4 15Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (type === "refresh") {
+    return (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20 6v5h-5M4 18v-5h5M5.6 9A7 7 0 0 1 17 6.7L20 11M4 13l3 4.3A7 7 0 0 0 18.4 15" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M14 5h5v5M10 14L19 5M19 14v4.5A1.5 1.5 0 0 1 17.5 20h-12A1.5 1.5 0 0 1 4 18.5v-12A1.5 1.5 0 0 1 5.5 5H10" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
 export default function VemoAdminDashboardClean() {
@@ -212,9 +230,7 @@ export default function VemoAdminDashboardClean() {
         setNotice(data?.error || "Impossible de charger les clients.");
       }
 
-      if (data?.debug) {
-        console.table(data.debug);
-      }
+      if (data?.debug) console.table(data.debug);
     } catch {
       setNotice("Impossible de charger les clients.");
       setClients([]);
@@ -238,12 +254,11 @@ export default function VemoAdminDashboardClean() {
 
   const tableRows = useMemo(() => {
     let rows = selectedClient ? [selectedClient] : visibleClients;
-
     const q = search.trim().toLowerCase();
 
     if (q) {
       rows = rows.filter((c) => {
-        return `${displayName(c)} ${c.dossier_number || ""} ${c.phone || ""} ${statusLabel(c.payment_status || c.status, locale, "payment")} ${statusLabel(c.dossier_status || c.status, locale, "dossier")}`
+        return `${displayName(c)} ${c.full_name || ""} ${c.dossier_number || ""} ${c.phone || ""} ${c.package_name || ""} ${statusLabel(c.payment_status || c.status, locale, "payment")} ${statusLabel(c.dossier_status || c.status, locale, "dossier")}`
           .toLowerCase()
           .includes(q);
       });
@@ -278,14 +293,14 @@ export default function VemoAdminDashboardClean() {
     <main className="min-h-screen bg-[#F7FAFC] text-[#111827]">
       <header className="border-b border-[#E8E2DC] bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <div>
+          <a href="/fr/admin" className="leading-none">
             <div className="text-[28px] font-black tracking-[-0.06em] text-[#123A63]">
-              VEMO <span className="text-[#F15A24]">TECH</span>
+              VEMO<span className="text-[#F15A24]">TECH</span>
             </div>
             <div className="mt-1 text-[10px] font-black uppercase tracking-[0.34em] text-slate-400">
               {t.adminSpace}
             </div>
-          </div>
+          </a>
 
           <div className="flex items-center gap-3">
             <div className="flex items-center border-r border-[#E8E2DC] pr-4">
@@ -308,15 +323,17 @@ export default function VemoAdminDashboardClean() {
 
             <a
               href="/fr/admin/parametres"
-              className="rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F2] hover:text-[#F15A24]"
+              className="inline-flex items-center gap-2 rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F2] hover:text-[#F15A24]"
             >
-              Paramètres
+              <ActionIcon type="settings" />
+              {t.settings}
             </a>
 
             <button
               onClick={load}
-              className="rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F2] hover:text-[#F15A24]"
+              className="inline-flex items-center gap-2 rounded-[18px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
             >
+              <ActionIcon type="refresh" />
               {t.refresh}
             </button>
           </div>
@@ -393,7 +410,7 @@ export default function VemoAdminDashboardClean() {
                 <option value="all">{t.allClients}</option>
                 {visibleClients.map((client, index) => (
                   <option key={client.id || index} value={String(index)}>
-                    {displayName(client)}
+                    {displayName(client)} {client.dossier_number ? `— ${client.dossier_number}` : ""}
                   </option>
                 ))}
               </select>
@@ -414,20 +431,23 @@ export default function VemoAdminDashboardClean() {
             <div className="flex items-end">
               <button
                 onClick={() => openClient()}
-                className="h-[54px] w-full rounded-[16px] bg-[#F15A24] px-5 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
+                disabled={selectedIndex === "all"}
+                className="inline-flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] bg-[#F15A24] px-5 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
               >
-                {t.openFolder} →
+                <ActionIcon type="open" />
+                {t.openFolder}
               </button>
             </div>
           </div>
         </div>
 
         <div className="mt-6 overflow-hidden rounded-[2rem] border border-[#E8E2DC] bg-white shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
-          <div className="grid grid-cols-[130px_minmax(180px,1fr)_150px_145px_165px_165px_105px] bg-[#FBFCFD] px-5 py-4 text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">
+          <div className="grid grid-cols-[130px_minmax(180px,1.1fr)_150px_135px_135px_155px_155px_95px] bg-[#FBFCFD] px-5 py-4 text-[10px] font-black uppercase tracking-[0.11em] text-slate-500">
             <div>{t.no}</div>
             <div>{t.llc}</div>
+            <div>{t.client}</div>
             <div>{t.phone}</div>
-            <div>{t.created}</div>
+            <div>{t.pack}</div>
             <div>{t.payment}</div>
             <div>{t.folder}</div>
             <div className="text-right">{t.action}</div>
@@ -442,7 +462,7 @@ export default function VemoAdminDashboardClean() {
               tableRows.map((client, index) => (
                 <div
                   key={client.id || index}
-                  className="grid grid-cols-[130px_minmax(180px,1fr)_150px_145px_165px_165px_105px] items-center px-5 py-4"
+                  className="grid grid-cols-[130px_minmax(180px,1.1fr)_150px_135px_135px_155px_155px_95px] items-center px-5 py-4"
                 >
                   <div className="truncate text-xs font-black text-[#123A63]">
                     {client.dossier_number || "—"}
@@ -451,19 +471,23 @@ export default function VemoAdminDashboardClean() {
                     {displayName(client)}
                   </div>
                   <div className="truncate text-sm font-black text-slate-600">
+                    {client.full_name || "—"}
+                  </div>
+                  <div className="truncate text-sm font-black text-slate-600">
                     {client.phone || "—"}
                   </div>
-                  <div className="text-sm font-black text-[#123A63]">
-                    {fmtDate(client.created_at)}
+                  <div className="truncate text-sm font-black text-[#123A63]">
+                    {client.package_name || "—"}
                   </div>
                   <div>{badge(client.payment_status || client.status, locale, "payment")}</div>
                   <div>{badge(client.dossier_status || client.status, locale, "dossier")}</div>
                   <div className="text-right">
                     <button
                       onClick={() => openClient(client)}
-                      className="inline-flex rounded-[14px] bg-[#F15A24] px-4 py-3 text-xs font-black text-white shadow-[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] bg-[#F15A24] text-white shadow-[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
+                      title={t.manage}
                     >
-                      {t.manage} →
+                      <ActionIcon type="open" />
                     </button>
                   </div>
                 </div>
