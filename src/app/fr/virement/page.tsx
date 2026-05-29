@@ -6,14 +6,20 @@ import { PaymentHero, VemoCard, VemoInput, VemoPaymentShell, VemoTextarea } from
 export default function BankTransferPage() {
   const [packName, setPackName] = useState("New Mexico Standard");
   const [amount, setAmount] = useState("149");
+  const [clientName, setClientName] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const pack = params.get("pack");
     const amountParam = params.get("amount");
+    const emailParam = params.get("email");
+    const nameParam = params.get("name");
 
     if (pack) setPackName(pack);
     if (amountParam) setAmount(amountParam);
+    if (emailParam) setEmail(emailParam);
+    if (nameParam) setClientName(nameParam);
   }, []);
 
   return (
@@ -58,8 +64,8 @@ export default function BankTransferPage() {
             className="rounded-[20px] bg-[#F6F8FB] p-6"
           >
             <div className="grid gap-5 md:grid-cols-2">
-              <VemoInput name="client_name" required placeholder="Nom complet" />
-              <VemoInput name="client_email" required type="email" placeholder="Email de commande" />
+              <VemoInput name="client_name" required value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Nom complet" />
+              <VemoInput name="client_email" required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email de commande" />
               <VemoInput name="package_name" value={packName} onChange={(e) => setPackName(e.target.value)} placeholder="Pack choisi" />
               <VemoInput name="amount" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Montant USD" />
               <VemoInput name="reference" required placeholder="Référence du virement" />

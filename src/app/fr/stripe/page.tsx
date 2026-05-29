@@ -10,16 +10,22 @@ export default function StripePaymentPage() {
   const [packName, setPackName] = useState("New Mexico Standard");
   const [amount, setAmount] = useState("149");
   const [currency, setCurrency] = useState("USD");
+  const [clientName, setClientName] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const pack = params.get("pack");
     const amountParam = params.get("amount");
     const currencyParam = params.get("currency");
+    const emailParam = params.get("email");
+    const nameParam = params.get("name");
 
     if (pack) setPackName(pack);
     if (amountParam) setAmount(amountParam);
     if (currencyParam) setCurrency(currencyParam);
+    if (emailParam) setEmail(emailParam);
+    if (nameParam) setClientName(nameParam);
   }, []);
 
   async function startStripe(event: React.FormEvent<HTMLFormElement>) {
@@ -89,8 +95,8 @@ export default function StripePaymentPage() {
 
           <form onSubmit={startStripe} className="rounded-[18px] bg-[#F6F8FB] p-6">
             <div className="grid gap-4">
-              <VemoInput name="client_name" required placeholder="Nom complet" />
-              <VemoInput name="email" required type="email" placeholder="Email de commande" />
+              <VemoInput name="client_name" required value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Nom complet" />
+              <VemoInput name="email" required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email de commande" />
               <VemoInput name="package_name" value={packName} onChange={(e) => setPackName(e.target.value)} placeholder="Pack" />
               <VemoInput name="amount" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Montant USD" />
               <input type="hidden" name="currency" value={currency} />

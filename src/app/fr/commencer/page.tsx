@@ -1,10 +1,5 @@
-import { Suspense } from "react";
-import LLCStartWizard from "@/components/LLCStartWizard";
+import VemoStartFlowPage from "@/components/start/VemoStartFlowPage";
 
-export default function FrenchStartPage() {
-  return (<>
-    <Suspense fallback={null}>
-      <LLCStartWizard lang="fr" />
-    </Suspense>
-  </>);
+export default function CommencerPage() {
+  return <VemoStartFlowPage lang="fr" />;
 }
