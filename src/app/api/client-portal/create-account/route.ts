@@ -24,20 +24,15 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
 
-    const fullName = String(body.full_name || "").trim();
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
-
-    if (!fullName) {
-      return NextResponse.json({ ok: false, error: "Nom complet obligatoire." }, { status: 400 });
-    }
 
     if (!email || !email.includes("@")) {
       return NextResponse.json({ ok: false, error: "Email invalide." }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json({ ok: false, error: "Mot de passe trop court." }, { status: 400 });
+    if (password.length < 8) {
+      return NextResponse.json({ ok: false, error: "Le mot de passe doit contenir au moins 8 caractères." }, { status: 400 });
     }
 
     const supabase = supabaseAdmin();
@@ -56,7 +51,6 @@ export async function POST(request: NextRequest) {
         password,
         email_confirm: true,
         user_metadata: {
-          full_name: fullName,
           source: "payment_pending_verification"
         }
       });
@@ -71,8 +65,6 @@ export async function POST(request: NextRequest) {
         await supabase
           .from(table)
           .update({
-            full_name: fullName,
-            client_name: fullName,
             email,
             client_email: email,
             portal_enabled: true,

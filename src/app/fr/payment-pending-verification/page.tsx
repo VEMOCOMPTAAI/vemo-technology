@@ -16,9 +16,10 @@ export default function PaymentPendingVerificationPage() {
 
   const initialEmail = params.get("email") || "";
 
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -27,18 +28,18 @@ export default function PaymentPendingVerificationPage() {
     setError("");
     setMessage("");
 
-    if (!fullName.trim()) {
-      setError("Merci de renseigner votre nom complet.");
-      return;
-    }
-
     if (!emailIsValid(email)) {
       setError("Merci de renseigner un email valide.");
       return;
     }
 
-    if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères.");
+    if (password.length < 8) {
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("La confirmation du mot de passe ne correspond pas.");
       return;
     }
 
@@ -51,7 +52,6 @@ export default function PaymentPendingVerificationPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          full_name: fullName,
           email,
           password,
           source: "payment_pending_verification"
@@ -170,18 +170,6 @@ export default function PaymentPendingVerificationPage() {
             <div className="mt-6 space-y-4">
               <label className="block">
                 <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
-                  Nom complet
-                </span>
-                <input
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Nom complet"
-                  className="h-[54px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
-                />
-              </label>
-
-              <label className="block">
-                <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
                   Email
                 </span>
                 <input
@@ -200,7 +188,20 @@ export default function PaymentPendingVerificationPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimum 6 caractères"
+                  placeholder="Minimum 8 caractères"
+                  className="h-[54px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                  Confirmation mot de passe
+                </span>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirmer le mot de passe"
                   className="h-[54px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
                 />
               </label>
