@@ -923,15 +923,6 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                             ? "Confidentialité, coût optimisé et structure simple pour les entrepreneurs non-résidents."
                             : "État reconnu, image corporate plus forte et traitement généralement plus rapide."}
                         </p>
-
-                        <div className="mt-5 rounded-[1.1rem] border border-[#E3EAF2] bg-[#F8FAFC] px-4 py-3">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                              Renouvellement Registered Agent
-                            </span>
-                            <span className="text-sm font-black text-[#123A63]">{renewal}</span>
-                          </div>
-                        </div>
                       </button>
                     );
                   })}
