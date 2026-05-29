@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 type ClientDoc = {
-  id?: string;
+  id: string;
   title?: string;
   name?: string;
   filename?: string;
@@ -16,16 +16,16 @@ type ClientDoc = {
 };
 
 type ClientMessage = {
-  id?: string;
+  id: string;
   subject?: string;
   message?: string;
   content?: string;
-  sender?: string;
   created_at?: string;
 };
 
 export default function AdminClientPage() {
   const params = useSearchParams();
+
   const email = useMemo(
     () => String(params.get("email") || "").trim().toLowerCase(),
     [params]
@@ -51,24 +51,21 @@ export default function AdminClientPage() {
 
     setLoading(true);
 
-    try {
-      const [docsRes, msgRes] = await Promise.all([
-        fetch(`/api/admin/client-portal/documents?email=${encodeURIComponent(email)}`, {
-          cache: "no-store",
-        }),
-        fetch(`/api/admin/client-portal/messages?email=${encodeURIComponent(email)}`, {
-          cache: "no-store",
-        }),
-      ]);
+    const [docsRes, msgRes] = await Promise.all([
+      fetch(`/api/admin/client-portal/documents?email=${encodeURIComponent(email)}`, {
+        cache: "no-store",
+      }),
+      fetch(`/api/admin/client-portal/messages?email=${encodeURIComponent(email)}`, {
+        cache: "no-store",
+      }),
+    ]);
 
-      const docsData = await docsRes.json().catch(() => null);
-      const msgData = await msgRes.json().catch(() => null);
+    const docsData = await docsRes.json().catch(() => null);
+    const msgData = await msgRes.json().catch(() => null);
 
-      setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
-      setMessages(Array.isArray(msgData?.messages) ? msgData.messages : []);
-    } finally {
-      setLoading(false);
-    }
+    setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
+    setMessages(Array.isArray(msgData?.messages) ? msgData.messages : []);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -113,25 +110,15 @@ export default function AdminClientPage() {
       setUploadTitle("");
       setNotice("Document ajouté à l’espace client.");
       await loadClientData();
+    } catch (e: any) {
+      setNotice(e?.message || "Erreur upload document.");
     } finally {
       setSavingDoc(false);
     }
   }
 
-
   async function replaceDocument(docId: string, file: File) {
     setNotice("");
-
-    if (!email) {
-      setNotice("Email client introuvable.");
-      return;
-    }
-
-    if (!file) {
-      setNotice("Choisis un fichier.");
-      return;
-    }
-
     setReplacingDocId(docId);
 
     try {
@@ -162,32 +149,26 @@ export default function AdminClientPage() {
   }
 
   async function deleteDocument(docId: string) {
-    setNotice("");
-
     const confirmed = window.confirm("Supprimer ce document ?");
     if (!confirmed) return;
 
-    try {
-      const res = await fetch("/api/admin/client-portal/documents", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: docId }),
-      });
+    const res = await fetch("/api/admin/client-portal/documents", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: docId }),
+    });
 
-      const data = await res.json().catch(() => null);
+    const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.ok === false) {
-        setNotice(data?.error || "Erreur suppression document.");
-        return;
-      }
-
-      setNotice("Document supprimé.");
-      await loadClientData();
-    } catch (e: any) {
-      setNotice(e?.message || "Erreur suppression document.");
+    if (!res.ok || data?.ok === false) {
+      setNotice(data?.error || "Erreur suppression document.");
+      return;
     }
+
+    setNotice("Document supprimé.");
+    await loadClientData();
   }
 
   async function sendMessage() {
@@ -228,7 +209,7 @@ export default function AdminClientPage() {
 
       setMessageSubject("");
       setMessageContent("");
-      setNotice("Message envoyé au client.");
+      setNotice("Message envoyé.");
       await loadClientData();
     } finally {
       setSendingMessage(false);
@@ -241,27 +222,25 @@ export default function AdminClientPage() {
         <div className="rounded-[2rem] bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <a
-                href="/fr/admin"
-                className="text-sm font-black text-[#F15A24] hover:text-[#DB4F1C]"
-              >
+              <a href="/fr/admin" className="text-sm font-black text-[#F15A24]">
                 ← Retour admin
               </a>
 
-              <h1 className="mt-4 text-[34px] font-black tracking-[-0.06em] text-[#111827]">
+              <h1 className="mt-4 text-[34px] font-black tracking-[-0.06em]">
                 Fiche client
               </h1>
 
               <p className="mt-1 text-sm font-bold text-slate-500">
-                {email || "Aucun client sélectionné"}
+                {email || "Aucun email client"}
               </p>
             </div>
 
             <a
-              href="/fr/admin/parametres"
+              href={`/fr/espace-client?email=${encodeURIComponent(email)}`}
+              target="_blank"
               className="inline-flex h-[46px] items-center justify-center rounded-[15px] border border-[#E6EDF5] bg-white px-5 text-sm font-black text-[#123A63] transition hover:border-[#F15A24]"
             >
-              Paramètres packs
+              Voir espace client
             </a>
           </div>
 
@@ -279,7 +258,7 @@ export default function AdminClientPage() {
                 <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                   Documents
                 </p>
-                <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em] text-[#111827]">
+                <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
                   Documents visibles client
                 </h2>
               </div>
@@ -326,7 +305,6 @@ export default function AdminClientPage() {
                 documents.map((doc, index) => {
                   const url = doc.public_url || doc.url || "";
                   const title = doc.title || doc.name || doc.filename || `Document ${index + 1}`;
-                  const docId = String(doc.id || "");
 
                   return (
                     <div
@@ -363,13 +341,13 @@ export default function AdminClientPage() {
                             title="Remplacer"
                             className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-[13px] border border-[#E6EDF5] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
                           >
-                            {replacingDocId === docId ? "…" : "↻"}
+                            {replacingDocId === doc.id ? "…" : "↻"}
                             <input
                               type="file"
                               className="hidden"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
-                                if (file && docId) replaceDocument(docId, file);
+                                if (file && doc.id) replaceDocument(doc.id, file);
                                 e.currentTarget.value = "";
                               }}
                             />
@@ -378,7 +356,7 @@ export default function AdminClientPage() {
                           <button
                             type="button"
                             title="Supprimer"
-                            onClick={() => docId && deleteDocument(docId)}
+                            onClick={() => deleteDocument(doc.id)}
                             className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#FAD7CC] bg-[#FFF7F4] text-[#F15A24] transition hover:bg-[#F15A24] hover:text-white"
                           >
                             ×
@@ -398,7 +376,7 @@ export default function AdminClientPage() {
                 <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                   Messages
                 </p>
-                <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em] text-[#111827]">
+                <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
                   Communication client
                 </h2>
               </div>
@@ -435,28 +413,19 @@ export default function AdminClientPage() {
             </div>
 
             <div className="mt-6 space-y-3">
-              {loading ? (
-                <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
-                  Chargement...
-                </div>
-              ) : messages.length === 0 ? (
+              {messages.length === 0 ? (
                 <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
                   Aucun message pour ce client.
                 </div>
               ) : (
-                messages.map((item, index) => (
-                  <div
-                    key={item.id || `${item.created_at}-${index}`}
-                    className="rounded-[16px] border border-[#E6EDF5] bg-white p-4"
-                  >
+                messages.map((item) => (
+                  <div key={item.id} className="rounded-[16px] border border-[#E6EDF5] bg-white p-4">
                     <p className="text-sm font-black text-[#123A63]">
                       {item.subject || "Message VEMO"}
                     </p>
-
                     <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-slate-600">
                       {item.message || item.content || ""}
                     </p>
-
                     <p className="mt-3 text-xs font-bold text-slate-400">
                       {item.created_at
                         ? new Date(item.created_at).toLocaleString("fr-FR")

@@ -1,69 +1,60 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import fs from "fs/promises";
+import path from "path";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function supabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const DATA_FILE = path.join(process.cwd(), "data", "client-messages.json");
 
-  if (!url || !key) return null;
+function cleanEmail(value: any) {
+  return String(value || "").trim().toLowerCase();
+}
 
-  return createClient(url, key, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
+async function ensureFile() {
+  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
+
+  try {
+    await fs.access(DATA_FILE);
+  } catch {
+    await fs.writeFile(DATA_FILE, "[]", "utf8");
+  }
+}
+
+async function readMessages() {
+  await ensureFile();
+
+  try {
+    const raw = await fs.readFile(DATA_FILE, "utf8");
+    const parsed = JSON.parse(raw || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+async function writeMessages(messages: any[]) {
+  await ensureFile();
+  await fs.writeFile(DATA_FILE, JSON.stringify(messages, null, 2), "utf8");
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    const email = request.nextUrl.searchParams.get("email")?.trim().toLowerCase() || "";
-    const supabase = supabaseAdmin();
+  const email = cleanEmail(request.nextUrl.searchParams.get("email"));
+  const messages = await readMessages();
 
-    if (!email) {
-      return NextResponse.json({ ok: false, error: "Email client obligatoire." }, { status: 400 });
-    }
-
-    if (!supabase) {
-      return NextResponse.json({ ok: true, messages: [] });
-    }
-
-    for (const table of ["client_messages", "messages"]) {
-      try {
-        const { data, error } = await supabase
-          .from(table)
-          .select("*")
-          .or(`client_email.eq.${email},email.eq.${email}`)
-          .order("created_at", { ascending: false });
-
-        if (!error) {
-          return NextResponse.json({ ok: true, messages: data || [] });
-        }
-      } catch {}
-    }
-
-    return NextResponse.json({ ok: true, messages: [] });
-  } catch (error: any) {
-    return NextResponse.json(
-      { ok: false, error: error?.message || "Erreur lecture messages." },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    messages: messages
+      .filter((msg: any) => cleanEmail(msg.email || msg.client_email) === email)
+      .sort((a: any, b: any) => String(b.created_at).localeCompare(String(a.created_at))),
+  });
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const email = String(body.email || body.client_email || "")
-      .trim()
-      .toLowerCase();
-
+    const email = cleanEmail(body.email || body.client_email);
     const subject = String(body.subject || "Message VEMO").trim();
     const message = String(body.message || body.content || "").trim();
 
@@ -75,11 +66,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: "Message obligatoire." }, { status: 400 });
     }
 
-    const supabase = supabaseAdmin();
-
-    const payload = {
-      client_email: email,
+    const messages = await readMessages();
+    const item = {
+      id: `msg_${Date.now()}_${Math.random().toString(16).slice(2)}`,
       email,
+      client_email: email,
       subject,
       message,
       content: message,
@@ -89,28 +80,13 @@ export async function POST(request: NextRequest) {
       created_at: new Date().toISOString(),
     };
 
-    if (!supabase) {
-      return NextResponse.json({ ok: true, message: payload });
-    }
+    messages.unshift(item);
+    await writeMessages(messages);
 
-    for (const table of ["client_messages", "messages"]) {
-      try {
-        const { data, error } = await supabase
-          .from(table)
-          .insert(payload)
-          .select("*")
-          .single();
-
-        if (!error) {
-          return NextResponse.json({ ok: true, message: data });
-        }
-      } catch {}
-    }
-
-    return NextResponse.json({ ok: true, message: payload });
+    return NextResponse.json({ ok: true, message: item });
   } catch (error: any) {
     return NextResponse.json(
-      { ok: false, error: error?.message || "Erreur envoi message." },
+      { ok: false, error: error?.message || "Erreur message." },
       { status: 500 }
     );
   }
