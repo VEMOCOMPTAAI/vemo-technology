@@ -18,6 +18,11 @@ type Pack = {
 
 const states: StateName[] = ["New Mexico", "Wyoming"];
 
+const renewalFallback: Record<StateName, number> = {
+  "New Mexico": 35,
+  Wyoming: 25,
+};
+
 function stateSlug(state: StateName) {
   return state === "New Mexico" ? "new-mexico" : "wyoming";
 }
@@ -31,15 +36,28 @@ function startHref(pack: Pack, state: StateName) {
   )}&state=${slug}&amount=${price}&currency=USD`;
 }
 
-function displayFeatures(features: string[]) {
+function displayFeatures(features: string[], renewalPrice: number) {
   return (Array.isArray(features) ? features : [])
     .map((feature) => String(feature || "").trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((feature) => !feature.toLowerCase().includes("renouvellement registered agent"))
+    .map((feature) => {
+      const clean = feature
+        .replace(/\s*\(Renouvellement\s+\d+\s*USD\s*\/\s*an\)\s*/i, "")
+        .trim();
+
+      if (clean.toLowerCase().includes("registered agent offert")) {
+        return `${clean} (Renouvellement ${renewalPrice} USD / an)`;
+      }
+
+      return clean;
+    });
 }
 
 export default function TarifsPage() {
   const [selectedState, setSelectedState] = useState<StateName>("New Mexico");
   const [packs, setPacks] = useState<Pack[]>([]);
+  const [renewal, setRenewal] = useState<Record<StateName, number>>(renewalFallback);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,6 +70,13 @@ export default function TarifsPage() {
 
         if (Array.isArray(data.packs)) {
           setPacks(data.packs);
+        }
+
+        if (data.registeredAgentRenewal) {
+          setRenewal({
+            "New Mexico": Number(data.registeredAgentRenewal["New Mexico"] || 35),
+            Wyoming: Number(data.registeredAgentRenewal.Wyoming || 25),
+          });
         }
       })
       .catch(() => null)
@@ -152,15 +177,18 @@ export default function TarifsPage() {
           </div>
         ) : null}
 
-        <div className="mx-auto mt-7 grid max-w-[920px] gap-4 lg:grid-cols-3">
+        <div className="mx-auto mt-7 grid max-w-[920px] items-stretch gap-4 lg:grid-cols-3">
           {orderedPacks.map((pack) => {
             const price = Number(pack.prices?.[selectedState] || 0);
-            const features = displayFeatures(pack.features || []);
+            const renewalPrice = Number(
+              renewal[selectedState] || renewalFallback[selectedState]
+            );
+            const features = displayFeatures(pack.features || [], renewalPrice);
 
             return (
               <article
                 key={`${selectedState}-${pack.id}`}
-                className={`flex flex-col rounded-[20px] border bg-white p-4 ${
+                className={`flex h-full min-h-[520px] flex-col rounded-[20px] border bg-white p-4 ${
                   pack.recommended ? "border-[#F15A24]" : "border-[#E4ECF5]"
                 }`}
               >
@@ -193,7 +221,7 @@ export default function TarifsPage() {
                   </p>
                 </div>
 
-                <div className="mt-3 space-y-1.5">
+                <div className="mt-3 flex-1 space-y-1.5">
                   {features.map((feature) => (
                     <div
                       key={feature}
@@ -209,7 +237,7 @@ export default function TarifsPage() {
                   ))}
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-4 pt-1">
                   <a
                     href={startHref(pack, selectedState)}
                     className="inline-flex h-[42px] w-full items-center justify-center rounded-[12px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C]"
