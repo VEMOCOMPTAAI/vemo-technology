@@ -327,7 +327,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             <a
               href={lang === "fr" ? "/fr/tarifs" : "/en/pricing"}
-              className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.18)] hover:bg-[#D94A1B]"
+              className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(18,58,99,.12)] hover:bg-[#D94A1B]"
             >
               {t.start} →
             </a>
@@ -345,7 +345,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 onClick={() => setStep(index)}
                 className={`rounded-[14px] border p-3 text-left transition ${
                   step === index
-                    ? "border-[#F15A24] bg-[#FFF7F1] text-[#F15A24]"
+                    ? "border-[#F15A24] bg-white text-[#F15A24]"
                     : index < step
                     ? "border-[#DCE7F2] bg-[#F8FAFC] text-[#123A63]"
                     : "border-[#E3EAF2] bg-white text-slate-400"
@@ -383,7 +383,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       onClick={() => setPlanId(plan.id)}
                       className={`relative min-h-[260px] rounded-[1.6rem] border p-5 text-left transition ${
                         planId === plan.id
-                          ? "border-[#F15A24] bg-[#FFF7F1] shadow-[0_18px_40px_rgba(241,90,36,.12)]"
+                          ? "border-[#F15A24] bg-white shadow-[0_18px_40px_rgba(18,58,99,.08)]"
                           : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
                       }`}
                     >
@@ -431,7 +431,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       type="button"
                       onClick={() => setState(s)}
                       className={`rounded-[1.6rem] border p-6 text-left transition ${
-                        state === s ? "border-[#F15A24] bg-[#FFF7F1]" : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
+                        state === s ? "border-[#F15A24] bg-white" : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
                       }`}
                     >
                       <h3 className="text-2xl font-black text-[#123A63]">{s}</h3>
@@ -440,7 +440,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                           ? "Confidentialité, coût optimisé et structure simple pour non-résidents."
                           : "État reconnu, frais plus élevés mais image corporate plus forte."}
                       </p>
-                      <div className="mt-5 rounded-full border border-[#FFD2C2] bg-[#FFF7F1] px-4 py-2 text-sm font-black text-[#F15A24]">
+                      <div className="mt-5 rounded-full border border-[#F15A24] bg-white px-4 py-2 text-sm font-black text-[#F15A24]">
                         {s === "Wyoming" ? "+ $50" : "Frais inclus"}
                       </div>
                     </button>
@@ -583,7 +583,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         onClick={() => toggleService(service)}
                         className={`rounded-[1.3rem] border p-4 text-left text-sm font-black transition ${
                           services.includes(service)
-                            ? "border-[#F15A24] bg-[#FFF7F1] text-[#F15A24]"
+                            ? "border-[#F15A24] bg-white text-[#F15A24]"
                             : "border-[#E3EAF2] bg-white text-[#123A63] hover:border-[#F15A24]/40"
                         }`}
                       >
@@ -630,7 +630,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     type="button"
                     onClick={() => setPaymentMethod("card")}
                     className={`rounded-[1.5rem] border p-6 text-left transition ${
-                      paymentMethod === "card" ? "border-[#F15A24] bg-[#FFF7F1]" : "border-[#E3EAF2] bg-white"
+                      paymentMethod === "card" ? "border-[#F15A24] bg-white" : "border-[#E3EAF2] bg-white"
                     }`}
                   >
                     <div className="text-2xl font-black text-[#123A63]">💳 Credit card</div>
@@ -641,7 +641,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     type="button"
                     onClick={() => setPaymentMethod("bank_transfer")}
                     className={`rounded-[1.5rem] border p-6 text-left transition ${
-                      paymentMethod === "bank_transfer" ? "border-[#F15A24] bg-[#FFF7F1]" : "border-[#E3EAF2] bg-white"
+                      paymentMethod === "bank_transfer" ? "border-[#F15A24] bg-white" : "border-[#E3EAF2] bg-white"
                     }`}
                   >
                     <div className="text-2xl font-black text-[#123A63]">🏦 Virement</div>
@@ -671,7 +671,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 type="button"
                 onClick={next}
                 disabled={busy}
-                className="rounded-[12px] bg-[#F15A24] px-8 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.18)] hover:bg-[#D94A1B] disabled:opacity-60"
+                className="rounded-[12px] bg-[#F15A24] px-8 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(18,58,99,.12)] hover:bg-[#D94A1B] disabled:opacity-60"
               >
                 {busy ? "Traitement..." : `${t.next} →`}
               </button>
@@ -709,7 +709,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
               ))}
             </div>
 
-            <div className="mt-8 rounded-[1.4rem] border border-[#FFD2C2] bg-[#FFF7F1] p-5">
+            <div className="mt-8 rounded-[1.4rem] border border-[#F15A24] bg-white p-5">
               <div className="flex items-end justify-between">
                 <p className="text-lg font-black text-[#111827]">{t.estimated}</p>
                 <p className="text-4xl font-black tracking-[-0.08em] text-[#F15A24]">${finalPrice}</p>
