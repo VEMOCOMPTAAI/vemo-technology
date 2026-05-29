@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Elements, CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { VEMO_COUNTRIES, flagFromIso, type VemoCountry } from "@/lib/vemoCountries";
 
@@ -316,43 +316,175 @@ function CountryPicker({
 }
 
 function PaymentCardElement({
-  clientSecret,
-  email,
+  billingName,
+  billingEmail,
+  amount,
+  dossierNumber,
 }: {
-  clientSecret: string;
-  email: string;
+  billingName: string;
+  billingEmail: string;
+  amount: number;
+  dossierNumber: string;
 }) {
   const stripe = useStripe();
   const elements = useElements();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [name, setName] = useState(billingName || "");
+  const [emailValue, setEmailValue] = useState(billingEmail || "");
 
   async function pay() {
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      setError("Stripe n’est pas encore prêt.");
+      return;
+    }
+
+    const card = elements.getElement(CardElement);
+
+    if (!card) {
+      setError("Le formulaire carte est introuvable.");
+      return;
+    }
 
     setBusy(true);
     setError("");
 
-    const result = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        receipt_email: email,
-        return_url: `${window.location.origin}/fr/payment-success?email=${encodeURIComponent(email)}`,
-      },
-    });
+    try {
+      const intentRes = await fetch("/api/payments/create-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          amount,
+          currency: "USD",
+          email: emailValue,
+          dossier_number: dossierNumber,
+          billing_name: name
+        })
+      });
 
-    if (result.error) {
-      setError(result.error.message || "Paiement refusé.");
+      const intent = await intentRes.json().catch(() => null);
+
+      if (!intentRes.ok || intent?.ok === false || !intent?.clientSecret) {
+        setError(intent?.error || "Impossible de préparer le paiement Stripe.");
+        return;
+      }
+
+      const result = await stripe.confirmCardPayment(intent.clientSecret, {
+        payment_method: {
+          card,
+          billing_details: {
+            name,
+            email: emailValue
+          }
+        }
+      });
+
+      if (result.error) {
+        setError(result.error.message || "Paiement refusé.");
+        return;
+      }
+
+      window.location.href = `/fr/payment-success?email=${encodeURIComponent(emailValue)}`;
+    } catch (e: any) {
+      setError(e?.message || "Erreur paiement Stripe.");
+    } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="mt-5 rounded-[1.4rem] border border-[#E3EAF2] bg-white p-5">
-      <PaymentElement />
+    <div className="rounded-[28px] border border-[#E6EDF5] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
+            Paiement par carte
+          </p>
+          <h3 className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#0F172A]">
+            Paiement sécurisé
+          </h3>
+          <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-slate-500">
+            Saisissez vos informations de facturation et votre carte directement dans cette page.
+          </p>
+        </div>
+
+        <div className="rounded-[18px] border border-[#E6EDF5] bg-white px-4 py-3 text-right">
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+            Montant
+          </p>
+          <p className="mt-1 text-[32px] font-black tracking-[-0.06em] text-[#F15A24]">
+            ${amount}
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="block">
+          <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+            Nom de facturation
+          </span>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nom ou société"
+            className="h-[56px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+            Email de facturation
+          </span>
+          <input
+            value={emailValue}
+            onChange={(e) => setEmailValue(e.target.value)}
+            placeholder="facturation@domaine.com"
+            className="h-[56px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
+          />
+        </label>
+      </div>
+
+      <div className="mt-5 rounded-[22px] border border-[#E6EDF5] bg-white p-5">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#E6EDF5] bg-white text-xl">
+            💳
+          </div>
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+              Informations carte
+            </p>
+            <p className="text-sm font-bold text-[#123A63]">
+              Carte Visa, Mastercard, American Express...
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-5">
+          <CardElement
+            options={{
+              hidePostalCode: true,
+              style: {
+                base: {
+                  fontSize: "16px",
+                  color: "#123A63",
+                  fontWeight: "600",
+                  fontFamily: "Inter, system-ui, sans-serif",
+                  "::placeholder": {
+                    color: "#94A3B8"
+                  }
+                },
+                invalid: {
+                  color: "#DC2626"
+                }
+              }
+            }}
+          />
+        </div>
+      </div>
 
       {error ? (
-        <div className="mt-4 rounded-[14px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-black text-red-700">
+        <div className="mt-5 rounded-[16px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
           {error}
         </div>
       ) : null}
@@ -361,9 +493,9 @@ function PaymentCardElement({
         type="button"
         onClick={pay}
         disabled={busy || !stripe || !elements}
-        className="mt-5 h-[52px] w-full rounded-[16px] bg-[#F15A24] text-sm font-black text-white shadow-[0_14px_28px_rgba(18,58,99,.12)] transition hover:bg-[#D94A1B] disabled:opacity-60"
+        className="mt-6 h-[58px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white shadow-[0_16px_30px_rgba(241,90,36,.18)] transition hover:bg-[#DB4F1C] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {busy ? "Traitement du paiement..." : "Confirmer le paiement"}
+        {busy ? "Traitement du paiement..." : `Payer $${amount}`}
       </button>
     </div>
   );
@@ -407,6 +539,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [dossierNumber, setDossierNumber] = useState("");
   const [clientSecret, setClientSecret] = useState("");
+  const [autoStripeAttempted, setAutoStripeAttempted] = useState(false);
   const [bankProofFile, setBankProofFile] = useState<File | null>(null);
 
   const [busy, setBusy] = useState(false);
@@ -468,7 +601,6 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       setManagerName(memberName);
     }
   }, [memberRole, memberName]);
-
   function handlePhoneChange(value: string) {
     const country = findCountryByDial(value);
 
@@ -800,16 +932,18 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       key={plan.id}
                       type="button"
                       onClick={() => setPlanId(plan.id)}
-                      className={`relative flex min-h-[400px] flex-col rounded-[1.6rem] border p-6 pt-16 text-left transition ${
+                      className={`relative flex min-h-[410px] flex-col rounded-[1.6rem] border p-6 text-left transition ${
                         planId === plan.id
                           ? "border-[#F15A24] bg-white shadow-[0_18px_40px_rgba(18,58,99,.08)]"
                           : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
                       }`}
                     >
                       {plan.recommended && (
-                        <span className="absolute left-6 top-5 rounded-full bg-[#F15A24] px-3 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-[0_10px_24px_rgba(241,90,36,.22)]">
-                          {t.recommended}
-                        </span>
+                        <div className="mb-5 flex items-center justify-start">
+                          <span className="inline-flex h-[34px] items-center justify-center rounded-full border border-[#F15A24] bg-white px-4 text-[11px] font-black uppercase tracking-[0.08em] text-[#F15A24] shadow-none">
+                            {t.recommended}
+                          </span>
+                        </div>
                       )}
 
                       <div className="flex items-start justify-between gap-3">
@@ -1083,260 +1217,166 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 9 && (
               <>
-                <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div>
-                    <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Paiement</h1>
-                    <p className="mt-3 max-w-2xl text-sm font-bold leading-7 text-slate-500">
-                      Choisissez votre méthode de paiement. Le paiement carte reste intégré dans cette page, le virement passe par justificatif et validation admin.
+                    <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
+                      Étape 10
+                    </p>
+                    <h1 className="mt-2 text-[42px] font-black tracking-[-0.06em] text-[#0F172A]">
+                      Paiement sécurisé
+                    </h1>
+                    <p className="mt-4 max-w-2xl text-[15px] font-semibold leading-8 text-slate-500">
+                      Finalisez votre dossier en choisissant votre mode de paiement.
+                      La carte bancaire est sélectionnée par défaut.
                     </p>
                   </div>
 
-                  <div className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] px-5 py-4 text-right">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                      Montant à régler
+                  <div className="rounded-[22px] border border-[#E6EDF5] bg-white px-5 py-4 text-right shadow-[0_14px_35px_rgba(15,23,42,0.04)]">
+                    <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                      Total
                     </p>
-                    <p className="mt-1 text-3xl font-black tracking-[-0.08em] text-[#F15A24]">
+                    <p className="mt-1 text-[38px] font-black tracking-[-0.06em] text-[#F15A24]">
                       ${finalPrice || 0}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-8 grid gap-5 md:grid-cols-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPaymentMethod("card");
-                      setClientSecret("");
-                    }}
-                    className={`relative min-h-[190px] overflow-hidden rounded-[1.9rem] border bg-white p-6 text-left transition ${
-                      paymentMethod === "card"
-                        ? "border-[#F15A24] shadow-[0_22px_55px_rgba(18,58,99,.10)]"
-                        : "border-[#E3EAF2] hover:border-[#F15A24]/35 hover:shadow-[0_16px_38px_rgba(18,58,99,.06)]"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] border text-2xl ${
-                            paymentMethod === "card"
-                              ? "border-[#F15A24]/25 bg-[#FFF8F5]"
-                              : "border-[#E3EAF2] bg-[#F8FAFC]"
-                          }`}
-                        >
-                          💳
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                            Paiement immédiat
-                          </p>
-                          <h3 className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#123A63]">
-                            Carte bancaire
-                          </h3>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`mt-1 flex h-6 w-6 items-center justify-center rounded-full border text-xs font-black ${
-                          paymentMethod === "card"
-                            ? "border-[#F15A24] bg-[#F15A24] text-white"
-                            : "border-[#D6E0EA] bg-white text-transparent"
-                        }`}
-                      >
-                        ✓
+                <div className="mt-8 rounded-[32px] border border-[#E6EDF5] bg-white p-7 shadow-[0_20px_55px_rgba(15,23,42,0.05)]">
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <label className="block">
+                      <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                        Nom de facturation
                       </span>
-                    </div>
-
-                    <p className="mt-5 text-sm font-bold leading-7 text-slate-500">
-                      Paiement Stripe sécurisé, intégré directement dans cette page, sans redirection externe.
-                    </p>
-
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-[#E3EAF2] bg-[#F8FAFC] px-3 py-1 text-xs font-black text-[#123A63]">
-                        Stripe sécurisé
-                      </span>
-                      <span className="rounded-full border border-[#E3EAF2] bg-[#F8FAFC] px-3 py-1 text-xs font-black text-[#123A63]">
-                        Confirmation instantanée
-                      </span>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPaymentMethod("bank_transfer");
-                      setClientSecret("");
-                    }}
-                    className={`relative min-h-[190px] overflow-hidden rounded-[1.9rem] border bg-white p-6 text-left transition ${
-                      paymentMethod === "bank_transfer"
-                        ? "border-[#F15A24] shadow-[0_22px_55px_rgba(18,58,99,.10)]"
-                        : "border-[#E3EAF2] hover:border-[#F15A24]/35 hover:shadow-[0_16px_38px_rgba(18,58,99,.06)]"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] border text-2xl ${
-                            paymentMethod === "bank_transfer"
-                              ? "border-[#F15A24]/25 bg-[#FFF8F5]"
-                              : "border-[#E3EAF2] bg-[#F8FAFC]"
-                          }`}
-                        >
-                          🏦
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                            Vérification admin
-                          </p>
-                          <h3 className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#123A63]">
-                            Virement bancaire
-                          </h3>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`mt-1 flex h-6 w-6 items-center justify-center rounded-full border text-xs font-black ${
-                          paymentMethod === "bank_transfer"
-                            ? "border-[#F15A24] bg-[#F15A24] text-white"
-                            : "border-[#D6E0EA] bg-white text-transparent"
-                        }`}
-                      >
-                        ✓
-                      </span>
-                    </div>
-
-                    <p className="mt-5 text-sm font-bold leading-7 text-slate-500">
-                      Contact WhatsApp, upload du justificatif, puis passage du dossier en attente de vérification.
-                    </p>
-
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">
-                        WhatsApp
-                      </span>
-                      <span className="rounded-full border border-[#E3EAF2] bg-[#F8FAFC] px-3 py-1 text-xs font-black text-[#123A63]">
-                        Upload justificatif
-                      </span>
-                    </div>
-                  </button>
-                </div>
-
-                {paymentMethod === "card" ? (
-                  <div className="mt-7 overflow-hidden rounded-[1.9rem] border border-[#E3EAF2] bg-white shadow-[0_18px_45px_rgba(18,58,99,.06)]">
-                    <div className="border-b border-[#E3EAF2] bg-[#F8FAFC] px-6 py-5">
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                            Paiement carte
-                          </p>
-                          <h3 className="mt-1 text-xl font-black text-[#123A63]">
-                            Paiement sécurisé par Stripe
-                          </h3>
-                        </div>
-                        <div className="rounded-full border border-[#E3EAF2] bg-white px-4 py-2 text-xs font-black text-[#123A63]">
-                          Montant : ${finalPrice || 0}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-6">
-                      {!clientSecret ? (
-                        <>
-                          <p className="text-sm font-bold leading-7 text-slate-500">
-                            Préparez le paiement sécurisé. Le formulaire Stripe apparaîtra ici, dans la même page.
-                          </p>
-
-                          <button
-                            type="button"
-                            onClick={prepareStripePayment}
-                            disabled={busy}
-                            className="mt-5 h-[56px] w-full rounded-[1.25rem] bg-[#F15A24] text-sm font-black text-white shadow-[0_18px_34px_rgba(241,90,36,.24)] transition hover:translate-y-[-1px] hover:bg-[#D94A1B] disabled:opacity-60"
-                          >
-                            {busy ? "Préparation du paiement..." : `Préparer le paiement $${finalPrice || 0}`}
-                          </button>
-                        </>
-                      ) : stripePromise ? (
-                        <Elements stripe={stripePromise} options={{ clientSecret }}>
-                          <PaymentCardElement clientSecret={clientSecret} email={email} />
-                        </Elements>
-                      ) : (
-                        <div className="rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-black text-amber-800">
-                          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY manquante dans .env.local.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-7 overflow-hidden rounded-[1.9rem] border border-[#E3EAF2] bg-white shadow-[0_18px_45px_rgba(18,58,99,.06)]">
-                    <div className="border-b border-[#E3EAF2] bg-[#F8FAFC] px-6 py-5">
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                            Paiement par virement
-                          </p>
-                          <h3 className="mt-1 text-xl font-black text-[#123A63]">
-                            Envoyer le justificatif
-                          </h3>
-                        </div>
-
-                        <a
-                          href="https://wa.me/"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex h-11 items-center justify-center rounded-[1rem] border border-emerald-200 bg-emerald-50 px-5 text-sm font-black text-emerald-700"
-                        >
-                          WhatsApp
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="p-6">
-                      <div className="grid gap-4 md:grid-cols-3">
-                        <div className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                            Étape 01
-                          </p>
-                          <p className="mt-2 text-sm font-black text-[#123A63]">
-                            Contacter VEMO sur WhatsApp
-                          </p>
-                        </div>
-
-                        <div className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                            Étape 02
-                          </p>
-                          <p className="mt-2 text-sm font-black text-[#123A63]">
-                            Uploader le justificatif
-                          </p>
-                        </div>
-
-                        <div className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                            Étape 03
-                          </p>
-                          <p className="mt-2 text-sm font-black text-[#123A63]">
-                            Vérification admin
-                          </p>
-                        </div>
-                      </div>
-
                       <input
-                        type="file"
-                        onChange={(e) => setBankProofFile(e.target.files?.[0] || null)}
-                        className="mt-5 block w-full rounded-[1.2rem] border border-[#E3EAF2] bg-white px-4 py-4 text-sm font-black text-[#123A63]"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Nom ou société"
+                        className="h-[56px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
                       />
+                    </label>
 
-                      <button
-                        type="button"
-                        onClick={submitBankTransfer}
-                        disabled={busy}
-                        className="mt-5 h-[56px] w-full rounded-[1.25rem] bg-[#F15A24] text-sm font-black text-white shadow-[0_18px_34px_rgba(241,90,36,.24)] transition hover:translate-y-[-1px] hover:bg-[#D94A1B] disabled:opacity-60"
-                      >
-                        {busy ? "Envoi du justificatif..." : "Uploader le justificatif et continuer →"}
-                      </button>
-                    </div>
+                    <label className="block">
+                      <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                        Email de facturation
+                      </span>
+                      <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="facturation@domaine.com"
+                        className="h-[56px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
+                      />
+                    </label>
                   </div>
-                )}
+
+                  <div className="mt-6">
+                    <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                      Méthode de paiement
+                    </span>
+
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => {
+                        setPaymentMethod(e.target.value as PaymentMethod);
+                        setClientSecret("");
+                      }}
+                      className="h-[56px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none transition focus:border-[#F15A24]"
+                    >
+                      <option value="card">Carte bancaire</option>
+                      <option value="bank_transfer">Virement bancaire</option>
+                    </select>
+                  </div>
+
+                  <div className="mt-6">
+                    {paymentMethod === "card" ? (
+                      !stripePromise ? (
+                        <div className="rounded-[18px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm font-bold text-amber-800">
+                          Stripe n’est pas configuré : ajoute NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY et STRIPE_SECRET_KEY dans .env.local.
+                        </div>
+                      ) : (
+                        <Elements stripe={stripePromise}>
+                          <PaymentCardElement
+                            billingName={fullName}
+                            billingEmail={email}
+                            amount={finalPrice || 0}
+                            dossierNumber={dossierNumber}
+                          />
+                        </Elements>
+                      )
+                    ) : (
+                      <div className="rounded-[28px] border border-[#E6EDF5] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+                        <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                          <div>
+                            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
+                              Paiement par virement
+                            </p>
+                            <h3 className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#0F172A]">
+                              Envoi du justificatif
+                            </h3>
+                            <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-slate-500">
+                              Contactez VEMO sur WhatsApp puis ajoutez le justificatif.
+                              Votre dossier passera ensuite en attente de vérification.
+                            </p>
+                          </div>
+
+                          <a
+                            href="https://wa.me/"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex h-[52px] min-w-[170px] items-center justify-center rounded-[16px] border border-[#F15A24] bg-white px-5 text-sm font-black text-[#F15A24] transition hover:bg-[#FFF4EE]"
+                          >
+                            WhatsApp
+                          </a>
+                        </div>
+
+                        <div className="grid gap-4 md:grid-cols-3">
+                          <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
+                            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                              Étape 01
+                            </p>
+                            <p className="mt-2 text-sm font-black text-[#123A63]">
+                              Contacter VEMO
+                            </p>
+                          </div>
+
+                          <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
+                            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                              Étape 02
+                            </p>
+                            <p className="mt-2 text-sm font-black text-[#123A63]">
+                              Uploader le justificatif
+                            </p>
+                          </div>
+
+                          <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
+                            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                              Étape 03
+                            </p>
+                            <p className="mt-2 text-sm font-black text-[#123A63]">
+                              Vérification admin
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-5">
+                          <input
+                            type="file"
+                            onChange={(e) => setBankProofFile(e.target.files?.[0] || null)}
+                            className="block w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold text-[#123A63]"
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={submitBankTransfer}
+                          disabled={busy}
+                          className="mt-5 h-[58px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white shadow-[0_16px_30px_rgba(241,90,36,.18)] transition hover:bg-[#DB4F1C] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {busy ? "Envoi du justificatif..." : "Uploader le justificatif et continuer →"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </>
             )}
 
