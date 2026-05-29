@@ -707,7 +707,7 @@ export default function VemoAdminDashboard() {
                   <div className="mt-6 grid gap-6 xl:grid-cols-[420px_1fr]">
                     <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
                       <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
-                        Ajouter / remplacer
+                        Ajouter / replace
                       </p>
 
                       <h3 className="mt-2 text-2xl font-black text-[#111827]">
@@ -768,7 +768,7 @@ export default function VemoAdminDashboard() {
                           disabled={uploading}
                           className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:opacity-60"
                         >
-                          {uploading ? "Upload..." : "Ajouter / remplacer →"}
+                          {uploading ? "Upload..." : "Ajouter / replace →"}
                         </button>
                       </form>
                     </div>

@@ -598,7 +598,7 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                 <div className={`mb-1 flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black ${
                   step === index ? "bg-[#F15A24] text-white" : "bg-[#EDF3F8] text-[#123A63]"
                 }`}>
-                  {String(index + 1).padDémarrer(2, "0")}
+                  {String(index + 1).padStart(2, "0")}
                 </div>
                 <div className="text-[11px] font-black">{label}</div>
               </button>
@@ -609,7 +609,7 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
         <div className="mt-7 grid gap-7 lg:grid-cols-[1.1fr_0.68fr]">
           <section className="rounded-[2rem] border border-[#E3EAF2] bg-white p-8 shadow-[0_24px_70px_rgba(18,58,99,0.08)]">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F15A24]">
-              Étape {String(step + 1).padDémarrer(2, "0")}
+              Étape {String(step + 1).padStart(2, "0")}
             </p>
 
             {step === 0 && (
