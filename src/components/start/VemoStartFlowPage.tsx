@@ -293,7 +293,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const t = content[lang];
 
   const [step, setStep] = useState(0);
-  const [planId, setPlanId] = useState<"starter" | "standard" | "premium">("standard");
+  const [planId, setPlanId] = useState<"" | "starter" | "standard" | "premium">("");
   const [state, setState] = useState("New Mexico");
   const [packId, setPackId] = useState("");
 
@@ -326,7 +326,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const [error, setError] = useState("");
 
   const selectedPlan = useMemo(() => {
-    return plans.find((p) => p.id === planId) || plans[1];
+    return plans.find((p) => p.id === planId) || null;
   }, [planId]);
 
   const selectedCountry = useMemo(() => {
@@ -346,11 +346,12 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   }, [addressCountryIso, selectedCountry]);
 
   const finalPrice = useMemo(() => {
+    if (!selectedPlan) return null;
     return getPlanPrice(selectedPlan.id, state);
   }, [selectedPlan, state]);
 
-  const packName = `${state} ${selectedPlan.label}`;
-  const services = availableServices(selectedPlan.id, state);
+  const packName = selectedPlan ? `${state} ${selectedPlan.label}` : "";
+  const services = selectedPlan ? availableServices(selectedPlan.id, state) : [];
   const progress = Math.round(((step + 1) / t.steps.length) * 100);
   const switchHref = lang === "fr" ? "/en/commencer" : "/fr/commencer";
 
@@ -363,7 +364,9 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     const qName = params.get("name");
     const qLlc = params.get("llc");
 
-    setPlanId(slugPlanToPlan(qPack) as any);
+    if (qPack) {
+      setPlanId(slugPlanToPlan(qPack) as any);
+    }
 
     if (qState?.toLowerCase().includes("wyoming")) setState("Wyoming");
     if (qState?.toLowerCase().includes("new")) setState("New Mexico");
@@ -401,6 +404,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   }
 
   function canContinue() {
+    if (step === 1 && !selectedPlan) return false;
     if (step === 2 && !llcName.trim()) return false;
     if (step === 3 && (!activitySector.trim() || !activityDescription.trim())) return false;
     if (step === 4 && (!fullName.trim() || !emailIsValid(email) || !phoneIsValid(phone))) return false;
@@ -412,6 +416,11 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
   async function submitFinal() {
     setError("");
+
+    if (!selectedPlan) {
+      setError("Merci de choisir une formule avant de continuer.");
+      return;
+    }
 
     if (!fullName.trim() || !emailIsValid(email) || !llcName.trim() || !phoneIsValid(phone)) {
       setError(lang === "fr" ? "Merci de vérifier le nom, l’email, le téléphone et le nom LLC." : "Please check the name, email, phone and LLC name.");
@@ -440,7 +449,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
           state,
           package_name: packName,
           pack_id: packId || `${state.toLowerCase().replace(/\s+/g, "_")}_${selectedPlan.id}`,
-          amount: finalPrice,
+          amount: finalPrice || 0,
           currency: "USD",
           payment_method: paymentMethod,
           activity_sector: activitySector,
@@ -585,32 +594,75 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                   L’État doit être choisi avant la formule, car les prix et les délais peuvent changer.
                 </p>
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  {["New Mexico", "Wyoming"].map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setState(s)}
-                      className={`rounded-[1.6rem] border p-6 text-left transition ${
-                        state === s ? "border-[#F15A24] bg-white" : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
-                      }`}
-                    >
-                      <h3 className="text-2xl font-black text-[#123A63]">{s}</h3>
-                      <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                        {s === "New Mexico"
-                          ? "Confidentialité, coût optimisé et structure simple pour non-résidents."
-                          : "État reconnu, image corporate plus forte et traitement généralement plus rapide."}
-                      </p>
-                      <div className="mt-5 rounded-[14px] border border-[#E3EAF2] bg-[#F8FAFC] px-4 py-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                          Registered Agent renewal
+                <div className="mt-6 grid gap-5 md:grid-cols-2">
+                  {["New Mexico", "Wyoming"].map((s) => {
+                    const selected = state === s;
+                    const renewal = s === "Wyoming" ? "25 $ / an" : "35 $ / an";
+
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setState(s)}
+                        className={`group relative overflow-hidden rounded-[1.8rem] border bg-white p-6 text-left transition ${
+                          selected
+                            ? "border-[#F15A24] shadow-[0_20px_48px_rgba(18,58,99,.10)]"
+                            : "border-[#E3EAF2] shadow-[0_12px_28px_rgba(18,58,99,.04)] hover:border-[#F15A24]/40 hover:shadow-[0_18px_42px_rgba(18,58,99,.08)]"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                              État LLC
+                            </p>
+                            <h3 className="mt-2 text-2xl font-black tracking-[-0.04em] text-[#123A63]">
+                              {s}
+                            </h3>
+                          </div>
+
+                          <div
+                            className={`flex h-7 w-7 items-center justify-center rounded-full border ${
+                              selected
+                                ? "border-[#F15A24] bg-[#F15A24] text-white"
+                                : "border-[#D6E0EA] bg-white text-transparent"
+                            }`}
+                          >
+                            ✓
+                          </div>
+                        </div>
+
+                        <p className="mt-4 min-h-[72px] text-sm font-bold leading-7 text-slate-500">
+                          {s === "New Mexico"
+                            ? "Confidentialité, coût optimisé et structure simple pour les entrepreneurs non-résidents."
+                            : "État reconnu, image corporate plus forte et traitement généralement plus rapide."}
                         </p>
-                        <p className="mt-1 text-sm font-black text-[#123A63]">
-                          {s === "Wyoming" ? "25 $ / an" : "35 $ / an"}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
+
+                        <div className="mt-5 grid gap-3">
+                          <div className="rounded-[1.1rem] border border-[#E3EAF2] bg-[#F8FAFC] px-4 py-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
+                                Registered Agent renewal
+                              </span>
+                              <span className="text-sm font-black text-[#123A63]">
+                                {renewal}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="rounded-[1.1rem] border border-[#E3EAF2] bg-white px-4 py-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
+                                Frais de dépôt
+                              </span>
+                              <span className="text-sm font-black text-emerald-700">
+                                Inclus
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             )}
@@ -875,11 +927,15 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
               <>
                 <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Services inclus</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Les services affichés correspondent uniquement au pack choisi : {selectedPlan.label}.
+                  Les services affichés correspondent uniquement au pack choisi : {selectedPlan?.label || "—"}.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  {services.map((service) => (
+                  {services.length === 0 ? (
+                    <div className="md:col-span-2 rounded-[1.3rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5 text-sm font-black text-slate-500">
+                      Choisissez d’abord une formule pour afficher les services inclus.
+                    </div>
+                  ) : services.map((service) => (
                     <div
                       key={service}
                       className="rounded-[1.3rem] border border-[#E3EAF2] bg-white p-4 text-left text-sm font-black text-[#123A63]"
@@ -1017,8 +1073,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
             <div className="mt-8 space-y-5">
               {[
                 ["État", state, "Inclus"],
-                ["Accompagnement", selectedPlan.label, `$${finalPrice}`],
-                ["Services", `${services.length} inclus`, "$0"],
+                ["Accompagnement", selectedPlan?.label || "À choisir", selectedPlan ? `$${finalPrice}` : "—"],
+                ["Services", selectedPlan ? `${services.length} inclus` : "À choisir", selectedPlan ? "$0" : "—"],
               ].map(([k, v, price]) => (
                 <div key={k} className="flex items-start justify-between gap-4">
                   <div>
@@ -1031,9 +1087,17 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
             </div>
 
             <div className="mt-8 rounded-[1.4rem] border border-[#F15A24] bg-white p-5">
-              <div className="flex items-end justify-between">
+              <div className="flex items-end justify-between gap-4">
                 <p className="text-lg font-black text-[#111827]">{t.estimated}</p>
-                <p className="text-4xl font-black tracking-[-0.08em] text-[#F15A24]">${finalPrice}</p>
+                {selectedPlan ? (
+                  <p className="text-4xl font-black tracking-[-0.08em] text-[#F15A24]">
+                    ${finalPrice}
+                  </p>
+                ) : (
+                  <p className="text-sm font-black text-slate-400">
+                    Après choix de formule
+                  </p>
+                )}
               </div>
             </div>
 
