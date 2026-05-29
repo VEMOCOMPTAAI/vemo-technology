@@ -689,14 +689,30 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const [error, setError] = useState("");
 
   const selectedPlan = useMemo(() => runtimePlans.find((p) => p.id === planId) || null, [planId]);
+
+  const safeSelectedPlan =
+    selectedPlan ||
+    syncedPlans?.[0] ||
+    publicPacks?.[0] ||
+    {
+      id: "starter",
+      label: "Starter",
+      description: "",
+      prices: {
+        "New Mexico": 129,
+        Wyoming: 179,
+      },
+      features: [],
+    };
+
   const selectedCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === countryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!, [countryIso]);
   const phoneCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === phoneCountryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!, [phoneCountryIso]);
   const memberCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === memberCountryIso) || selectedCountry, [memberCountryIso, selectedCountry]);
   const addressCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === addressCountryIso) || selectedCountry, [addressCountryIso, selectedCountry]);
 
-  const services = selectedPlan ? getRuntimePlanFeatures(selectedPlan.id, state) : [];
+  const services = selectedPlan ? getRuntimePlanFeatures(safeSelectedPlan.id, state) : [];
   const selectableServices = visibleSelectableServices(services);
-  const finalPrice = selectedPlan ? getRuntimePlanPrice(selectedPlan.id, state) : null;
+  const finalPrice = selectedPlan ? getRuntimePlanPrice(safeSelectedPlan.id, state) : null;
   const packName = selectedPlan ? `${state} ${selectedPlan?.label || "À choisir"}` : "";
   const progress = Math.round(((step + 1) / t.steps.length) * 100);
   const switchHref = lang === "fr" ? "/en/commencer" : "/fr/commencer";
@@ -816,7 +832,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
         llc_alternative_name: alternativeName,
         state,
         package_name: packName,
-        pack_id: packId || `${state.toLowerCase().replace(/\s+/g, "_")}_${selectedPlan.id}`,
+        pack_id: packId || `${state.toLowerCase().replace(/\s+/g, "_")}_${safeSelectedPlan.id}`,
         amount: finalPrice,
         currency: "USD",
         payment_method: method,
