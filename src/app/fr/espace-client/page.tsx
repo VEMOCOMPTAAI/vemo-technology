@@ -2,26 +2,42 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
+
+function supabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+  if (!url || !key) return null;
+
+  return createClient(url, key);
+}
 
 export default function EspaceClientPage() {
   const params = useSearchParams();
 
-  const queryEmail = useMemo(
+  const previewEmail = useMemo(
     () => String(params.get("email") || "").trim().toLowerCase(),
     [params]
   );
 
-  const [email, setEmail] = useState(queryEmail);
+  const [email, setEmail] = useState("");
   const [documents, setDocuments] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState("");
 
-  async function loadData(targetEmail = email) {
+  async function loadData(targetEmail: string) {
     const cleanEmail = String(targetEmail || "").trim().toLowerCase();
 
-    if (!cleanEmail) return;
+    if (!cleanEmail) {
+      setDocuments([]);
+      setMessages([]);
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
 
@@ -43,45 +59,82 @@ export default function EspaceClientPage() {
   }
 
   useEffect(() => {
-    if (queryEmail) {
-      setEmail(queryEmail);
-      loadData(queryEmail);
+    async function boot() {
+      setNotice("");
+
+      if (previewEmail) {
+        setEmail(previewEmail);
+        await loadData(previewEmail);
+        return;
+      }
+
+      const supabase = supabaseClient();
+
+      if (!supabase) {
+        setNotice("Configuration Supabase manquante.");
+        setLoading(false);
+        return;
+      }
+
+      const { data } = await supabase.auth.getUser();
+      const sessionEmail = data?.user?.email?.trim().toLowerCase() || "";
+
+      if (!sessionEmail) {
+        window.location.href = "/fr/connexion";
+        return;
+      }
+
+      setEmail(sessionEmail);
+      await loadData(sessionEmail);
     }
-  }, [queryEmail]);
+
+    boot();
+  }, [previewEmail]);
 
   return (
     <main className="min-h-screen bg-[#F5F7FA] text-[#111827]">
       <section className="mx-auto max-w-[1120px] px-6 py-8">
         <div className="rounded-[2rem] bg-white p-6">
-          <div className="text-[30px] font-black uppercase leading-none tracking-[-0.06em]">
-            <span className="text-[#123A63]">VEMO</span>
-            <span className="text-[#F15A24]">TECH</span>
-          </div>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div className="text-[30px] font-black uppercase leading-none tracking-[-0.06em]">
+                <span className="text-[#123A63]">VEMO</span>
+                <span className="text-[#F15A24]">TECH</span>
+              </div>
 
-          <h1 className="mt-6 text-[34px] font-black tracking-[-0.06em]">
-            Espace client
-          </h1>
+              <p className="mt-3 text-[10px] font-black uppercase tracking-[0.30em] text-slate-400">
+                Espace client
+              </p>
 
-          <p className="mt-1 text-sm font-bold text-slate-500">
-            Documents et messages de votre dossier.
-          </p>
+              <h1 className="mt-6 text-[34px] font-black tracking-[-0.06em]">
+                Mon espace client
+              </h1>
 
-          <div className="mt-5 flex gap-3">
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Votre email"
-              className="h-[52px] flex-1 rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
-            />
+              <p className="mt-1 text-sm font-bold text-slate-500">
+                {email || "Connexion en cours..."}
+              </p>
+            </div>
 
             <button
               type="button"
               onClick={() => loadData(email)}
-              className="h-[52px] rounded-[16px] bg-[#F15A24] px-6 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
+              className="inline-flex h-[46px] items-center justify-center rounded-[15px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
             >
               Actualiser
             </button>
           </div>
+
+          {previewEmail ? (
+            <div className="mt-5 rounded-[16px] border border-[#FAD7CC] bg-[#FFF7F4] px-4 py-3 text-sm font-black text-[#F15A24]">
+              Aperçu admin du compte client.
+            </div>
+          ) : null}
+
+          {notice ? (
+            <div className="mt-5 rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-3 text-sm font-black text-[#123A63]">
+              {notice}
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -161,7 +214,11 @@ export default function EspaceClientPage() {
             </div>
 
             <div className="mt-6 space-y-3">
-              {messages.length === 0 ? (
+              {loading ? (
+                <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
+                  Chargement...
+                </div>
+              ) : messages.length === 0 ? (
                 <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
                   Aucun message disponible.
                 </div>
