@@ -60,10 +60,6 @@ export default function AdminFinalPage() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState("");
   const [message, setMessage] = useState("");
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [uploadTitle, setUploadTitle] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [documentClientEmail, setDocumentClientEmail] = useState("");
 
   async function load() {
     setLoading(true);
@@ -106,54 +102,6 @@ export default function AdminFinalPage() {
       return matchesQuery && matchesSelected;
     });
   }, [items, query, selectedEmail]);
-
-
-  async function uploadClientDocument() {
-    setMessage("");
-
-    const targetEmail = documentClientEmail || selectedEmail;
-
-    if (!targetEmail) {
-      setMessage("Sélectionne d’abord un client.");
-      return;
-    }
-
-    if (!uploadFile) {
-      setMessage("Choisis un document à uploader.");
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      const form = new FormData();
-      form.append("email", targetEmail);
-      form.append("client_email", targetEmail);
-      form.append("title", uploadTitle || uploadFile.name);
-      form.append("file", uploadFile);
-
-      const res = await fetch("/api/admin/client-portal/documents", {
-        method: "POST",
-        body: form,
-      });
-
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || data?.ok === false) {
-        setMessage(data?.error || "Erreur upload document.");
-        return;
-      }
-
-      setUploadFile(null);
-      setUploadTitle("");
-      setMessage("Document uploadé. Il sera visible dans l’espace client.");
-    } catch (e: any) {
-      setMessage(e?.message || "Erreur upload document.");
-    } finally {
-      setUploading(false);
-    }
-  }
-
   async function updateStatus(item: AdminItem, patch: Partial<AdminItem>) {
     setSavingId(item.id);
     setMessage("");
@@ -311,8 +259,8 @@ export default function AdminFinalPage() {
               </div>
 
               <a
-                href={selectedEmail ? `/fr/espace-client?email=${encodeURIComponent(selectedEmail)}` : "/fr/espace-client"}
-                className="inline-flex h-[44px] items-center rounded-[14px] border border-[#E6EDF5] bg-white px-4 text-xs font-black text-[#123A63] transition hover:border-[#F15A24]"
+                href={selectedEmail ? `/fr/admin/client?email=${encodeURIComponent(selectedEmail)}` : "/fr/admin/client"}
+                className="inline-flex h-[44px] items-center justify-center rounded-[14px] bg-[#F15A24] px-5 text-xs font-black text-white transition hover:bg-[#DB4F1C]"
               >
                 Voir espace client
               </a>
@@ -412,7 +360,7 @@ export default function AdminFinalPage() {
 
                   <div className="flex flex-col gap-2">
                     <a
-                      href={`/fr/espace-client?email=${encodeURIComponent(item.email || "")}`}
+                      href={`/fr/admin/client?email=${encodeURIComponent(item.email || "")}`}
                       className="rounded-[12px] border border-[#E6EDF5] px-3 py-2 text-center text-xs font-black text-[#123A63] transition hover:border-[#F15A24]"
                     >
                       Espace

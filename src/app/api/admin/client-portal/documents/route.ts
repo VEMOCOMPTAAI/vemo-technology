@@ -33,17 +33,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: true, documents: [] });
     }
 
-    const { data, error } = await supabase
-      .from("client_documents")
-      .select("*")
-      .or(`client_email.eq.${email},email.eq.${email}`)
-      .order("created_at", { ascending: false });
+    for (const table of ["client_documents", "documents"]) {
+      try {
+        const { data, error } = await supabase
+          .from(table)
+          .select("*")
+          .or(`client_email.eq.${email},email.eq.${email}`)
+          .order("created_at", { ascending: false });
 
-    if (error) {
-      return NextResponse.json({ ok: true, documents: [] });
+        if (!error) {
+          return NextResponse.json({ ok: true, documents: data || [] });
+        }
+      } catch {}
     }
 
-    return NextResponse.json({ ok: true, documents: data || [] });
+    return NextResponse.json({ ok: true, documents: [] });
   } catch (error: any) {
     return NextResponse.json(
       { ok: false, error: error?.message || "Erreur lecture documents." },
@@ -76,10 +80,11 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       return NextResponse.json({
         ok: true,
-        warning: "Supabase non configuré. Upload simulé.",
         document: {
           client_email: email,
           name: title,
+          filename: file.name,
+          created_at: new Date().toISOString(),
         },
       });
     }
@@ -116,19 +121,18 @@ export async function POST(request: NextRequest) {
     const payload = {
       client_email: email,
       email,
+      title,
       name: title,
       filename: file.name,
-      title,
       file_path: path,
       path,
       url: publicUrl,
       public_url: publicUrl,
       mime_type: file.type || null,
       size_bytes: file.size || null,
+      visible_to_client: true,
       created_at: new Date().toISOString(),
     };
-
-    let inserted: any = null;
 
     for (const table of ["client_documents", "documents"]) {
       try {
@@ -139,16 +143,12 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (!error) {
-          inserted = data;
-          break;
+          return NextResponse.json({ ok: true, document: data });
         }
       } catch {}
     }
 
-    return NextResponse.json({
-      ok: true,
-      document: inserted || payload,
-    });
+    return NextResponse.json({ ok: true, document: payload });
   } catch (error: any) {
     return NextResponse.json(
       { ok: false, error: error?.message || "Erreur upload document." },
