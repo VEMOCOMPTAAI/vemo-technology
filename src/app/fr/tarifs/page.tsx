@@ -85,9 +85,16 @@ function startHref(pack: Pack, state: StateName) {
 function cleanFeatureList(features: string[]) {
   return features
     .filter(Boolean)
-    .filter((feature) => !feature.toLowerCase().includes("renouvellement registered agent"))
-    .filter((feature) => !feature.toLowerCase().includes("registered agent offert la première année"))
-    .slice(0, 6);
+    .filter((feature) => {
+      const lower = feature.toLowerCase();
+      return (
+        !lower.includes("documents de création llc") &&
+        !lower.includes("frais de dépôt") &&
+        !lower.includes("registered agent offert") &&
+        !lower.includes("renouvellement registered agent")
+      );
+    })
+    .slice(0, 4);
 }
 
 export default function TarifsPage() {
@@ -235,6 +242,18 @@ export default function TarifsPage() {
                 </div>
 
                 <div className="mt-3 space-y-1.5">
+                                    <div className="flex items-start gap-2 rounded-[12px] border border-[#E8EEF6] bg-white px-3 py-2">
+                    <span className="mt-[1px] text-[11px] font-black text-[#F15A24]">
+                      ✓
+                    </span>
+                    <span className="text-[11.5px] font-bold leading-4 text-[#123A63]">
+                      Registered Agent offert la première année{" "}
+                      <span className="font-black text-[#123A63]">
+                        (Renouvellement {renewalPrice} USD / an)
+                      </span>
+                    </span>
+                  </div>
+
                   {features.map((feature) => (
                     <div
                       key={feature}
