@@ -1,29 +1,36 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import { VEMO_COUNTRIES, flagFromIso, type VemoCountry } from "@/lib/vemoCountries";
 
 type Lang = "fr" | "en";
-type PaiementMethod = "card" | "bank_transfer";
+type PlanId = "" | "starter" | "standard" | "premium";
+type PaymentMethod = "card" | "bank_transfer";
 
 type Plan = {
-  id: "starter" | "standard" | "premium";
+  id: Exclude<PlanId, "">;
   label: string;
   subtitle: string;
   features: string[];
   recommended?: boolean;
 };
 
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
+
 const plans: Plan[] = [
   {
     id: "starter",
-    label: "Démarrerer",
+    label: "Starter",
     subtitle: "Pour démarrer simplement votre dossier LLC.",
     features: [
       "Préparation du dossier LLC",
       "Documents de création LLC",
       "Registered Agent offert la première année",
-      "Suivi administratif de base"
+      "Suivi administratif de base",
     ],
   },
   {
@@ -31,11 +38,11 @@ const plans: Plan[] = [
     label: "Standard",
     subtitle: "La formule recommandée pour la plupart des non-résidents.",
     features: [
-      "Tout le Pack Démarrerer",
+      "Tout le Pack Starter",
       "Demande EIN",
       "Operating Agreement",
       "Registered Agent offert la première année",
-      "Suivi administratif renforcé"
+      "Suivi administratif renforcé",
     ],
     recommended: true,
   },
@@ -48,7 +55,7 @@ const plans: Plan[] = [
       "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
       "Form 5472 + Form 1120 offerts la première année",
       "Registered Agent offert la première année",
-      "Support prioritaire"
+      "Support prioritaire",
     ],
   },
 ];
@@ -63,10 +70,43 @@ const activitySectors = [
   "Import / Export",
   "Holding / Investment",
   "Travel / Tourism",
-  "Autre activité"
+  "Autre activité",
 ];
 
 const designators = ["LLC", "L.L.C.", "Limited Liability Company"];
+
+const countryNamesFr: Record<string, string> = {
+  MA: "Maroc",
+  DZ: "Algérie",
+  FR: "France",
+  AE: "Émirats arabes unis",
+  SA: "Arabie saoudite",
+  US: "États-Unis",
+  GB: "Royaume-Uni",
+  ES: "Espagne",
+  IT: "Italie",
+  DE: "Allemagne",
+  BE: "Belgique",
+  NL: "Pays-Bas",
+  PT: "Portugal",
+  TR: "Turquie",
+  TN: "Tunisie",
+  EG: "Égypte",
+  CA: "Canada",
+  CN: "Chine",
+  JP: "Japon",
+  KR: "Corée du Sud",
+  QA: "Qatar",
+  KW: "Koweït",
+  OM: "Oman",
+  BH: "Bahreïn",
+  JO: "Jordanie",
+  LB: "Liban",
+  SN: "Sénégal",
+  CI: "Côte d’Ivoire",
+  CM: "Cameroun",
+  NG: "Nigeria",
+};
 
 const content = {
   fr: {
@@ -85,49 +125,32 @@ const content = {
     included: "Inclus",
     toComplete: "À compléter",
     recommended: "Recommandé",
-    steps: [
-      "État",
-      "Formule",
-      "Nom LLC",
-      "Activité",
-      "Compte",
-      "Membres",
-      "Adresse",
-      "Services",
-      "Résumé",
-      "Paiement",
-    ],
+    steps: ["État", "Formule", "Nom LLC", "Activité", "Compte", "Membres", "Adresse", "Services", "Résumé", "Paiement"],
   },
   en: {
-    home: "Accueil",
-    pricing: "Tarifs",
+    home: "Home",
+    pricing: "Pricing",
     faq: "FAQ",
     contact: "Contact",
-    start: "Démarrer",
+    start: "Start",
     next: "Continue",
     back: "← Back",
-    summary: "Résumé",
+    summary: "Summary",
     progress: "Progress",
-    company: "Votre société LLC",
-    estimated: "Total estimé",
+    company: "Your LLC company",
+    estimated: "Estimated total",
     finalNote: "The final amount may be adjusted depending on the services actually required.",
-    included: "Inclus",
+    included: "Included",
     toComplete: "To complete",
     recommended: "Recommended",
-    steps: [
-      "État",
-      "Formule",
-      "Nom LLC",
-      "Activity",
-      "Compte",
-      "Membres",
-      "Adresse",
-      "Services",
-      "Résumé",
-      "Paiement",
-    ],
+    steps: ["State", "Package", "LLC name", "Activity", "Account", "Members", "Address", "Services", "Summary", "Payment"],
   },
 };
+
+function countryDisplayName(country: VemoCountry, lang: Lang = "fr") {
+  if (lang === "fr") return countryNamesFr[country.iso] || country.name;
+  return country.name;
+}
 
 function inputClass() {
   return "h-[54px] w-full rounded-[16px] border border-[#E1E7EF] bg-white px-4 text-sm font-black text-[#123A63] outline-none transition focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10";
@@ -143,8 +166,7 @@ function getPlanPrice(planId: string, state: string) {
     standard: { "New Mexico": 149, Wyoming: 199 },
     premium: { "New Mexico": 199, Wyoming: 249 },
   };
-
-  return prices[planId]?.[state] || prices.standard["New Mexico"];
+  return prices[planId]?.[state] || 0;
 }
 
 function availableServices(planId: string, state: string) {
@@ -153,7 +175,7 @@ function availableServices(planId: string, state: string) {
       "Préparation du dossier LLC",
       "Documents de création LLC",
       "Registered Agent offert la première année",
-      "Suivi administratif de base"
+      "Suivi administratif de base",
     ];
   }
 
@@ -164,7 +186,7 @@ function availableServices(planId: string, state: string) {
         : "Demande EIN — délai estimatif New Mexico : 10 à 30 jours ouvrables",
       "Operating Agreement",
       "Registered Agent offert la première année",
-      "Suivi administratif renforcé"
+      "Suivi administratif renforcé",
     ];
   }
 
@@ -176,7 +198,7 @@ function availableServices(planId: string, state: string) {
     "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
     "Form 5472 + Form 1120 offerts la première année",
     "Registered Agent offert la première année",
-    "Support prioritaire"
+    "Support prioritaire",
   ];
 }
 
@@ -184,41 +206,17 @@ function emailIsValid(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email.trim());
 }
 
-
-function countryDisplayName(country: VemoCountry) {
-  const names: Record<string, string> = {
-    MA: "Maroc",
-    DZ: "Algérie",
-    FR: "France",
-    AE: "Émirats arabes unis",
-    SA: "Arabie saoudite",
-    US: "États-Unis",
-    GB: "Royaume-Uni",
-    ES: "Espagne",
-    IT: "Italie",
-    DE: "Allemagne",
-    BE: "Belgique",
-    NL: "Pays-Bas",
-    PT: "Portugal",
-    TR: "Turquie",
-    TN: "Tunisie",
-    EG: "Égypte",
-    CA: "Canada"
-  };
-
-  return names[country.iso] || country.name;
-}
-
 function phoneIsValid(phone: string) {
   const digits = phone.replace(/\D/g, "");
   return digits.length >= 6 && digits.length <= 15;
 }
 
-function slugPlanToPlan(pack?: string | null, amount?: string | null) {
+function slugPlanToPlan(pack?: string | null): PlanId {
   const raw = String(pack || "").toLowerCase();
   if (raw.includes("premium")) return "premium";
   if (raw.includes("starter")) return "starter";
-  return "standard";
+  if (raw.includes("standard")) return "standard";
+  return "";
 }
 
 function findCountryByDial(value: string) {
@@ -233,11 +231,13 @@ function CountryPicker({
   valueIso,
   onChange,
   compact = false,
+  lang = "fr",
 }: {
   label: string;
   valueIso: string;
   onChange: (country: VemoCountry) => void;
   compact?: boolean;
+  lang?: Lang;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -246,9 +246,14 @@ function CountryPicker({
 
   const filtered = VEMO_COUNTRIES.filter((country) => {
     const q = search.toLowerCase().trim();
+    const fr = countryDisplayName(country, "fr").toLowerCase();
+    const en = country.name.toLowerCase();
+
     if (!q) return true;
+
     return (
-      country.name.toLowerCase().includes(q) ||
+      fr.includes(q) ||
+      en.includes(q) ||
       country.dial.includes(q) ||
       country.iso.toLowerCase().includes(q)
     );
@@ -256,14 +261,12 @@ function CountryPicker({
 
   return (
     <div className="relative">
-      <span className="mb-2 block text-sm font-black text-[#123A63]">{label}</span>
+      {label ? <span className="mb-2 block text-sm font-black text-[#123A63]">{label}</span> : null}
 
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className={`h-[54px] w-full rounded-[16px] border border-[#E1E7EF] bg-white px-4 text-left text-sm font-black text-[#123A63] outline-none transition hover:border-[#F15A24]/50 ${
-          compact ? "min-w-[124px]" : ""
-        }`}
+        className="h-[54px] w-full rounded-[16px] border border-[#E1E7EF] bg-white px-4 text-left text-sm font-black text-[#123A63] outline-none transition hover:border-[#F15A24]/50"
       >
         {compact ? (
           <span className="flex items-center justify-center gap-2">
@@ -273,7 +276,7 @@ function CountryPicker({
         ) : (
           <span className="flex items-center gap-2">
             <span>{flagFromIso(selected.iso)}</span>
-            <span className="truncate">{countryDisplayName(selected)}</span>
+            <span className="truncate">{countryDisplayName(selected, lang)}</span>
           </span>
         )}
       </button>
@@ -283,7 +286,7 @@ function CountryPicker({
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher un pays ou un indicatif..."
+            placeholder="Rechercher un pays ou indicatif..."
             className="h-11 w-full rounded-[13px] border border-[#E1E7EF] bg-[#F8FAFC] px-3 text-sm font-bold outline-none focus:border-[#F15A24]"
           />
 
@@ -300,11 +303,9 @@ function CountryPicker({
                 className="flex w-full items-center justify-between rounded-[12px] px-3 py-2 text-left text-sm font-black text-[#123A63] hover:bg-[#F8FAFC]"
               >
                 <span className="truncate">
-                  {flagFromIso(country.iso)} {countryDisplayName(country)}
+                  {flagFromIso(country.iso)} {countryDisplayName(country, lang)}
                 </span>
-                {compact ? (
-                  <span className="ml-3 text-slate-400">{country.dial}</span>
-                ) : null}
+                {compact ? <span className="ml-3 text-slate-400">{country.dial}</span> : null}
               </button>
             ))}
           </div>
@@ -314,11 +315,65 @@ function CountryPicker({
   );
 }
 
-export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) {
+function PaymentCardElement({
+  clientSecret,
+  email,
+}: {
+  clientSecret: string;
+  email: string;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function pay() {
+    if (!stripe || !elements) return;
+
+    setBusy(true);
+    setError("");
+
+    const result = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        receipt_email: email,
+        return_url: `${window.location.origin}/fr/payment-success?email=${encodeURIComponent(email)}`,
+      },
+    });
+
+    if (result.error) {
+      setError(result.error.message || "Paiement refusé.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-5 rounded-[1.4rem] border border-[#E3EAF2] bg-white p-5">
+      <PaymentElement />
+
+      {error ? (
+        <div className="mt-4 rounded-[14px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-black text-red-700">
+          {error}
+        </div>
+      ) : null}
+
+      <button
+        type="button"
+        onClick={pay}
+        disabled={busy || !stripe || !elements}
+        className="mt-5 h-[52px] w-full rounded-[16px] bg-[#F15A24] text-sm font-black text-white shadow-[0_14px_28px_rgba(18,58,99,.12)] transition hover:bg-[#D94A1B] disabled:opacity-60"
+      >
+        {busy ? "Traitement du paiement..." : "Confirmer le paiement"}
+      </button>
+    </div>
+  );
+}
+
+export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const t = content[lang];
 
   const [step, setStep] = useState(0);
-  const [planId, setPlanId] = useState<"" | "starter" | "standard" | "premium">("");
+  const [planId, setPlanId] = useState<PlanId>("");
   const [state, setState] = useState("New Mexico");
   const [packId, setPackId] = useState("");
 
@@ -338,65 +393,53 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
 
   const [memberName, setMemberName] = useState("");
   const [memberCountryIso, setMemberCountryIso] = useState("MA");
-  const [memberRole, setMemberRole] = useState("Membre");
+  const [memberRole, setMemberRole] = useState("Membre et Manager");
   const [managerName, setManagerName] = useState("");
-  const [address, setAdresse] = useState("");
-  const [addressCity, setAdresseCity] = useState("");
-  const [addressPostalCode, setAdressePostalCode] = useState("");
-  const [addressCountryIso, setAdresseCountryIso] = useState("MA");
-  const [confirmRésumé, setConfirmRésumé] = useState(false);
-  const [paymentMethod, setPaiementMethod] = useState<PaiementMethod>("card");
+
+  const [address, setAddress] = useState("");
+  const [addressCity, setAddressCity] = useState("");
+  const [addressPostalCode, setAddressPostalCode] = useState("");
+  const [addressCountryIso, setAddressCountryIso] = useState("MA");
+
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [confirmSummary, setConfirmSummary] = useState(false);
+
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
+  const [dossierNumber, setDossierNumber] = useState("");
+  const [clientSecret, setClientSecret] = useState("");
+  const [bankProofFile, setBankProofFile] = useState<File | null>(null);
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const selectedPlan = useMemo(() => {
-    return plans.find((p) => p.id === planId) || null;
-  }, [planId]);
+  const selectedPlan = useMemo(() => plans.find((p) => p.id === planId) || null, [planId]);
+  const selectedCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === countryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!, [countryIso]);
+  const phoneCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === phoneCountryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!, [phoneCountryIso]);
+  const memberCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === memberCountryIso) || selectedCountry, [memberCountryIso, selectedCountry]);
+  const addressCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === addressCountryIso) || selectedCountry, [addressCountryIso, selectedCountry]);
 
-  const selectedCountry = useMemo(() => {
-    return VEMO_COUNTRIES.find((c) => c.iso === countryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!;
-  }, [countryIso]);
-
-  const phoneCountry = useMemo(() => {
-    return VEMO_COUNTRIES.find((c) => c.iso === phoneCountryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!;
-  }, [phoneCountryIso]);
-
-  const memberCountry = useMemo(() => {
-    return VEMO_COUNTRIES.find((c) => c.iso === memberCountryIso) || selectedCountry;
-  }, [memberCountryIso, selectedCountry]);
-
-  const addressCountry = useMemo(() => {
-    return VEMO_COUNTRIES.find((c) => c.iso === addressCountryIso) || selectedCountry;
-  }, [addressCountryIso, selectedCountry]);
-
-  const finalPrice = useMemo(() => {
-    if (!selectedPlan) return null;
-    return getPlanPrice(selectedPlan.id, state);
-  }, [selectedPlan, state]);
-
-  const packName = selectedPlan ? `${state} ${selectedPlan.label}` : "";
   const services = selectedPlan ? availableServices(selectedPlan.id, state) : [];
+  const finalPrice = selectedPlan ? getPlanPrice(selectedPlan.id, state) : null;
+  const packName = selectedPlan ? `${state} ${selectedPlan.label}` : "";
   const progress = Math.round(((step + 1) / t.steps.length) * 100);
   const switchHref = lang === "fr" ? "/en/commencer" : "/fr/commencer";
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-
     const qPack = params.get("pack");
-    const qÉtat = params.get("state");
+    const qState = params.get("state");
     const qEmail = params.get("email");
     const qName = params.get("name");
     const qLlc = params.get("llc");
 
     if (qPack) {
-      setPlanId(slugPlanToPlan(qPack) as any);
+      setPlanId(slugPlanToPlan(qPack));
+      setPackId(qPack);
     }
 
-    if (qÉtat?.toLowerCase().includes("wyoming")) setState("Wyoming");
-    if (qÉtat?.toLowerCase().includes("new")) setState("New Mexico");
+    if (qState?.toLowerCase().includes("wyoming")) setState("Wyoming");
+    if (qState?.toLowerCase().includes("new")) setState("New Mexico");
 
-    if (qPack) setPackId(qPack);
     if (qEmail) setEmail(qEmail);
     if (qName) {
       setFullName(qName);
@@ -412,9 +455,19 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
   }, [fullName, memberName, managerName]);
 
   useEffect(() => {
-    if (!memberCountryIso || memberCountryIso === "MA") setMemberCountryIso(countryIso);
-    if (!addressCountryIso || addressCountryIso === "MA") setAdresseCountryIso(countryIso);
+    setMemberCountryIso(countryIso);
+    setAddressCountryIso(countryIso);
   }, [countryIso]);
+
+  useEffect(() => {
+    setSelectedServices([]);
+  }, [planId, state]);
+
+  useEffect(() => {
+    if (memberRole === "Membre et Manager") {
+      setManagerName(memberName);
+    }
+  }, [memberRole, memberName]);
 
   function handlePhoneChange(value: string) {
     const country = findCountryByDial(value);
@@ -428,80 +481,144 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
     setPhone(value);
   }
 
+  function toggleService(service: string) {
+    setSelectedServices((prev) => {
+      if (prev.includes(service)) return prev.filter((item) => item !== service);
+      return [...prev, service];
+    });
+  }
+
   function canContinue() {
     if (step === 1 && !selectedPlan) return false;
     if (step === 2 && !llcName.trim()) return false;
     if (step === 3 && (!activitySector.trim() || !activityDescription.trim())) return false;
     if (step === 4 && (!fullName.trim() || !emailIsValid(email) || !phoneIsValid(phone))) return false;
-    if (step === 5 && (!memberName.trim() || !managerName.trim() || !memberRole.trim())) return false;
+    if (step === 5 && (!memberName.trim() || !memberRole.trim())) return false;
+    if (step === 5 && memberRole !== "Membre et Manager" && !managerName.trim()) return false;
     if (step === 6 && (!address.trim() || !addressCity.trim() || !addressCountryIso.trim())) return false;
-    if (step === 8 && !confirmRésumé) return false;
+    if (step === 7 && selectedServices.length === 0) return false;
+    if (step === 8 && !confirmSummary) return false;
     return true;
   }
 
-  async function submitFinal() {
-    setError("");
-
-    if (!selectedPlan) {
-      setError("Merci de choisir une formule avant de continuer.");
-      return;
+  async function createOrder(method: PaymentMethod) {
+    if (!selectedPlan || !finalPrice) {
+      throw new Error("Merci de choisir une formule.");
     }
 
-    if (!fullName.trim() || !emailIsValid(email) || !llcName.trim() || !phoneIsValid(phone)) {
-      setError(lang === "fr" ? "Merci de vérifier le nom, l’email, le téléphone et le nom LLC." : "Please check the name, email, phone and Nom LLC.");
+    const manager = memberRole === "Membre et Manager" ? memberName : managerName;
+
+    const res = await fetch("/api/orders/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lang,
+        full_name: fullName,
+        email,
+        phone: `${phoneCountry.dial} ${phone}`.trim(),
+        phone_country: countryDisplayName(phoneCountry, lang),
+        country: countryDisplayName(selectedCountry, lang),
+        llc_name: `${llcName} ${designator}`.trim(),
+        llc_name_raw: llcName,
+        llc_designator: designator,
+        llc_alternative_name: alternativeName,
+        state,
+        package_name: packName,
+        pack_id: packId || `${state.toLowerCase().replace(/\s+/g, "_")}_${selectedPlan.id}`,
+        amount: finalPrice,
+        currency: "USD",
+        payment_method: method,
+        activity_sector: activitySector,
+        activity_description: activityDescription,
+        member_name: memberName,
+        member_country: countryDisplayName(memberCountry, lang),
+        member_role: memberRole,
+        manager_name: manager,
+        address,
+        address_city: addressCity,
+        address_postal_code: addressPostalCode,
+        address_country: countryDisplayName(addressCountry, lang),
+        services: selectedServices,
+        summary_confirmed: confirmSummary,
+      }),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok || data?.ok === false) {
+      throw new Error(data?.error || "Erreur création dossier.");
+    }
+
+    setDossierNumber(data?.dossier_number || "");
+    return data;
+  }
+
+  async function prepareStripePayment() {
+    setError("");
+    setBusy(true);
+
+    try {
+      const order = dossierNumber ? { dossier_number: dossierNumber } : await createOrder("card");
+
+      const intentRes = await fetch("/api/payments/create-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: finalPrice,
+          currency: "USD",
+          email,
+          dossier_number: order.dossier_number || dossierNumber,
+        }),
+      });
+
+      const intent = await intentRes.json().catch(() => null);
+
+      if (!intentRes.ok || intent?.ok === false || !intent?.clientSecret) {
+        setError(intent?.error || "Impossible de préparer le paiement Stripe.");
+        return;
+      }
+
+      setClientSecret(intent.clientSecret);
+    } catch (e: any) {
+      setError(e?.message || "Erreur préparation paiement.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitBankTransfer() {
+    setError("");
+
+    if (!bankProofFile) {
+      setError("Merci d’uploader le justificatif de virement.");
       return;
     }
 
     setBusy(true);
 
     try {
-      const res = await fetch("/api/orders/start", {
+      const order = dossierNumber ? { dossier_number: dossierNumber } : await createOrder("bank_transfer");
+
+      const form = new FormData();
+      form.append("email", email);
+      form.append("dossier_number", order.dossier_number || dossierNumber);
+      form.append("file", bankProofFile);
+
+      const res = await fetch("/api/orders/bank-transfer-proof", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lang,
-          full_name: fullName,
-          email,
-          phone: `${phoneCountry.dial} ${phone}`.trim(),
-          phone_country: phoneCountry.iso === 'MA' ? 'Maroc' : phoneCountry.name,
-          country: selectedCountry.iso === 'MA' ? 'Maroc' : selectedCountry.name,
-          llc_name: `${llcName} ${designator}`.trim(),
-          llc_name_raw: llcName,
-          llc_designator: designator,
-          llc_alternative_name: alternativeName,
-          state,
-          package_name: packName,
-          pack_id: packId || `${state.toLowerCase().replace(/\s+/g, "_")}_${selectedPlan.id}`,
-          amount: finalPrice || 0,
-          currency: "USD",
-          payment_method: paymentMethod,
-          activity_sector: activitySector,
-          activity_description: activityDescription,
-          member_name: memberName,
-          member_country: memberCountry.iso === 'MA' ? 'Maroc' : memberCountry.name,
-          member_role: memberRole,
-          manager_name: managerName,
-          address,
-          address_city: addressCity,
-          address_postal_code: addressPostalCode,
-          address_country: addressCountry.iso === 'MA' ? 'Maroc' : addressCountry.name,
-          services,
-          summary_confirmed: confirmRésumé,
-        }),
+        body: form,
       });
 
       const data = await res.json().catch(() => null);
 
-      if (!res.ok || data?.ok === false || !data?.redirectTo) {
-        setError(data?.error || "Erreur pendant la création du dossier.");
+      if (!res.ok || data?.ok === false) {
+        setError(data?.error || "Erreur upload justificatif.");
         return;
       }
 
-      window.location.href = data.redirectTo;
-    } catch {
-      setError("Erreur réseau pendant la création du dossier.");
+      window.location.href = `/fr/payment-pending-verification?email=${encodeURIComponent(email)}`;
+    } catch (e: any) {
+      setError(e?.message || "Erreur virement.");
     } finally {
       setBusy(false);
     }
@@ -511,19 +628,16 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
     setError("");
 
     if (!canContinue()) {
-      if (step === 4) {
-        setError("Merci de vérifier le nom complet, l’email et le numéro de téléphone.");
-      } else {
-        setError(lang === "fr" ? "Merci de compléter cette étape avant de continuer." : "Please complete this step before continuing.");
-      }
+      if (step === 4) setError("Merci de vérifier le nom complet, l’email et le numéro de téléphone.");
+      else if (step === 7) setError("Merci de sélectionner au moins un service inclus.");
+      else if (step === 8) setError("Merci de confirmer les informations avant le paiement.");
+      else setError("Merci de compléter cette étape avant de continuer.");
       return;
     }
 
     if (step < 9) {
       setStep(step + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      submitFinal();
     }
   }
 
@@ -549,7 +663,7 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                 <span className="text-[#111827]">Technology</span>
               </div>
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                LLC US pour non-résidents
+                LLC US POUR NON-RÉSIDENTS
               </div>
             </div>
           </a>
@@ -587,7 +701,7 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                 key={label}
                 type="button"
                 onClick={() => setStep(index)}
-                className={`rounded-[14px] border p-3 text-left transition ${
+                className={`min-h-[76px] rounded-[14px] border p-3 text-left transition ${
                   step === index
                     ? "border-[#F15A24] bg-white text-[#F15A24]"
                     : index < step
@@ -616,7 +730,7 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
               <>
                 <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Choisissez l’État de création</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  L’État de création doit être choisi avant la formule, car les prix et les délais peuvent changer.
+                  L’État doit être choisi avant la formule, car les prix et les délais peuvent changer.
                 </p>
 
                 <div className="mt-6 grid gap-5 md:grid-cols-2">
@@ -629,10 +743,10 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                         key={s}
                         type="button"
                         onClick={() => setState(s)}
-                        className={`group relative overflow-hidden rounded-[1.8rem] border bg-white p-6 text-left transition ${
+                        className={`relative min-h-[260px] rounded-[1.8rem] border bg-white p-6 text-left transition ${
                           selected
                             ? "border-[#F15A24] shadow-[0_20px_48px_rgba(18,58,99,.10)]"
-                            : "border-[#E3EAF2] shadow-[0_12px_28px_rgba(18,58,99,.04)] hover:border-[#F15A24]/40 hover:shadow-[0_18px_42px_rgba(18,58,99,.08)]"
+                            : "border-[#E3EAF2] shadow-[0_12px_28px_rgba(18,58,99,.04)] hover:border-[#F15A24]/40"
                         }`}
                       >
                         <div className="flex items-start justify-between gap-4">
@@ -645,13 +759,9 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                             </h3>
                           </div>
 
-                          <div
-                            className={`flex h-7 w-7 items-center justify-center rounded-full border ${
-                              selected
-                                ? "border-[#F15A24] bg-[#F15A24] text-white"
-                                : "border-[#D6E0EA] bg-white text-transparent"
-                            }`}
-                          >
+                          <div className={`flex h-7 w-7 items-center justify-center rounded-full border ${
+                            selected ? "border-[#F15A24] bg-[#F15A24] text-white" : "border-[#D6E0EA] bg-white text-transparent"
+                          }`}>
                             ✓
                           </div>
                         </div>
@@ -662,17 +772,14 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                             : "État reconnu, image corporate plus forte et traitement généralement plus rapide."}
                         </p>
 
-                        <div className="mt-5 grid gap-3">
-                          <div className="rounded-[1.1rem] border border-[#E3EAF2] bg-[#F8FAFC] px-4 py-3">
-                            <div className="flex items-center justify-between gap-3">
-                              <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                                Renouvellement Registered Agent
-                              </span>
-                              <span className="text-sm font-black text-[#123A63]">
-                                {renewal}
-                              </span>
-                            </div>
-                          </div>                        </div>
+                        <div className="mt-5 rounded-[1.1rem] border border-[#E3EAF2] bg-[#F8FAFC] px-4 py-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
+                              Renouvellement Registered Agent
+                            </span>
+                            <span className="text-sm font-black text-[#123A63]">{renewal}</span>
+                          </div>
+                        </div>
                       </button>
                     );
                   })}
@@ -693,7 +800,7 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                       key={plan.id}
                       type="button"
                       onClick={() => setPlanId(plan.id)}
-                      className={`relative min-h-[300px] rounded-[1.6rem] border p-5 text-left transition ${
+                      className={`relative flex min-h-[340px] flex-col rounded-[1.6rem] border p-5 text-left transition ${
                         planId === plan.id
                           ? "border-[#F15A24] bg-white shadow-[0_18px_40px_rgba(18,58,99,.08)]"
                           : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
@@ -717,11 +824,11 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                         }`} />
                       </div>
 
-                      <p className="mt-4 text-sm font-bold leading-6 text-slate-500">{plan.subtitle}</p>
+                      <p className="mt-4 min-h-[72px] text-sm font-bold leading-6 text-slate-500">{plan.subtitle}</p>
 
-                      <ul className="mt-5 space-y-2">
-                        {plan.features.map((f) => (
-                          <li key={f} className="text-xs font-black text-[#123A63]">✓ {f}</li>
+                      <ul className="mt-5 flex-1 space-y-2">
+                        {plan.features.map((feature) => (
+                          <li key={feature} className="text-xs font-black text-[#123A63]">✓ {feature}</li>
                         ))}
                       </ul>
                     </button>
@@ -746,9 +853,7 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Designator</span>
                     <select value={designator} onChange={(e) => setDesignator(e.target.value)} className={inputClass()}>
-                      {designators.map((item) => (
-                        <option key={item} value={item}>{item}</option>
-                      ))}
+                      {designators.map((item) => <option key={item} value={item}>{item}</option>)}
                     </select>
                   </label>
 
@@ -771,20 +876,13 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Secteur d’activité</span>
                     <select value={activitySector} onChange={(e) => setActivitySector(e.target.value)} className={inputClass()}>
-                      {activitySectors.map((sector) => (
-                        <option key={sector} value={sector}>{sector}</option>
-                      ))}
+                      {activitySectors.map((sector) => <option key={sector} value={sector}>{sector}</option>)}
                     </select>
                   </label>
 
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Description de l’activité</span>
-                    <textarea
-                      value={activityDescription}
-                      onChange={(e) => setActivityDescription(e.target.value)}
-                      className={textareaClass()}
-                      placeholder="Ex : Online consulting, digital services, software, e-commerce, marketing services..."
-                    />
+                    <textarea value={activityDescription} onChange={(e) => setActivityDescription(e.target.value)} className={textareaClass()} placeholder="Ex : consulting en ligne, services digitaux, logiciel, e-commerce..." />
                   </label>
                 </div>
               </>
@@ -806,36 +904,18 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Email</span>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`${inputClass()} ${email && !emailIsValid(email) ? "border-red-300" : ""}`} />
-                    {email && !emailIsValid(email) && (
-                      <p className="mt-2 text-xs font-black text-red-600">Email invalide.</p>
-                    )}
+                    {email && !emailIsValid(email) ? <p className="mt-2 text-xs font-black text-red-600">Email invalide.</p> : null}
                   </label>
 
-                  <CountryPicker
-                    label="Pays de résidence"
-                    valueIso={countryIso}
-                    onChange={(country) => setCountryIso(country.iso)}
-                  />
+                  <CountryPicker label="Pays de résidence" valueIso={countryIso} onChange={(country) => setCountryIso(country.iso)} lang={lang} />
 
                   <div>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Téléphone / WhatsApp</span>
                     <div className="grid grid-cols-[118px_1fr] gap-3">
-                      <CountryPicker
-                        label=""
-                        valueIso={phoneCountryIso}
-                        onChange={(country) => setPhoneCountryIso(country.iso)}
-                        compact
-                      />
-                      <input
-                        value={phone}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        className={`${inputClass()} ${phone && !phoneIsValid(phone) ? "border-red-300" : ""}`}
-                        placeholder="651980076"
-                      />
+                      <CountryPicker label="" valueIso={phoneCountryIso} onChange={(country) => setPhoneCountryIso(country.iso)} compact lang={lang} />
+                      <input value={phone} onChange={(e) => handlePhoneChange(e.target.value)} className={`${inputClass()} ${phone && !phoneIsValid(phone) ? "border-red-300" : ""}`} placeholder="651980076" />
                     </div>
-                    {phone && !phoneIsValid(phone) && (
-                      <p className="mt-2 text-xs font-black text-red-600">Numéro invalide.</p>
-                    )}
+                    {phone && !phoneIsValid(phone) ? <p className="mt-2 text-xs font-black text-red-600">Numéro invalide.</p> : null}
                   </div>
                 </div>
               </>
@@ -851,42 +931,26 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                 <div className="mt-6 grid gap-4 md:grid-cols-[1fr_1fr_220px]">
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Nom du membre</span>
-                    <input
-                      value={memberName}
-                      onChange={(e) => setMemberName(e.target.value)}
-                      className={inputClass()}
-                      placeholder="Nom complet"
-                    />
+                    <input value={memberName} onChange={(e) => setMemberName(e.target.value)} className={inputClass()} placeholder="Nom complet" />
                   </label>
 
-                  <CountryPicker
-                    label="Pays"
-                    valueIso={memberCountryIso}
-                    onChange={(country) => setMemberCountryIso(country.iso)}
-                  />
+                  <CountryPicker label="Pays" valueIso={memberCountryIso} onChange={(country) => setMemberCountryIso(country.iso)} lang={lang} />
 
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Rôle</span>
-                    <select
-                      value={memberRole}
-                      onChange={(e) => setMemberRole(e.target.value)}
-                      className={inputClass()}
-                    >
+                    <select value={memberRole} onChange={(e) => setMemberRole(e.target.value)} className={inputClass()}>
                       <option value="Membre">Membre</option>
                       <option value="Manager">Manager</option>
                       <option value="Membre et Manager">Membre et Manager</option>
                     </select>
                   </label>
 
-                  <label className="md:col-span-3">
-                    <span className="mb-2 block text-sm font-black text-[#123A63]">Manager</span>
-                    <input
-                      value={managerName}
-                      onChange={(e) => setManagerName(e.target.value)}
-                      className={inputClass()}
-                      placeholder="Nom du manager"
-                    />
-                  </label>
+                  {memberRole !== "Membre et Manager" ? (
+                    <label className="md:col-span-3">
+                      <span className="mb-2 block text-sm font-black text-[#123A63]">Manager</span>
+                      <input value={managerName} onChange={(e) => setManagerName(e.target.value)} className={inputClass()} placeholder="Nom du manager" />
+                    </label>
+                  ) : null}
                 </div>
               </>
             )}
@@ -901,37 +965,20 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                 <div className="mt-6 grid gap-4 md:grid-cols-3">
                   <label className="md:col-span-3">
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Adresse</span>
-                    <input
-                      value={address}
-                      onChange={(e) => setAdresse(e.target.value)}
-                      className={inputClass()}
-                      placeholder="Adresse complète"
-                    />
+                    <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass()} placeholder="Adresse complète" />
                   </label>
 
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Ville</span>
-                    <input
-                      value={addressCity}
-                      onChange={(e) => setAdresseCity(e.target.value)}
-                      className={inputClass()}
-                    />
+                    <input value={addressCity} onChange={(e) => setAddressCity(e.target.value)} className={inputClass()} />
                   </label>
 
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Code postal</span>
-                    <input
-                      value={addressPostalCode}
-                      onChange={(e) => setAdressePostalCode(e.target.value)}
-                      className={inputClass()}
-                    />
+                    <input value={addressPostalCode} onChange={(e) => setAddressPostalCode(e.target.value)} className={inputClass()} />
                   </label>
 
-                  <CountryPicker
-                    label="Pays"
-                    valueIso={addressCountryIso}
-                    onChange={(country) => setAdresseCountryIso(country.iso)}
-                  />
+                  <CountryPicker label="Pays" valueIso={addressCountryIso} onChange={(country) => setAddressCountryIso(country.iso)} lang={lang} />
                 </div>
               </>
             )}
@@ -940,21 +987,27 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
               <>
                 <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Services inclus</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Les services affichés correspondent uniquement au pack choisi : {selectedPlan?.label || "—"}.
+                  Sélectionnez les services dont vous avez besoin parmi ceux disponibles dans le pack choisi : {selectedPlan?.label || "—"}.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   {services.length === 0 ? (
                     <div className="md:col-span-2 rounded-[1.3rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5 text-sm font-black text-slate-500">
-                      Choisissez d’abord une formule pour afficher les services inclus.
+                      Choisissez d’abord une formule pour afficher les services disponibles.
                     </div>
                   ) : services.map((service) => (
-                    <div
+                    <button
                       key={service}
-                      className="rounded-[1.3rem] border border-[#E3EAF2] bg-white p-4 text-left text-sm font-black text-[#123A63]"
+                      type="button"
+                      onClick={() => toggleService(service)}
+                      className={`min-h-[66px] rounded-[1.3rem] border p-4 text-left text-sm font-black transition ${
+                        selectedServices.includes(service)
+                          ? "border-[#F15A24] bg-white text-[#F15A24] shadow-[0_12px_28px_rgba(18,58,99,.06)]"
+                          : "border-[#E3EAF2] bg-white text-[#123A63] hover:border-[#F15A24]/40"
+                      }`}
                     >
-                      ✓ {service}
-                    </div>
+                      {selectedServices.includes(service) ? "✓ " : "+ "} {service}
+                    </button>
                   ))}
                 </div>
               </>
@@ -970,27 +1023,28 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   {[
                     ["État", state],
-                    ["Formule", selectedPlan.label],
+                    ["Formule", selectedPlan?.label || "—"],
                     ["Nom LLC", `${llcName} ${designator}`.trim()],
                     ["Nom alternatif", alternativeName],
                     ["Secteur", activitySector],
                     ["Activité", activityDescription],
                     ["Client", fullName],
                     ["Email", email],
-                    ["Pays du client", (selectedCountry.iso === 'MA' ? 'Maroc' : selectedCountry.name)],
+                    ["Pays du client", countryDisplayName(selectedCountry, lang)],
                     ["Téléphone", `${phoneCountry.dial} ${phone}`],
                     ["Membre principal", memberName],
-                    ["Pays du membre", (memberCountry.iso === 'MA' ? 'Maroc' : memberCountry.name)],
+                    ["Pays du membre", countryDisplayName(memberCountry, lang)],
                     ["Rôle", memberRole],
-                    ["Manager", managerName],
+                    ["Manager", memberRole === "Membre et Manager" ? memberName : managerName],
                     ["Adresse", address],
                     ["Ville", addressCity],
                     ["Code postal", addressPostalCode],
-                    ["Pays adresse", (addressCountry.iso === 'MA' ? 'Maroc' : addressCountry.name)],
-                  ].map(([k, v]) => (
-                    <div key={k} className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
-                      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{k}</p>
-                      <p className="mt-2 text-sm font-black text-[#123A63]">{v || "—"}</p>
+                    ["Pays adresse", countryDisplayName(addressCountry, lang)],
+                    ["Services sélectionnés", selectedServices.length ? selectedServices.join(", ") : "—"],
+                  ].map(([key, value]) => (
+                    <div key={key} className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
+                      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{key}</p>
+                      <p className="mt-2 text-sm font-black text-[#123A63]">{value || "—"}</p>
                     </div>
                   ))}
                 </div>
@@ -998,8 +1052,8 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                 <label className="mt-6 flex gap-4 rounded-[1.5rem] border border-[#E3EAF2] bg-white p-5 text-sm font-black leading-7 text-[#123A63]">
                   <input
                     type="checkbox"
-                    checked={confirmRésumé}
-                    onChange={(e) => setConfirmRésumé(e.target.checked)}
+                    checked={confirmSummary}
+                    onChange={(e) => setConfirmSummary(e.target.checked)}
                     className="mt-1 h-4 w-4 shrink-0 accent-[#F15A24]"
                   />
                   <span>
@@ -1013,40 +1067,109 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
               <>
                 <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Paiement</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Choisissez votre mode de paiement pour continuer.
+                  Choisissez votre mode de paiement. Le paiement carte reste intégré dans cette page.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   <button
                     type="button"
-                    onClick={() => setPaiementMethod("card")}
-                    className={`rounded-[1.5rem] border p-6 text-left transition ${
-                      paymentMethod === "card" ? "border-[#F15A24] bg-white" : "border-[#E3EAF2] bg-white"
+                    onClick={() => {
+                      setPaymentMethod("card");
+                      setClientSecret("");
+                    }}
+                    className={`min-h-[138px] rounded-[1.5rem] border p-6 text-left transition ${
+                      paymentMethod === "card" ? "border-[#F15A24] bg-white shadow-[0_14px_30px_rgba(18,58,99,.08)]" : "border-[#E3EAF2] bg-white"
                     }`}
                   >
                     <div className="text-2xl font-black text-[#123A63]">💳 Carte bancaire</div>
-                    <p className="mt-3 text-sm font-bold text-slate-500">Paiement en ligne sécurisé.</p>
+                    <p className="mt-3 text-sm font-bold text-slate-500">Paiement Stripe sécurisé directement dans cette page.</p>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setPaiementMethod("bank_transfer")}
-                    className={`rounded-[1.5rem] border p-6 text-left transition ${
-                      paymentMethod === "bank_transfer" ? "border-[#F15A24] bg-white" : "border-[#E3EAF2] bg-white"
+                    onClick={() => {
+                      setPaymentMethod("bank_transfer");
+                      setClientSecret("");
+                    }}
+                    className={`min-h-[138px] rounded-[1.5rem] border p-6 text-left transition ${
+                      paymentMethod === "bank_transfer" ? "border-[#F15A24] bg-white shadow-[0_14px_30px_rgba(18,58,99,.08)]" : "border-[#E3EAF2] bg-white"
                     }`}
                   >
                     <div className="text-2xl font-black text-[#123A63]">🏦 Virement bancaire</div>
-                    <p className="mt-3 text-sm font-bold text-slate-500">Upload du justificatif puis vérification admin.</p>
+                    <p className="mt-3 text-sm font-bold text-slate-500">WhatsApp + upload du justificatif avant vérification admin.</p>
                   </button>
                 </div>
+
+                {paymentMethod === "card" ? (
+                  <div className="mt-6 rounded-[1.5rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5">
+                    {!clientSecret ? (
+                      <>
+                        <p className="text-sm font-bold leading-7 text-slate-600">
+                          Cliquez pour préparer le paiement sécurisé Stripe sans quitter cette page.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={prepareStripePayment}
+                          disabled={busy}
+                          className="mt-4 h-[52px] w-full rounded-[16px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#D94A1B] disabled:opacity-60"
+                        >
+                          {busy ? "Préparation..." : `Préparer le paiement ${finalPrice ? `$${finalPrice}` : ""}`}
+                        </button>
+                      </>
+                    ) : stripePromise ? (
+                      <Elements stripe={stripePromise} options={{ clientSecret }}>
+                        <PaymentCardElement clientSecret={clientSecret} email={email} />
+                      </Elements>
+                    ) : (
+                      <div className="rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-black text-amber-800">
+                        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY manquante dans .env.local.
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mt-6 rounded-[1.5rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5">
+                    <div className="grid gap-4 md:grid-cols-[1fr_180px]">
+                      <div>
+                        <p className="text-sm font-black text-[#123A63]">Envoyer le justificatif de virement</p>
+                        <p className="mt-2 text-sm font-bold leading-7 text-slate-500">
+                          Après upload, le dossier passera en paiement en attente de vérification.
+                        </p>
+                      </div>
+
+                      <a
+                        href="https://wa.me/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex h-[52px] items-center justify-center rounded-[16px] border border-emerald-200 bg-emerald-50 text-sm font-black text-emerald-700"
+                      >
+                        WhatsApp
+                      </a>
+                    </div>
+
+                    <input
+                      type="file"
+                      onChange={(e) => setBankProofFile(e.target.files?.[0] || null)}
+                      className="mt-5 block w-full rounded-[16px] border border-[#E3EAF2] bg-white px-4 py-4 text-sm font-black text-[#123A63]"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={submitBankTransfer}
+                      disabled={busy}
+                      className="mt-5 h-[52px] w-full rounded-[16px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#D94A1B] disabled:opacity-60"
+                    >
+                      {busy ? "Envoi..." : "Uploader le justificatif et continuer →"}
+                    </button>
+                  </div>
+                )}
               </>
             )}
 
-            {error && (
+            {error ? (
               <div className="mt-6 rounded-[16px] border border-red-200 bg-red-50 px-5 py-4 text-sm font-black text-red-700">
                 {error}
               </div>
-            )}
+            ) : null}
 
             <div className="mt-8 flex items-center justify-between border-t border-[#E3EAF2] pt-6">
               <button
@@ -1058,14 +1181,15 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
                 {t.back}
               </button>
 
-              <button
-                type="button"
-                onClick={next}
-                disabled={busy}
-                className="rounded-[12px] bg-[#F15A24] px-8 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(18,58,99,.12)] hover:bg-[#D94A1B] disabled:opacity-60"
-              >
-                {busy ? "Traitement..." : `${t.next} →`}
-              </button>
+              {step < 9 ? (
+                <button
+                  type="button"
+                  onClick={next}
+                  className="rounded-[12px] bg-[#F15A24] px-8 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(18,58,99,.12)] hover:bg-[#D94A1B]"
+                >
+                  {t.next} →
+                </button>
+              ) : null}
             </div>
           </section>
 
@@ -1087,12 +1211,12 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
               {[
                 ["État", state, "Inclus"],
                 ["Accompagnement", selectedPlan?.label || "À choisir", selectedPlan ? `$${finalPrice}` : "—"],
-                ["Services", selectedPlan ? `${services.length} inclus` : "À choisir", selectedPlan ? "$0" : "—"],
-              ].map(([k, v, price]) => (
-                <div key={k} className="flex items-start justify-between gap-4">
+                ["Services", selectedServices.length ? `${selectedServices.length} sélectionné(s)` : selectedPlan ? "À sélectionner" : "À choisir", "$0"],
+              ].map(([key, value, price]) => (
+                <div key={key} className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-sm font-black text-[#111827]">{k}</p>
-                    <p className="mt-1 text-xs font-bold text-slate-500">{v}</p>
+                    <p className="text-sm font-black text-[#111827]">{key}</p>
+                    <p className="mt-1 text-xs font-bold text-slate-500">{value}</p>
                   </div>
                   <p className="text-sm font-black text-[#111827]">{price}</p>
                 </div>
@@ -1103,13 +1227,9 @@ export default function VemoDémarrerFlowPage({ lang = "fr" }: { lang?: Lang }) 
               <div className="flex items-end justify-between gap-4">
                 <p className="text-lg font-black text-[#111827]">{t.estimated}</p>
                 {selectedPlan ? (
-                  <p className="text-4xl font-black tracking-[-0.08em] text-[#F15A24]">
-                    ${finalPrice}
-                  </p>
+                  <p className="text-4xl font-black tracking-[-0.08em] text-[#F15A24]">${finalPrice}</p>
                 ) : (
-                  <p className="text-sm font-black text-slate-400">
-                    Après choix de formule
-                  </p>
+                  <p className="text-sm font-black text-slate-400">Après choix de formule</p>
                 )}
               </div>
             </div>
