@@ -216,11 +216,8 @@ export default function TarifsPage() {
           <h1 className="mt-3 text-[44px] font-black tracking-[-0.07em] text-[#111827]">
             Packs LLC
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-[15px] font-semibold leading-7 text-slate-600">
-            Les prix et services affichés sont synchronisés avec les paramètres admin.
-          </p>
 
-          <div className="mt-7 inline-flex rounded-[16px] border border-[#E8EEF6] bg-white p-1">
+          <div className="mt-6 inline-flex rounded-[16px] border border-[#E8EEF6] bg-white p-1">
             {stateOptions.map((state) => (
               <button
                 key={state}
