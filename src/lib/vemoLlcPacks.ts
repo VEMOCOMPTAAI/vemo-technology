@@ -1,100 +1,86 @@
-export type VemoLlcPlanId = "starter" | "standard" | "premium";
-export type VemoLlcState = "New Mexico" | "Wyoming";
+export type VemoLlcState = "Wyoming" | "New Mexico";
+
+export type VemoLlcPackId = "starter" | "standard" | "premium";
 
 export type VemoLlcPack = {
-  id: VemoLlcPlanId;
+  id: VemoLlcPackId;
   label: string;
+  description: string;
   recommended?: boolean;
-  shortDescription: string;
   prices: Record<VemoLlcState, number>;
   features: string[];
 };
 
-export function registeredAgentRenewalAmount(state: string) {
-  return state === "Wyoming" ? 25 : 35;
-}
-
-export function registeredAgentRenewalLabel(state: string) {
-  return state === "Wyoming"
-    ? "Renouvellement Registered Agent : 25 USD / an"
-    : "Renouvellement Registered Agent : 35 USD / an";
-}
+export const REGISTERED_AGENT_RENEWAL_BY_STATE: Record<VemoLlcState, number> = {
+  Wyoming: 25,
+  "New Mexico": 35,
+};
 
 export const VEMO_LLC_PACKS: VemoLlcPack[] = [
   {
     id: "starter",
     label: "Starter",
-    shortDescription: "Pour démarrer simplement votre LLC.",
+    description: "L’essentiel pour créer votre LLC.",
     prices: {
-      "New Mexico": 129,
-      "Wyoming": 179
+      Wyoming: 300,
+      "New Mexico": 250,
     },
     features: [
       "Documents de création LLC",
       "Frais de dépôt de l’État inclus",
       "Registered Agent offert la première année",
-      "REGISTERED_AGENT_RENEWAL",
-      "US Phone Number offert 3 mois"
-    ]
+      "US Phone Number offert 3 mois",
+    ],
   },
   {
     id: "standard",
     label: "Standard",
+    description: "La formule recommandée pour démarrer sérieusement.",
     recommended: true,
-    shortDescription: "La formule recommandée pour la plupart des non-résidents.",
     prices: {
-      "New Mexico": 149,
-      "Wyoming": 199
+      Wyoming: 600,
+      "New Mexico": 550,
     },
     features: [
       "Documents de création LLC",
       "Frais de dépôt de l’État inclus",
       "Registered Agent offert la première année",
-      "REGISTERED_AGENT_RENEWAL",
       "US Phone Number offert 3 mois",
       "Demande EIN",
-      "Assistance Stripe + Mercury"
-    ]
+      "Assistance Stripe + Mercury",
+    ],
   },
   {
     id: "premium",
     label: "Premium",
-    shortDescription: "Accompagnement complet avec paiements, outils et présence en ligne.",
+    description: "L’offre complète pour structurer votre activité.",
     prices: {
-      "New Mexico": 199,
-      "Wyoming": 249
+      Wyoming: 1000,
+      "New Mexico": 950,
     },
     features: [
       "Documents de création LLC",
       "Frais de dépôt de l’État inclus",
       "Registered Agent offert la première année",
-      "REGISTERED_AGENT_RENEWAL",
       "US Phone Number offert 3 mois",
       "Demande EIN",
       "Assistance Stripe / PayPal",
       "Assistance Wise / Mercury / Payoneer",
-      "Shopify offert 3 mois + nom de domaine 1 an"
-    ]
-  }
+      "Shopify offert 3 mois + nom de domaine 1 an",
+    ],
+  },
 ];
 
-export function getVemoLlcPack(id: string) {
-  return VEMO_LLC_PACKS.find((pack) => pack.id === id) || VEMO_LLC_PACKS[1];
+export function getVemoLlcPackPrice(packId: VemoLlcPackId, state: VemoLlcState) {
+  return VEMO_LLC_PACKS.find((pack) => pack.id === packId)?.prices[state] || 0;
 }
 
-export function getVemoLlcPackPrice(id: string, state: string) {
-  const pack = getVemoLlcPack(id);
-  return pack.prices[state as VemoLlcState] || pack.prices["New Mexico"];
-}
+export function getVemoLlcPackFeatures(packId: VemoLlcPackId, state: VemoLlcState) {
+  const pack = VEMO_LLC_PACKS.find((item) => item.id === packId);
+  if (!pack) return [];
 
-export function getVemoLlcPackFeatures(id: string, state: string) {
-  const pack = getVemoLlcPack(id);
-
-  return pack.features.map((feature) => {
-    if (feature === "REGISTERED_AGENT_RENEWAL") {
-      return registeredAgentRenewalLabel(state);
-    }
-
-    return feature;
-  });
+  return [
+    ...pack.features,
+    `Renouvellement Registered Agent : ${REGISTERED_AGENT_RENEWAL_BY_STATE[state]} USD / an`,
+  ];
 }
