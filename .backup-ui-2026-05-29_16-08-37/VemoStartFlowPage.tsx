@@ -800,21 +800,21 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       key={plan.id}
                       type="button"
                       onClick={() => setPlanId(plan.id)}
-                      className={`relative flex min-h-[400px] flex-col rounded-[1.6rem] border p-6 pt-16 text-left transition ${
+                      className={`relative flex min-h-[370px] flex-col rounded-[1.6rem] border p-6 text-left transition ${
                         planId === plan.id
                           ? "border-[#F15A24] bg-white shadow-[0_18px_40px_rgba(18,58,99,.08)]"
                           : "border-[#E3EAF2] bg-white hover:border-[#F15A24]/40"
                       }`}
                     >
                       {plan.recommended && (
-                        <span className="absolute left-6 top-5 rounded-full bg-[#F15A24] px-3 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-white shadow-[0_10px_24px_rgba(241,90,36,.22)]">
+                        <span className="absolute right-5 top-5 rounded-[10px] border border-[#F15A24]/20 bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-[#F15A24] shadow-[0_8px_18px_rgba(18,58,99,.06)]">
                           {t.recommended}
                         </span>
                       )}
 
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-xl font-black text-[#111827]">{plan.label}</h3>
+                          <h3 className="pr-28 text-xl font-black text-[#111827]">{plan.label}</h3>
                           <div className="mt-2 text-4xl font-black tracking-[-0.07em] text-[#123A63]">
                             ${getPlanPrice(plan.id, state)}
                           </div>
@@ -1083,82 +1083,39 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 9 && (
               <>
-                <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                  <div>
-                    <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Paiement</h1>
-                    <p className="mt-3 max-w-2xl text-sm font-bold leading-7 text-slate-500">
-                      Choisissez votre méthode de paiement. Le paiement carte reste intégré dans cette page, le virement passe par justificatif et validation admin.
-                    </p>
-                  </div>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Paiement</h1>
+                <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
+                  Choisissez votre mode de paiement. Le paiement carte reste intégré dans cette page.
+                </p>
 
-                  <div className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] px-5 py-4 text-right">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                      Montant à régler
-                    </p>
-                    <p className="mt-1 text-3xl font-black tracking-[-0.08em] text-[#F15A24]">
-                      ${finalPrice || 0}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-8 grid gap-5 md:grid-cols-2">
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
                   <button
                     type="button"
                     onClick={() => {
                       setPaymentMethod("card");
                       setClientSecret("");
                     }}
-                    className={`relative min-h-[190px] overflow-hidden rounded-[1.9rem] border bg-white p-6 text-left transition ${
+                    className={`group flex min-h-[132px] items-start gap-4 rounded-[1.5rem] border bg-white p-5 text-left transition ${
                       paymentMethod === "card"
-                        ? "border-[#F15A24] shadow-[0_22px_55px_rgba(18,58,99,.10)]"
-                        : "border-[#E3EAF2] hover:border-[#F15A24]/35 hover:shadow-[0_16px_38px_rgba(18,58,99,.06)]"
+                        ? "border-[#F15A24] shadow-[0_16px_34px_rgba(18,58,99,.08)]"
+                        : "border-[#E3EAF2] hover:border-[#F15A24]/40 hover:shadow-[0_12px_28px_rgba(18,58,99,.06)]"
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] border text-2xl ${
-                            paymentMethod === "card"
-                              ? "border-[#F15A24]/25 bg-[#FFF8F5]"
-                              : "border-[#E3EAF2] bg-[#F8FAFC]"
-                          }`}
-                        >
-                          💳
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                            Paiement immédiat
-                          </p>
-                          <h3 className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#123A63]">
-                            Carte bancaire
-                          </h3>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`mt-1 flex h-6 w-6 items-center justify-center rounded-full border text-xs font-black ${
-                          paymentMethod === "card"
-                            ? "border-[#F15A24] bg-[#F15A24] text-white"
-                            : "border-[#D6E0EA] bg-white text-transparent"
-                        }`}
-                      >
-                        ✓
+                    <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border text-xl ${
+                      paymentMethod === "card"
+                        ? "border-[#F15A24]/20 bg-white text-[#F15A24]"
+                        : "border-[#E3EAF2] bg-[#F8FAFC] text-[#123A63]"
+                    }`}>
+                      💳
+                    </span>
+                    <span>
+                      <span className="block text-xl font-black tracking-[-0.04em] text-[#123A63]">
+                        Carte bancaire
                       </span>
-                    </div>
-
-                    <p className="mt-5 text-sm font-bold leading-7 text-slate-500">
-                      Paiement Stripe sécurisé, intégré directement dans cette page, sans redirection externe.
-                    </p>
-
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-[#E3EAF2] bg-[#F8FAFC] px-3 py-1 text-xs font-black text-[#123A63]">
-                        Stripe sécurisé
+                      <span className="mt-2 block text-sm font-bold leading-6 text-slate-500">
+                        Paiement Stripe sécurisé, intégré directement dans cette page.
                       </span>
-                      <span className="rounded-full border border-[#E3EAF2] bg-[#F8FAFC] px-3 py-1 text-xs font-black text-[#123A63]">
-                        Confirmation instantanée
-                      </span>
-                    </div>
+                    </span>
                   </button>
 
                   <button
@@ -1167,174 +1124,90 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       setPaymentMethod("bank_transfer");
                       setClientSecret("");
                     }}
-                    className={`relative min-h-[190px] overflow-hidden rounded-[1.9rem] border bg-white p-6 text-left transition ${
+                    className={`group flex min-h-[132px] items-start gap-4 rounded-[1.5rem] border bg-white p-5 text-left transition ${
                       paymentMethod === "bank_transfer"
-                        ? "border-[#F15A24] shadow-[0_22px_55px_rgba(18,58,99,.10)]"
-                        : "border-[#E3EAF2] hover:border-[#F15A24]/35 hover:shadow-[0_16px_38px_rgba(18,58,99,.06)]"
+                        ? "border-[#F15A24] shadow-[0_16px_34px_rgba(18,58,99,.08)]"
+                        : "border-[#E3EAF2] hover:border-[#F15A24]/40 hover:shadow-[0_12px_28px_rgba(18,58,99,.06)]"
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] border text-2xl ${
-                            paymentMethod === "bank_transfer"
-                              ? "border-[#F15A24]/25 bg-[#FFF8F5]"
-                              : "border-[#E3EAF2] bg-[#F8FAFC]"
-                          }`}
-                        >
-                          🏦
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                            Vérification admin
-                          </p>
-                          <h3 className="mt-1 text-2xl font-black tracking-[-0.05em] text-[#123A63]">
-                            Virement bancaire
-                          </h3>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`mt-1 flex h-6 w-6 items-center justify-center rounded-full border text-xs font-black ${
-                          paymentMethod === "bank_transfer"
-                            ? "border-[#F15A24] bg-[#F15A24] text-white"
-                            : "border-[#D6E0EA] bg-white text-transparent"
-                        }`}
-                      >
-                        ✓
+                    <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border text-xl ${
+                      paymentMethod === "bank_transfer"
+                        ? "border-[#F15A24]/20 bg-white text-[#F15A24]"
+                        : "border-[#E3EAF2] bg-[#F8FAFC] text-[#123A63]"
+                    }`}>
+                      🏦
+                    </span>
+                    <span>
+                      <span className="block text-xl font-black tracking-[-0.04em] text-[#123A63]">
+                        Virement bancaire
                       </span>
-                    </div>
-
-                    <p className="mt-5 text-sm font-bold leading-7 text-slate-500">
-                      Contact WhatsApp, upload du justificatif, puis passage du dossier en attente de vérification.
-                    </p>
-
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">
-                        WhatsApp
+                      <span className="mt-2 block text-sm font-bold leading-6 text-slate-500">
+                        WhatsApp, upload du justificatif, puis vérification admin.
                       </span>
-                      <span className="rounded-full border border-[#E3EAF2] bg-[#F8FAFC] px-3 py-1 text-xs font-black text-[#123A63]">
-                        Upload justificatif
-                      </span>
-                    </div>
+                    </span>
                   </button>
                 </div>
 
                 {paymentMethod === "card" ? (
-                  <div className="mt-7 overflow-hidden rounded-[1.9rem] border border-[#E3EAF2] bg-white shadow-[0_18px_45px_rgba(18,58,99,.06)]">
-                    <div className="border-b border-[#E3EAF2] bg-[#F8FAFC] px-6 py-5">
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                            Paiement carte
-                          </p>
-                          <h3 className="mt-1 text-xl font-black text-[#123A63]">
-                            Paiement sécurisé par Stripe
-                          </h3>
-                        </div>
-                        <div className="rounded-full border border-[#E3EAF2] bg-white px-4 py-2 text-xs font-black text-[#123A63]">
-                          Montant : ${finalPrice || 0}
-                        </div>
+                  <div className="mt-6 rounded-[1.5rem] border border-[#E3EAF2] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,.04)]">
+                    {!clientSecret ? (
+                      <>
+                        <p className="text-sm font-bold leading-7 text-slate-600">
+                          Cliquez pour préparer le paiement sécurisé Stripe sans quitter cette page.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={prepareStripePayment}
+                          disabled={busy}
+                          className="mt-4 h-[52px] w-full rounded-[16px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#D94A1B] disabled:opacity-60"
+                        >
+                          {busy ? "Préparation..." : `Préparer le paiement ${finalPrice ? `$${finalPrice}` : ""}`}
+                        </button>
+                      </>
+                    ) : stripePromise ? (
+                      <Elements stripe={stripePromise} options={{ clientSecret }}>
+                        <PaymentCardElement clientSecret={clientSecret} email={email} />
+                      </Elements>
+                    ) : (
+                      <div className="rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-black text-amber-800">
+                        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY manquante dans .env.local.
                       </div>
-                    </div>
-
-                    <div className="p-6">
-                      {!clientSecret ? (
-                        <>
-                          <p className="text-sm font-bold leading-7 text-slate-500">
-                            Préparez le paiement sécurisé. Le formulaire Stripe apparaîtra ici, dans la même page.
-                          </p>
-
-                          <button
-                            type="button"
-                            onClick={prepareStripePayment}
-                            disabled={busy}
-                            className="mt-5 h-[56px] w-full rounded-[1.25rem] bg-[#F15A24] text-sm font-black text-white shadow-[0_18px_34px_rgba(241,90,36,.24)] transition hover:translate-y-[-1px] hover:bg-[#D94A1B] disabled:opacity-60"
-                          >
-                            {busy ? "Préparation du paiement..." : `Préparer le paiement $${finalPrice || 0}`}
-                          </button>
-                        </>
-                      ) : stripePromise ? (
-                        <Elements stripe={stripePromise} options={{ clientSecret }}>
-                          <PaymentCardElement clientSecret={clientSecret} email={email} />
-                        </Elements>
-                      ) : (
-                        <div className="rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-black text-amber-800">
-                          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY manquante dans .env.local.
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="mt-7 overflow-hidden rounded-[1.9rem] border border-[#E3EAF2] bg-white shadow-[0_18px_45px_rgba(18,58,99,.06)]">
-                    <div className="border-b border-[#E3EAF2] bg-[#F8FAFC] px-6 py-5">
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">
-                            Paiement par virement
-                          </p>
-                          <h3 className="mt-1 text-xl font-black text-[#123A63]">
-                            Envoyer le justificatif
-                          </h3>
-                        </div>
-
-                        <a
-                          href="https://wa.me/"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex h-11 items-center justify-center rounded-[1rem] border border-emerald-200 bg-emerald-50 px-5 text-sm font-black text-emerald-700"
-                        >
-                          WhatsApp
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="p-6">
-                      <div className="grid gap-4 md:grid-cols-3">
-                        <div className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                            Étape 01
-                          </p>
-                          <p className="mt-2 text-sm font-black text-[#123A63]">
-                            Contacter VEMO sur WhatsApp
-                          </p>
-                        </div>
-
-                        <div className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                            Étape 02
-                          </p>
-                          <p className="mt-2 text-sm font-black text-[#123A63]">
-                            Uploader le justificatif
-                          </p>
-                        </div>
-
-                        <div className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">
-                            Étape 03
-                          </p>
-                          <p className="mt-2 text-sm font-black text-[#123A63]">
-                            Vérification admin
-                          </p>
-                        </div>
+                  <div className="mt-6 rounded-[1.5rem] border border-[#E3EAF2] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,.04)]">
+                    <div className="grid gap-4 md:grid-cols-[1fr_180px]">
+                      <div>
+                        <p className="text-sm font-black text-[#123A63]">Envoyer le justificatif de virement</p>
+                        <p className="mt-2 text-sm font-bold leading-7 text-slate-500">
+                          Après upload, le dossier passera en paiement en attente de vérification.
+                        </p>
                       </div>
 
-                      <input
-                        type="file"
-                        onChange={(e) => setBankProofFile(e.target.files?.[0] || null)}
-                        className="mt-5 block w-full rounded-[1.2rem] border border-[#E3EAF2] bg-white px-4 py-4 text-sm font-black text-[#123A63]"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={submitBankTransfer}
-                        disabled={busy}
-                        className="mt-5 h-[56px] w-full rounded-[1.25rem] bg-[#F15A24] text-sm font-black text-white shadow-[0_18px_34px_rgba(241,90,36,.24)] transition hover:translate-y-[-1px] hover:bg-[#D94A1B] disabled:opacity-60"
+                      <a
+                        href="https://wa.me/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex h-[52px] items-center justify-center rounded-[16px] border border-emerald-200 bg-emerald-50 text-sm font-black text-emerald-700"
                       >
-                        {busy ? "Envoi du justificatif..." : "Uploader le justificatif et continuer →"}
-                      </button>
+                        WhatsApp
+                      </a>
                     </div>
+
+                    <input
+                      type="file"
+                      onChange={(e) => setBankProofFile(e.target.files?.[0] || null)}
+                      className="mt-5 block w-full rounded-[16px] border border-[#E3EAF2] bg-white px-4 py-4 text-sm font-black text-[#123A63]"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={submitBankTransfer}
+                      disabled={busy}
+                      className="mt-5 h-[52px] w-full rounded-[16px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#D94A1B] disabled:opacity-60"
+                    >
+                      {busy ? "Envoi..." : "Uploader le justificatif et continuer →"}
+                    </button>
                   </div>
                 )}
               </>
