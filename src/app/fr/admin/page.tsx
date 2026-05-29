@@ -268,8 +268,6 @@ export default function AdminFinalPage() {
 
             <div className="mt-5 grid gap-3 lg:grid-cols-[0.85fr_1fr_1fr_auto]">
               <select
-                value={documentClientEmail || selectedEmail}
-                onChange={(e) => setDocumentClientEmail(e.target.value)}
                 className="h-[50px] rounded-[15px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
               >
                 <option value="">Choisir client</option>
