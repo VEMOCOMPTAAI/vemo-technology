@@ -1,17 +1,38 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
-  REGISTERED_AGENT_RENEWAL_BY_STATE,
-  VEMO_LLC_PACKS,
-} from "@/lib/vemoLlcPacks";
+  readVemoLlcPacksPayload,
+  writeVemoLlcPacksPayload,
+} from "@/lib/vemoLlcPacksStore";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const payload = readVemoLlcPacksPayload();
+
   return NextResponse.json({
     ok: true,
-    packs: VEMO_LLC_PACKS,
-    registeredAgentRenewal: REGISTERED_AGENT_RENEWAL_BY_STATE,
-    states: ["Wyoming", "New Mexico"],
+    ...payload,
   });
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const payload = writeVemoLlcPacksPayload(body);
+
+    return NextResponse.json({
+      ok: true,
+      saved: true,
+      ...payload,
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error?.message || "Erreur sauvegarde paramètres packs.",
+      },
+      { status: 500 }
+    );
+  }
 }

@@ -1,0 +1,63 @@
+{
+  "states": ["Wyoming", "New Mexico"],
+  "registeredAgentRenewal": {
+    "Wyoming": 25,
+    "New Mexico": 35
+  },
+  "packs": [
+    {
+      "id": "starter",
+      "label": "Starter",
+      "description": "L’essentiel pour créer votre LLC.",
+      "recommended": false,
+      "prices": {
+        "Wyoming": 300,
+        "New Mexico": 250
+      },
+      "features": [
+        "Documents de création LLC",
+        "Frais de dépôt de l’État inclus",
+        "Registered Agent offert la première année",
+        "US Phone Number offert 3 mois"
+      ]
+    },
+    {
+      "id": "standard",
+      "label": "Standard",
+      "description": "La formule recommandée pour démarrer sérieusement.",
+      "recommended": true,
+      "prices": {
+        "Wyoming": 600,
+        "New Mexico": 550
+      },
+      "features": [
+        "Documents de création LLC",
+        "Frais de dépôt de l’État inclus",
+        "Registered Agent offert la première année",
+        "US Phone Number offert 3 mois",
+        "Demande EIN",
+        "Assistance Stripe + Mercury"
+      ]
+    },
+    {
+      "id": "premium",
+      "label": "Premium",
+      "description": "L’offre complète pour structurer votre activité.",
+      "recommended": false,
+      "prices": {
+        "Wyoming": 1000,
+        "New Mexico": 950
+      },
+      "features": [
+        "Documents de création LLC",
+        "Frais de dépôt de l’État inclus",
+        "Registered Agent offert la première année",
+        "US Phone Number offert 3 mois",
+        "Demande EIN",
+        "Assistance Stripe / PayPal",
+        "Assistance Wise / Mercury / Payoneer",
+        "Shopify offert 3 mois + nom de domaine 1 an"
+      ]
+    }
+  ]
+}

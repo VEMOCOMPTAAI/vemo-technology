@@ -501,6 +501,73 @@ function PaymentCardElement({
 }
 
 export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
+
+  // RUNTIME_EDITABLE_PACKS_PATCH
+  const [runtimePacks, setRuntimePacks] = useState<any[]>([]);
+  const [runtimeRenewal, setRuntimeRenewal] = useState<Record<string, number>>({
+    Wyoming: 25,
+    "New Mexico": 35,
+  });
+
+  useEffect(() => {
+    let alive = true;
+
+    fetch("/api/public/llc-packs", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!alive || !data?.ok) return;
+
+        if (Array.isArray(data.packs)) {
+          setRuntimePacks(data.packs);
+        }
+
+        if (data.registeredAgentRenewal) {
+          setRuntimeRenewal(data.registeredAgentRenewal);
+        }
+      })
+      .catch(() => null);
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const runtimePlans = useMemo(() => {
+    const source = runtimePacks.length ? runtimePacks : VEMO_LLC_PACKS;
+
+    return source.map((pack: any) => ({
+      id: pack.id,
+      label: pack.label,
+      description: pack.description || "",
+      recommended: Boolean(pack.recommended),
+      prices: pack.prices || {
+        Wyoming: 0,
+        "New Mexico": 0,
+      },
+      features: Array.isArray(pack.features) ? pack.features : [],
+    }));
+  }, [runtimePacks]);
+
+  function getRuntimePlanPrice(planId: any, selectedState: any) {
+    return (
+      runtimePlans.find((plan: any) => plan.id === planId)?.prices?.[selectedState] || 0
+    );
+  }
+
+  function getRuntimePlanFeatures(planId: any, selectedState: any) {
+    const plan = runtimePlans.find((item: any) => item.id === planId);
+    if (!plan) return [];
+
+    const renewalPrice = runtimeRenewal?.[selectedState] || 0;
+
+    return [
+      ...(Array.isArray(plan.features) ? plan.features : []),
+      renewalPrice
+        ? `Renouvellement Registered Agent : ${renewalPrice} USD / an`
+        : "Renouvellement Registered Agent",
+    ];
+  }
+
   const t = content[lang];
 
   const [step, setStep] = useState(0);
@@ -544,15 +611,15 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const selectedPlan = useMemo(() => plans.find((p) => p.id === planId) || null, [planId]);
+  const selectedPlan = useMemo(() => runtimePlans.find((p) => p.id === planId) || null, [planId]);
   const selectedCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === countryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!, [countryIso]);
   const phoneCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === phoneCountryIso) || VEMO_COUNTRIES.find((c) => c.iso === "MA")!, [phoneCountryIso]);
   const memberCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === memberCountryIso) || selectedCountry, [memberCountryIso, selectedCountry]);
   const addressCountry = useMemo(() => VEMO_COUNTRIES.find((c) => c.iso === addressCountryIso) || selectedCountry, [addressCountryIso, selectedCountry]);
 
-  const services = selectedPlan ? availableServices(selectedPlan.id, state) : [];
+  const services = selectedPlan ? getRuntimePlanFeatures(selectedPlan.id, state) : [];
   const selectableServices = visibleSelectableServices(services);
-  const finalPrice = selectedPlan ? getPlanPrice(selectedPlan.id, state) : null;
+  const finalPrice = selectedPlan ? getRuntimePlanPrice(selectedPlan.id, state) : null;
   const packName = selectedPlan ? `${state} ${selectedPlan?.label || "À choisir"}` : "";
   const progress = Math.round(((step + 1) / t.steps.length) * 100);
   const switchHref = lang === "fr" ? "/en/commencer" : "/fr/commencer";
@@ -930,7 +997,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-3">
-                  {plans.map((plan) => {
+                  {runtimePlans.map((plan) => {
                     const preview = FORMULA_PREVIEW[plan.id];
                     const selected = planId === plan.id;
 
@@ -970,7 +1037,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         </h3>
 
                         <div className="mt-2 text-[36px] font-black leading-none tracking-[-0.06em] text-[#123A63]">
-                          ${getPlanPrice(plan.id, state)}
+                          ${getRuntimePlanPrice(plan.id, state)}
                         </div>
 
                         <p className="mt-4 min-h-[76px] text-[14px] font-bold leading-6 text-slate-500">
