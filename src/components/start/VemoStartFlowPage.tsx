@@ -20,26 +20,80 @@ const plans: Plan[] = [
     label: "Starter",
     price: 129,
     subtitle: "Pour démarrer simplement votre dossier LLC.",
-    features: ["Questionnaire LLC", "Préparation dossier", "Suivi administratif"],
+    features: [
+      "Préparation du dossier LLC",
+      "Documents de création LLC",
+      "Registered Agent offert la première année",
+      "Suivi administratif de base"
+    ],
   },
   {
     id: "standard",
     label: "Standard",
     price: 149,
     subtitle: "La formule recommandée pour la plupart des non-résidents.",
-    features: ["Tout Starter", "EIN", "Operating Agreement", "Suivi renforcé"],
+    features: [
+      "Tout le Pack Starter",
+      "Demande EIN",
+      "Operating Agreement",
+      "Registered Agent offert la première année",
+      "Suivi administratif renforcé"
+    ],
     recommended: true,
   },
   {
     id: "premium",
     label: "Premium",
     price: 199,
-    subtitle: "Un accompagnement plus complet et structuré.",
-    features: ["Tout Standard", "Préparation Stripe / PayPal", "Checklist bancaire", "Support prioritaire"],
+    subtitle: "Un accompagnement plus complet avec préparation bancaire et fiscale.",
+    features: [
+      "Tout le Pack Standard",
+      "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
+      "Form 5472 + Form 1120 offerts la première année",
+      "Registered Agent offert la première année",
+      "Support prioritaire"
+    ],
   },
 ];
 
-const wyomingExtra = 50;
+function getPlanPrice(planId: string, state: string) {
+  const prices: Record<string, Record<string, number>> = {
+    starter: { "New Mexico": 129, Wyoming: 179 },
+    standard: { "New Mexico": 149, Wyoming: 199 },
+    premium: { "New Mexico": 199, Wyoming: 249 },
+  };
+
+  return prices[planId]?.[state] || prices.standard["New Mexico"];
+}
+
+function availableServices(planId: string) {
+  if (planId === "starter") {
+    return [
+      "Préparation du dossier LLC",
+      "Documents de création LLC",
+      "Registered Agent offert la première année",
+      "Suivi administratif de base"
+    ];
+  }
+
+  if (planId === "standard") {
+    return [
+      "Demande EIN",
+      "Operating Agreement",
+      "Registered Agent offert la première année",
+      "Suivi administratif renforcé"
+    ];
+  }
+
+  return [
+    "Demande EIN",
+    "Operating Agreement",
+    "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
+    "Form 5472 + Form 1120 offerts la première année",
+    "Registered Agent offert la première année",
+    "Support prioritaire"
+  ];
+}
 
 const content = {
   fr: {
@@ -150,8 +204,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   }, [planId]);
 
   const finalPrice = useMemo(() => {
-    const base = selectedPlan.price;
-    return state === "Wyoming" ? base + wyomingExtra : base;
+    return getPlanPrice(selectedPlan.id, state);
   }, [selectedPlan, state]);
 
   const progress = Math.round(((step + 1) / t.steps.length) * 100);
@@ -396,7 +449,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         <div>
                           <h3 className="text-xl font-black text-[#111827]">{plan.label}</h3>
                           <div className="mt-2 text-4xl font-black tracking-[-0.07em] text-[#123A63]">
-                            ${state === "Wyoming" ? plan.price + wyomingExtra : plan.price}
+                            ${getPlanPrice(plan.id, state)}
                           </div>
                         </div>
                         <div className={`mt-2 h-5 w-5 rounded-full border ${
@@ -441,7 +494,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                           : "État reconnu, frais plus élevés mais image corporate plus forte."}
                       </p>
                       <div className="mt-5 rounded-full border border-[#F15A24] bg-white px-4 py-2 text-sm font-black text-[#F15A24]">
-                        {s === "Wyoming" ? "+ $50" : "Frais inclus"}
+                        {s === "Wyoming" ? "Frais de dépôt inclus" : "Frais inclus"}
                       </div>
                     </button>
                   ))}
@@ -567,16 +620,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  {[
-                    "EIN application",
-                    "Operating Agreement",
-                    "Stripe / PayPal / Wise preparation",
-                    "Form 5472 + Form 1120 first year",
-                    "Priority support",
-                    "Banking checklist",
-                  ]
-                    .filter((s) => selectedPlan.id !== "starter" || ["EIN application", "Operating Agreement"].includes(s) === false)
-                    .map((service) => (
+                  {availableServices(selectedPlan.id).map((service) => (
                       <button
                         key={service}
                         type="button"
@@ -694,8 +738,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             <div className="mt-8 space-y-5">
               {[
-                ["Accompagnement", selectedPlan.label, `$${state === "Wyoming" ? selectedPlan.price + wyomingExtra : selectedPlan.price}`],
-                ["État", state, state === "Wyoming" ? "+$50" : "Inclus"],
+                ["Accompagnement", selectedPlan.label, `$${finalPrice}`],
+                ["État", state, "Inclus"],
                 ["Services", `${services.length} sélectionné(s)`, "$0"],
                 ["Compte client", email ? email : t.toComplete, t.included],
               ].map(([k, v, price]) => (

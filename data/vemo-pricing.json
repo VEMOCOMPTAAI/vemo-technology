@@ -32,8 +32,8 @@
       "name_fr": "New Mexico Standard",
       "name_en": "New Mexico Standard",
       "price": 149,
-      "description_fr": "Pack recommandé pour créer une LLC au New Mexico avec EIN et Operating Agreement.",
-      "description_en": "Recommended package to form a New Mexico LLC with EIN and Operating Agreement.",
+      "description_fr": "Pack recommandé pour créer une LLC au New Mexico avec EIN, Operating Agreement et suivi renforcé.",
+      "description_en": "Recommended package to form a New Mexico LLC with EIN, Operating Agreement and enhanced tracking.",
       "features_fr": [
         "Tout le Pack Starter",
         "Demande EIN",
@@ -66,16 +66,16 @@
         "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
         "Form 5472 + Form 1120 offerts la première année",
         "Frais de dépôt de l’État inclus",
-        "Support prioritaire",
-        "Accompagnement premium"
+        "Registered Agent offert la première année",
+        "Support prioritaire"
       ],
       "features_en": [
         "Everything in Standard",
         "Stripe, PayPal, Wise, Mercury or Payoneer preparation",
         "First year Form 5472 + Form 1120 included",
         "State filing fees included",
-        "Priority support",
-        "Premium guidance"
+        "First year Registered Agent included",
+        "Priority support"
       ],
       "active": true,
       "recommended": false
@@ -111,8 +111,8 @@
       "name_fr": "Wyoming Standard",
       "name_en": "Wyoming Standard",
       "price": 199,
-      "description_fr": "Pack recommandé pour créer une LLC au Wyoming avec EIN et Operating Agreement.",
-      "description_en": "Recommended package to form a Wyoming LLC with EIN and Operating Agreement.",
+      "description_fr": "Pack recommandé pour créer une LLC au Wyoming avec EIN, Operating Agreement et suivi renforcé.",
+      "description_en": "Recommended package to form a Wyoming LLC with EIN, Operating Agreement and enhanced tracking.",
       "features_fr": [
         "Tout le Pack Starter",
         "Demande EIN",
@@ -145,16 +145,16 @@
         "Préparation Stripe, PayPal, Wise, Mercury ou Payoneer",
         "Form 5472 + Form 1120 offerts la première année",
         "Frais de dépôt de l’État inclus",
-        "Support prioritaire",
-        "Accompagnement premium"
+        "Registered Agent offert la première année",
+        "Support prioritaire"
       ],
       "features_en": [
         "Everything in Standard",
         "Stripe, PayPal, Wise, Mercury or Payoneer preparation",
         "First year Form 5472 + Form 1120 included",
         "State filing fees included",
-        "Priority support",
-        "Premium guidance"
+        "First year Registered Agent included",
+        "Priority support"
       ],
       "active": true,
       "recommended": false
