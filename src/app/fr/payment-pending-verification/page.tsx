@@ -225,7 +225,7 @@ export default function PaymentPendingVerificationPage() {
             </button>
 
             <a
-              href={`/fr/espace-client?email=${encodeURIComponent(email)}`}
+              href={`/fr/connexion?email=${encodeURIComponent(email)}`}
               className="mt-4 inline-flex h-[52px] w-full items-center justify-center rounded-[18px] border border-[#E6EDF5] bg-white text-sm font-black text-[#123A63] transition hover:border-[#F15A24]"
             >
               Se connecter

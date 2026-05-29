@@ -1,175 +1,232 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 
-function getSupabaseBrowser() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+export const dynamic = "force-dynamic";
+
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) return null;
 
   return createClient(url, key);
 }
 
+function emailIsValid(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email.trim());
+}
+
 export default function ClientLoginPage() {
-  const [email, setEmail] = useState("");
+  const params = useMemo(() => {
+    if (typeof window === "undefined") return new URLSearchParams();
+    return new URLSearchParams(window.location.search);
+  }, []);
+
+  const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    setLoading(true);
+  async function login() {
+    setError("");
     setMessage("");
 
+    if (!emailIsValid(email)) {
+      setError("Email invalide.");
+      return;
+    }
+
+    if (!password) {
+      setError("Mot de passe obligatoire.");
+      return;
+    }
+
+    const supabase = getSupabase();
+
+    if (!supabase) {
+      setError("Configuration Supabase manquante.");
+      return;
+    }
+
+    setBusy(true);
+
     try {
-      const cleanEmail = email.trim().toLowerCase();
-
-      if (!cleanEmail || !cleanEmail.includes("@")) {
-        setMessage("Veuillez saisir un email valide.");
-        setLoading(false);
-        return;
-      }
-
-      if (!password) {
-        setMessage("Veuillez saisir votre mot de passe.");
-        setLoading(false);
-        return;
-      }
-
-      const supabase = getSupabaseBrowser();
-
-      if (!supabase) {
-        setMessage("Configuration Supabase manquante.");
-        setLoading(false);
-        return;
-      }
-
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
+        email: email.trim().toLowerCase(),
         password,
       });
 
       if (error) {
         const msg = String(error.message || "").toLowerCase();
 
-        if (msg.includes("email not confirmed") || msg.includes("confirm")) {
-          setMessage("Votre email n’est pas encore confirmé. Veuillez cliquer sur le dernier lien de confirmation reçu par email, ou demander un nouvel email de confirmation.");
-        } else if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
-          setMessage("Email ou mot de passe incorrect.");
-        } else {
-          setMessage(error.message || "Connexion impossible.");
+        if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
+          setError("Merci de confirmer votre email avant de vous connecter.");
+          return;
         }
 
-        setLoading(false);
+        setError("Email ou mot de passe incorrect.");
         return;
       }
 
-      const sessionEmail = data?.user?.email || cleanEmail;
+      const user = data?.user;
 
-      const mark = await fetch("/api/client-portal/mark-session", {
+      if (!user?.email_confirmed_at && !user?.confirmed_at) {
+        await supabase.auth.signOut();
+        setError("Merci de confirmer votre email avant de vous connecter.");
+        return;
+      }
+
+      await fetch("/api/client-portal/mark-session", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: sessionEmail,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       }).catch(() => null);
 
-      if (!mark?.ok) {
-        const payload = await mark?.json().catch(() => ({}));
-        setMessage(
-          payload?.error ||
-            "Connexion réussie, mais l’activation de l’espace client a échoué."
-        );
-        setLoading(false);
+      window.location.href = `/fr/espace-client?email=${encodeURIComponent(email.trim().toLowerCase())}`;
+    } catch (e: any) {
+      setError(e?.message || "Erreur de connexion.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resendConfirmation() {
+    setError("");
+    setMessage("");
+
+    if (!emailIsValid(email)) {
+      setError("Renseigne d’abord ton email.");
+      return;
+    }
+
+    setResending(true);
+
+    try {
+      const res = await fetch("/api/client-portal/resend-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.ok === false) {
+        setError(data?.error || "Impossible de renvoyer l’email.");
         return;
       }
 
-      window.location.href = `/fr/espace-client?email=${encodeURIComponent(sessionEmail)}`;
-    } catch (error: any) {
-      setMessage(error?.message || "Erreur pendant la connexion.");
-      setLoading(false);
+      setMessage("Email de confirmation renvoyé.");
+    } catch (e: any) {
+      setError(e?.message || "Erreur pendant l’envoi.");
+    } finally {
+      setResending(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-white">
-      <SiteHeader lang="fr" />
+    <main className="min-h-screen bg-[#F5F8FB] px-6 py-10 text-[#111827]">
+      <section className="mx-auto flex min-h-[calc(100vh-80px)] max-w-6xl items-center">
+        <div className="grid w-full gap-8 lg:grid-cols-[1fr_0.85fr]">
+          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
+            <a href="/fr" className="inline-flex flex-col">
+              <div className="text-[30px] font-black uppercase leading-none tracking-[-0.06em]">
+                <span className="text-[#123A63]">VEMO</span>
+                <span className="text-[#F15A24]">TECH</span>
+              </div>
+              <div className="mt-2 text-[10px] font-black uppercase tracking-[0.34em] text-slate-500">
+                US LLC POUR NON-RÉSIDENTS
+              </div>
+            </a>
 
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-xl rounded-[2rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_22px_60px_rgba(18,58,99,0.08)]">
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F15A24]">
-            Connexion client
-          </p>
+            <p className="mt-10 text-[12px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
+              Espace client
+            </p>
 
-          <h1 className="mt-4 text-4xl font-black tracking-[-0.06em] text-[#111827]">
-            Accéder à mon espace client
-          </h1>
+            <h1 className="mt-3 text-[46px] font-black leading-tight tracking-[-0.07em] text-[#111827]">
+              Connectez-vous à votre dossier
+            </h1>
 
-          <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-            Connectez-vous avec l’email confirmé utilisé lors de votre commande.
-          </p>
+            <p className="mt-5 max-w-xl text-[16px] font-semibold leading-8 text-slate-600">
+              Suivez votre paiement, vos documents, vos messages et l’avancement de votre création LLC.
+            </p>
 
-          <form onSubmit={handleLogin} className="mt-8 space-y-5">
-            <label className="block">
-              <span className="mb-2 block text-sm font-black text-[#123A63]">
-                Email
-              </span>
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-                autoComplete="email"
-                placeholder="email@domain.com"
-                className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold text-[#111827] outline-none transition placeholder:text-slate-400 focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
-              />
-            </label>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {["Paiement", "Dossier", "Documents"].map((item) => (
+                <div key={item} className="rounded-[1.3rem] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+                  <p className="text-sm font-black text-[#123A63]">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-            <label className="block">
-              <span className="mb-2 block text-sm font-black text-[#123A63]">
-                Mot de passe
-              </span>
-              <input
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-                autoComplete="current-password"
-                placeholder="Votre mot de passe"
-                className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold text-[#111827] outline-none transition placeholder:text-slate-400 focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
-              />
-            </label>
+          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
+            <h2 className="text-[32px] font-black tracking-[-0.06em] text-[#111827]">
+              Se connecter
+            </h2>
 
-            {message && (
-              <div className="rounded-[18px] border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold leading-7 text-red-700">
+            <div className="mt-7 space-y-4">
+              <label className="block">
+                <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                  Email
+                </span>
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@domaine.com"
+                  className="h-[54px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+                  Mot de passe
+                </span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Votre mot de passe"
+                  className="h-[54px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
+                />
+              </label>
+            </div>
+
+            {error ? (
+              <div className="mt-5 rounded-[16px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+                {error}
+              </div>
+            ) : null}
+
+            {message ? (
+              <div className="mt-5 rounded-[16px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
                 {message}
               </div>
-            )}
+            ) : null}
 
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:cursor-not-allowed disabled:opacity-60"
+              type="button"
+              onClick={login}
+              disabled={busy}
+              className="mt-6 h-[56px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:opacity-60"
             >
-              {loading ? "Connexion..." : "Se connecter →"}
+              {busy ? "Connexion..." : "Se connecter"}
             </button>
-          </form>
 
-          <div className="mt-6 rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4">
-            <p className="text-xs font-bold leading-6 text-slate-500">
-              Si vous venez de créer votre compte, vérifiez d’abord votre boîte mail puis cliquez sur le lien de confirmation.
-            </p>
+            <button
+              type="button"
+              onClick={resendConfirmation}
+              disabled={resending}
+              className="mt-4 h-[52px] w-full rounded-[18px] border border-[#E6EDF5] bg-white text-sm font-black text-[#123A63] transition hover:border-[#F15A24] disabled:opacity-60"
+            >
+              {resending ? "Envoi..." : "Renvoyer l’email de confirmation"}
+            </button>
           </div>
         </div>
       </section>
-
-      <SiteFooter lang="fr" />
     </main>
   );
 }
