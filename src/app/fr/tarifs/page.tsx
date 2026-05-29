@@ -14,12 +14,11 @@ type Pack = {
   recommended?: boolean;
   prices: Record<string, number>;
   features: string[];
-  renewalPrices?: Record<string, number>;
 };
 
-const stateOptions: StateName[] = ["New Mexico", "Wyoming"];
+const states: StateName[] = ["New Mexico", "Wyoming"];
 
-const fallbackRenewals: Record<StateName, number> = {
+const renewalFallback: Record<StateName, number> = {
   "New Mexico": 35,
   Wyoming: 25,
 };
@@ -30,7 +29,6 @@ const fallbackPacks: Pack[] = [
     label: "Starter",
     description: "L’essentiel pour créer votre LLC.",
     prices: { "New Mexico": 129, Wyoming: 179 },
-    renewalPrices: { "New Mexico": 35, Wyoming: 25 },
     features: [
       "Documents de création LLC",
       "Frais de dépôt de l’État inclus",
@@ -44,9 +42,11 @@ const fallbackPacks: Pack[] = [
     description: "La formule recommandée pour démarrer sérieusement.",
     recommended: true,
     prices: { "New Mexico": 149, Wyoming: 199 },
-    renewalPrices: { "New Mexico": 35, Wyoming: 25 },
     features: [
-      "Tout Starter",
+      "Documents de création LLC",
+      "Frais de dépôt de l’État inclus",
+      "Registered Agent offert la première année",
+      "US Phone Number offert 3 mois",
       "Demande EIN",
       "Assistance Stripe + Mercury",
     ],
@@ -56,9 +56,12 @@ const fallbackPacks: Pack[] = [
     label: "Premium",
     description: "L’offre complète pour structurer votre activité.",
     prices: { "New Mexico": 199, Wyoming: 249 },
-    renewalPrices: { "New Mexico": 35, Wyoming: 25 },
     features: [
-      "Tout Standard",
+      "Documents de création LLC",
+      "Frais de dépôt de l’État inclus",
+      "Registered Agent offert la première année",
+      "US Phone Number offert 3 mois",
+      "Demande EIN",
       "Assistance Stripe / PayPal",
       "Assistance Wise / Mercury / Payoneer",
       "Shopify offert 3 mois + nom de domaine 1 an",
@@ -66,100 +69,58 @@ const fallbackPacks: Pack[] = [
   },
 ];
 
-function slugState(state: string) {
+function stateSlug(state: StateName) {
   return state === "New Mexico" ? "new-mexico" : "wyoming";
 }
 
-function buildHref(pack: Pack, state: StateName) {
-  const amount = Number(pack.prices?.[state] || 0);
-  const stateSlug = slugState(state);
+function startHref(pack: Pack, state: StateName) {
+  const price = Number(pack.prices?.[state] || 0);
+  const slug = stateSlug(state);
 
-  return `/fr/commencer?pack=${stateSlug}_${pack.id}&packName=${encodeURIComponent(
+  return `/fr/commencer?pack=${slug}_${pack.id}&packName=${encodeURIComponent(
     `${state} ${pack.label}`
-  )}&state=${stateSlug}&amount=${amount}&currency=USD`;
+  )}&state=${slug}&amount=${price}&currency=USD`;
 }
 
-function getPackPrice(pack: Pack, state: StateName) {
-  return Number(pack?.prices?.[state] || 0);
-}
-
-function getRenewalPrice(pack: Pack, state: StateName) {
-  const fromPack =
-    pack?.renewalPrices?.[state] ??
-    (pack as any)?.registeredAgentRenewal?.[state] ??
-    (pack as any)?.registered_agent_renewal?.[state] ??
-    (pack as any)?.renewals?.[state];
-
-  return Number(fromPack || fallbackRenewals[state]);
-}
-
-function cleanedFeatures(pack: Pack) {
-  return (pack.features || [])
+function cleanFeatureList(features: string[], renewalPrice: number) {
+  const cleaned = features
     .filter(Boolean)
-    .filter(
-      (item) =>
-        !item.toLowerCase().includes("documents de création llc") &&
-        !item.toLowerCase().includes("frais de dépôt") &&
-        !item.toLowerCase().includes("registered agent offert la première année") &&
-        !item.toLowerCase().includes("renouvellement registered agent")
-    )
-    .slice(0, 4);
+    .filter((feature) => !feature.toLowerCase().includes("renouvellement registered agent"))
+    .slice(0, 6);
+
+  cleaned.push(`Renouvellement Registered Agent : ${renewalPrice} USD / an`);
+
+  return cleaned;
 }
 
 export default function TarifsPage() {
-  const [packs, setPacks] = useState<Pack[]>(fallbackPacks);
   const [selectedState, setSelectedState] = useState<StateName>("New Mexico");
-  const [loading, setLoading] = useState(true);
+  const [packs, setPacks] = useState<Pack[]>(fallbackPacks);
+  const [renewal, setRenewal] = useState<Record<StateName, number>>(renewalFallback);
 
   useEffect(() => {
-    let mounted = true;
+    let active = true;
 
     fetch("/api/public/llc-packs", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (!mounted) return;
+        if (!active || !data?.ok) return;
 
-        const apiPacks = Array.isArray(data?.packs) ? data.packs : null;
+        if (Array.isArray(data.packs) && data.packs.length) {
+          setPacks(data.packs);
+        }
 
-        if (apiPacks?.length) {
-          const normalized: Pack[] = apiPacks.map((pack: any, index: number) => {
-            const id = (pack.id || ["starter", "standard", "premium"][index] || "starter") as PackId;
-
-            return {
-              id,
-              label:
-                pack.label ||
-                (id === "starter" ? "Starter" : id === "standard" ? "Standard" : "Premium"),
-              description:
-                pack.description ||
-                (id === "starter"
-                  ? "L’essentiel pour créer votre LLC."
-                  : id === "standard"
-                  ? "La formule recommandée pour démarrer sérieusement."
-                  : "L’offre complète pour structurer votre activité."),
-              recommended: Boolean(pack.recommended || id === "standard"),
-              prices: pack.prices || fallbackPacks.find((p) => p.id === id)?.prices || {},
-              renewalPrices:
-                pack.renewalPrices ||
-                pack.registeredAgentRenewal ||
-                pack.registered_agent_renewal ||
-                fallbackPacks.find((p) => p.id === id)?.renewalPrices ||
-                {},
-              features:
-                pack.features || fallbackPacks.find((p) => p.id === id)?.features || [],
-            };
+        if (data.registeredAgentRenewal) {
+          setRenewal({
+            "New Mexico": Number(data.registeredAgentRenewal["New Mexico"] || 35),
+            Wyoming: Number(data.registeredAgentRenewal.Wyoming || 25),
           });
-
-          setPacks(normalized);
         }
       })
-      .catch(() => null)
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
+      .catch(() => null);
 
     return () => {
-      mounted = false;
+      active = false;
     };
   }, []);
 
@@ -171,59 +132,58 @@ export default function TarifsPage() {
   return (
     <main className="min-h-screen bg-white text-[#111827]">
       <header className="border-b border-[#E8EEF6] bg-white">
-        <div className="mx-auto flex max-w-[1180px] items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-[1120px] items-center justify-between px-6 py-5">
           <a href="/fr" className="shrink-0">
-            <div className="text-[24px] font-black uppercase leading-none tracking-[-0.06em]">
+            <div className="text-[25px] font-black uppercase leading-none tracking-[-0.06em]">
               <span className="text-[#123A63]">VEMO</span>
               <span className="text-[#F15A24]">TECH</span>
             </div>
-            <div className="mt-1 text-[9px] font-black uppercase tracking-[0.30em] text-slate-500">
+            <div className="mt-1.5 text-[9px] font-black uppercase tracking-[0.30em] text-slate-500">
               US LLC POUR NON-RÉSIDENTS
             </div>
           </a>
 
-          <nav className="hidden items-center gap-8 lg:flex">
-            <a href="/fr" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">Accueil</a>
-            <a href="/fr/business-setup" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">Business Setup</a>
-            <a href="/fr/banking" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">Banking</a>
-            <a href="/fr/services" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">Services</a>
-            <a href="/fr/resources" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">Resources</a>
-            <a href="/fr/contact" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">Contact</a>
+          <nav className="hidden items-center gap-7 lg:flex">
+            <a href="/fr" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">
+              Accueil
+            </a>
+            <a href="/fr/tarifs" className="text-sm font-bold text-[#F15A24]">
+              Tarifs
+            </a>
+            <a href="/fr/faq" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">
+              FAQ
+            </a>
+            <a href="/fr/contact" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">
+              Contact
+            </a>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <a
-              href="/en/tarifs"
-              className="inline-flex h-[42px] items-center justify-center rounded-[12px] border border-[#E8EEF6] px-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
-            >
-              EN
-            </a>
-            <a
-              href="/fr/commencer"
-              className="inline-flex h-[44px] items-center justify-center rounded-[14px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
-            >
-              Démarrer →
-            </a>
-          </div>
+          <a
+            href="/fr/commencer"
+            className="inline-flex h-[44px] items-center justify-center rounded-[14px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
+          >
+            Démarrer →
+          </a>
         </div>
       </header>
 
-      <section className="mx-auto max-w-[1080px] px-6 py-10">
-        <div className="mx-auto max-w-3xl text-center">
+      <section className="mx-auto max-w-[1040px] px-6 py-9">
+        <div className="text-center">
           <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#F15A24]">
             Tarifs
           </p>
-          <h1 className="mt-3 text-[44px] font-black tracking-[-0.07em] text-[#111827]">
+
+          <h1 className="mt-2 text-[40px] font-black tracking-[-0.07em] text-[#111827]">
             Packs LLC
           </h1>
 
-          <div className="mt-6 inline-flex rounded-[16px] border border-[#E8EEF6] bg-white p-1">
-            {stateOptions.map((state) => (
+          <div className="mt-5 inline-flex rounded-[15px] border border-[#E8EEF6] bg-white p-1">
+            {states.map((state) => (
               <button
                 key={state}
                 type="button"
                 onClick={() => setSelectedState(state)}
-                className={`h-[42px] rounded-[12px] px-6 text-sm font-black transition ${
+                className={`h-[40px] rounded-[11px] px-6 text-sm font-black transition ${
                   selectedState === state
                     ? "bg-[#F15A24] text-white"
                     : "bg-white text-[#123A63] hover:bg-[#F8FAFC]"
@@ -233,103 +193,70 @@ export default function TarifsPage() {
               </button>
             ))}
           </div>
-
-          {loading ? (
-            <p className="mt-4 text-xs font-bold text-slate-400">Chargement...</p>
-          ) : null}
         </div>
 
-        <div className="mt-10 grid gap-5 lg:grid-cols-3">
+        <div className="mx-auto mt-8 grid max-w-[980px] gap-4 lg:grid-cols-3">
           {orderedPacks.map((pack) => {
-            const price = getPackPrice(pack, selectedState);
-            const renewal = getRenewalPrice(pack, selectedState);
-            const features = cleanedFeatures(pack);
+            const price = Number(pack.prices?.[selectedState] || 0);
+            const renewalPrice = renewal[selectedState] || renewalFallback[selectedState];
+            const features = cleanFeatureList(pack.features || [], renewalPrice);
 
             return (
               <article
                 key={`${selectedState}-${pack.id}`}
-                className={`flex flex-col rounded-[24px] border bg-white p-5 ${
-                  pack.recommended ? "border-[#F15A24]" : "border-[#E8EEF6]"
+                className={`flex min-h-[430px] flex-col rounded-[22px] border bg-white p-4 ${
+                  pack.recommended ? "border-[#F15A24]" : "border-[#E4ECF5]"
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
-                      {selectedState}
-                    </p>
-                    <h2 className="mt-3 text-[28px] font-black tracking-[-0.06em] text-[#123A63]">
-                      {pack.label}
-                    </h2>
-                  </div>
+                <div className="flex h-[28px] items-center justify-between gap-2">
+                  <p className="text-[9px] font-black uppercase tracking-[0.20em] text-slate-400">
+                    {selectedState}
+                  </p>
 
                   {pack.recommended ? (
-                    <span className="rounded-full border border-[#F15A24] bg-white px-3 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-[#F15A24]">
+                    <span className="rounded-full border border-[#F15A24] bg-white px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-[#F15A24]">
                       Recommandé
                     </span>
                   ) : null}
                 </div>
 
-                <p className="mt-3 min-h-[48px] text-[13px] font-semibold leading-6 text-slate-600">
+                <h2 className="mt-2 text-[25px] font-black tracking-[-0.06em] text-[#123A63]">
+                  {pack.label}
+                </h2>
+
+                <p className="mt-2 min-h-[42px] text-[12px] font-semibold leading-5 text-slate-600">
                   {pack.description}
                 </p>
 
-                <div className="mt-4 rounded-[18px] border border-[#E8EEF6] bg-white px-4 py-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
-                    Prix du pack
+                <div className="mt-3 rounded-[16px] border border-[#E8EEF6] bg-white px-3.5 py-3">
+                  <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    Prix
                   </p>
-                  <p className="mt-1 text-[34px] font-black leading-none tracking-[-0.05em] text-[#F15A24]">
+                  <p className="mt-1 text-[30px] font-black leading-none tracking-[-0.05em] text-[#F15A24]">
                     {price} USD
                   </p>
                 </div>
 
-                <div className="mt-3 rounded-[16px] border border-[#E8EEF6] bg-[#FFFDFC] px-4 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
-                    Renouvellement Registered Agent
-                  </p>
-                  <p className="mt-1 text-[18px] font-black text-[#123A63]">
-                    {renewal} USD / an
-                  </p>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-start gap-2 rounded-[14px] border border-[#E8EEF6] px-3 py-2.5">
-                    <span className="mt-[1px] text-[12px] font-black text-[#F15A24]">✓</span>
-                    <span className="text-[12.5px] font-bold leading-5 text-[#123A63]">
-                      Documents de création LLC
-                    </span>
-                  </div>
-
-                  <div className="flex items-start gap-2 rounded-[14px] border border-[#E8EEF6] px-3 py-2.5">
-                    <span className="mt-[1px] text-[12px] font-black text-[#F15A24]">✓</span>
-                    <span className="text-[12.5px] font-bold leading-5 text-[#123A63]">
-                      Frais de dépôt de l’État inclus
-                    </span>
-                  </div>
-
-                  <div className="flex items-start gap-2 rounded-[14px] border border-[#E8EEF6] px-3 py-2.5">
-                    <span className="mt-[1px] text-[12px] font-black text-[#F15A24]">✓</span>
-                    <span className="text-[12.5px] font-bold leading-5 text-[#123A63]">
-                      Registered Agent offert la première année
-                    </span>
-                  </div>
-
+                <div className="mt-3 space-y-1.5">
                   {features.map((feature) => (
                     <div
                       key={feature}
-                      className="flex items-start gap-2 rounded-[14px] border border-[#E8EEF6] px-3 py-2.5"
+                      className="flex items-start gap-2 rounded-[12px] border border-[#E8EEF6] bg-white px-3 py-2"
                     >
-                      <span className="mt-[1px] text-[12px] font-black text-[#F15A24]">✓</span>
-                      <span className="text-[12.5px] font-bold leading-5 text-[#123A63]">
+                      <span className="mt-[1px] text-[11px] font-black text-[#F15A24]">
+                        ✓
+                      </span>
+                      <span className="text-[11.5px] font-bold leading-4 text-[#123A63]">
                         {feature}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5">
+                <div className="mt-auto pt-4">
                   <a
-                    href={buildHref(pack, selectedState)}
-                    className="inline-flex h-[46px] w-full items-center justify-center rounded-[14px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C]"
+                    href={startHref(pack, selectedState)}
+                    className="inline-flex h-[43px] w-full items-center justify-center rounded-[13px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C]"
                   >
                     Choisir →
                   </a>
