@@ -82,15 +82,12 @@ function startHref(pack: Pack, state: StateName) {
   )}&state=${slug}&amount=${price}&currency=USD`;
 }
 
-function cleanFeatureList(features: string[], renewalPrice: number) {
-  const cleaned = features
+function cleanFeatureList(features: string[]) {
+  return features
     .filter(Boolean)
     .filter((feature) => !feature.toLowerCase().includes("renouvellement registered agent"))
+    .filter((feature) => !feature.toLowerCase().includes("registered agent offert la première année"))
     .slice(0, 6);
-
-  cleaned.push(`Renouvellement Registered Agent : ${renewalPrice} USD / an`);
-
-  return cleaned;
 }
 
 export default function TarifsPage() {
@@ -199,7 +196,7 @@ export default function TarifsPage() {
           {orderedPacks.map((pack) => {
             const price = Number(pack.prices?.[selectedState] || 0);
             const renewalPrice = renewal[selectedState] || renewalFallback[selectedState];
-            const features = cleanFeatureList(pack.features || [], renewalPrice);
+            const features = cleanFeatureList(pack.features || []);
 
             return (
               <article
