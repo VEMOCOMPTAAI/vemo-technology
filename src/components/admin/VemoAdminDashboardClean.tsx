@@ -288,16 +288,21 @@ export default function VemoAdminDashboardClean() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="rounded-[16px] border border-[#E8E2DC] bg-[#FBFCFD] p-1">
+            <div className="flex items-center border-r border-[#E8E2DC] pr-4">
               <button
                 onClick={() => setLocale("fr")}
-                className={`rounded-[12px] px-4 py-2 text-xs font-black transition ${locale === "fr" ? "bg-[#F15A24] text-white" : "text-[#123A63] hover:bg-white"}`}
+                className={`px-2 text-sm font-black transition ${
+                  locale === "fr" ? "text-[#F15A24]" : "text-[#111827] hover:text-[#F15A24]"
+                }`}
               >
                 FR
               </button>
+              <span className="mx-1 text-slate-300">/</span>
               <button
                 onClick={() => setLocale("en")}
-                className={`rounded-[12px] px-4 py-2 text-xs font-black transition ${locale === "en" ? "bg-[#F15A24] text-white" : "text-[#123A63] hover:bg-white"}`}
+                className={`px-2 text-sm font-black transition ${
+                  locale === "en" ? "text-[#F15A24]" : "text-[#111827] hover:text-[#F15A24]"
+                }`}
               >
                 EN
               </button>

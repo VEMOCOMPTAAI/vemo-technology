@@ -139,26 +139,25 @@ export default function VemoPublicPricingPage({ lang = "fr" }: { lang?: Lang }) 
           </a>
 
           <div className="flex items-center gap-3">
-            <a
-              href="/fr/tarifs"
-              className={`rounded-[14px] px-4 py-2 text-xs font-black ${
-                lang === "fr"
-                  ? "bg-[#F15A24] text-white"
-                  : "border border-[#E8E2DC] bg-white text-[#123A63]"
-              }`}
-            >
-              FR
-            </a>
-            <a
-              href="/en/pricing"
-              className={`rounded-[14px] px-4 py-2 text-xs font-black ${
-                lang === "en"
-                  ? "bg-[#F15A24] text-white"
-                  : "border border-[#E8E2DC] bg-white text-[#123A63]"
-              }`}
-            >
-              EN
-            </a>
+            <div className="flex items-center border-r border-[#E8E2DC] pr-4">
+              <a
+                href="/fr/tarifs"
+                className={`px-2 text-sm font-black transition ${
+                  lang === "fr" ? "text-[#F15A24]" : "text-[#111827] hover:text-[#F15A24]"
+                }`}
+              >
+                FR
+              </a>
+              <span className="mx-1 text-slate-300">/</span>
+              <a
+                href="/en/pricing"
+                className={`px-2 text-sm font-black transition ${
+                  lang === "en" ? "text-[#F15A24]" : "text-[#111827] hover:text-[#F15A24]"
+                }`}
+              >
+                EN
+              </a>
+            </div>
           </div>
         </div>
       </header>

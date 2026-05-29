@@ -304,18 +304,25 @@ export default function VemoClientSpacePremium({ lang = "fr" }: { lang?: Lang })
           </a>
 
           <div className="flex items-center gap-3">
-            <a
-              href={`/fr/espace-client${clientEmail ? `?email=${encodeURIComponent(clientEmail)}` : ""}`}
-              className={`rounded-[14px] px-4 py-2 text-xs font-black ${lang === "fr" ? "bg-[#F15A24] text-white" : "border border-[#E8E2DC] bg-white text-[#123A63]"}`}
-            >
-              FR
-            </a>
-            <a
-              href={`/en/client-space${clientEmail ? `?email=${encodeURIComponent(clientEmail)}` : ""}`}
-              className={`rounded-[14px] px-4 py-2 text-xs font-black ${lang === "en" ? "bg-[#F15A24] text-white" : "border border-[#E8E2DC] bg-white text-[#123A63]"}`}
-            >
-              EN
-            </a>
+            <div className="flex items-center border-r border-[#E8E2DC] pr-4">
+              <a
+                href={`/fr/espace-client${clientEmail ? `?email=${encodeURIComponent(clientEmail)}` : ""}`}
+                className={`px-2 text-sm font-black transition ${
+                  lang === "fr" ? "text-[#F15A24]" : "text-[#111827] hover:text-[#F15A24]"
+                }`}
+              >
+                FR
+              </a>
+              <span className="mx-1 text-slate-300">/</span>
+              <a
+                href={`/en/client-space${clientEmail ? `?email=${encodeURIComponent(clientEmail)}` : ""}`}
+                className={`px-2 text-sm font-black transition ${
+                  lang === "en" ? "text-[#F15A24]" : "text-[#111827] hover:text-[#F15A24]"
+                }`}
+              >
+                EN
+              </a>
+            </div>
             <button
               onClick={() => loadAll(clientEmail)}
               className="rounded-[16px] border border-[#E8E2DC] bg-white px-5 py-3 text-sm font-black text-[#123A63] transition hover:bg-[#FFF7F1] hover:text-[#F15A24]"
