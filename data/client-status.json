@@ -1,10 +1,10 @@
 {
   "test@mail.com": {
     "email": "test@mail.com",
-    "payment_status": "Refusé",
+    "payment_status": "Remboursé",
     "dossier_status": "En traitement",
     "current_step": "EIN en cours",
     "note": "",
-    "updated_at": "2026-05-30T11:28:49.298Z"
+    "updated_at": "2026-05-30T11:36:17.002Z"
   }
 }

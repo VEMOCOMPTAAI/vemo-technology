@@ -43,7 +43,9 @@ export default function AdminClientPage() {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [notice, setNotice] = useState("");
   const [clientStatus, setClientStatus] = useState<any>(null);
+  const [clientSummary, setClientSummary] = useState<any>(null);
   const [savingStatus, setSavingStatus] = useState(false);
+  const [savingSummary, setSavingSummary] = useState(false);
 
   async function loadClientData() {
     if (!email) {
@@ -53,7 +55,7 @@ export default function AdminClientPage() {
 
     setLoading(true);
 
-    const [docsRes, msgRes, statusRes] = await Promise.all([
+    const [docsRes, msgRes, statusRes, summaryRes] = await Promise.all([
       fetch(`/api/admin/client-portal/documents?email=${encodeURIComponent(email)}`, {
         cache: "no-store",
       }),
@@ -63,15 +65,20 @@ export default function AdminClientPage() {
       fetch(`/api/admin/client-portal/status?email=${encodeURIComponent(email)}`, {
         cache: "no-store",
       }),
+      fetch(`/api/admin/client-portal/summary?email=${encodeURIComponent(email)}`, {
+        cache: "no-store",
+      }),
     ]);
 
     const docsData = await docsRes.json().catch(() => null);
     const msgData = await msgRes.json().catch(() => null);
     const statusData = await statusRes.json().catch(() => null);
+    const summaryData = await summaryRes.json().catch(() => null);
 
     setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
     setMessages(Array.isArray(msgData?.messages) ? msgData.messages : []);
     setClientStatus(statusData?.status || null);
+    setClientSummary(summaryData?.summary || null);
     setLoading(false);
   }
 
@@ -79,6 +86,48 @@ export default function AdminClientPage() {
     loadClientData();
   }, [email]);
 
+
+
+  async function saveClientSummary(next: any) {
+    setNotice("");
+
+    if (!email) {
+      setNotice("Email client introuvable.");
+      return;
+    }
+
+    const merged = {
+      ...(clientSummary || {}),
+      ...next,
+      email,
+      client_email: email,
+    };
+
+    setClientSummary(merged);
+    setSavingSummary(true);
+
+    try {
+      const res = await fetch("/api/admin/client-portal/summary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(merged),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.ok === false) {
+        setNotice(data?.error || "Erreur sauvegarde résumé.");
+        return;
+      }
+
+      setClientSummary(data.summary);
+      setNotice("Résumé dossier mis à jour.");
+    } finally {
+      setSavingSummary(false);
+    }
+  }
 
   async function saveClientStatus(next: any) {
     setNotice("");

@@ -29,6 +29,7 @@ export default function EspaceClientPage() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [clientStatus, setClientStatus] = useState<any>(null);
+  const [clientSummary, setClientSummary] = useState<any>(null);
   const [replySubject, setReplySubject] = useState("");
   const [replyContent, setReplyContent] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
@@ -45,7 +46,7 @@ export default function EspaceClientPage() {
 
     setLoading(true);
 
-    const [docsRes, msgRes, statusRes] = await Promise.all([
+    const [docsRes, msgRes, statusRes, summaryRes] = await Promise.all([
       fetch(`/api/client-portal/documents?email=${encodeURIComponent(cleanEmail)}`, {
         cache: "no-store",
       }),
@@ -55,15 +56,20 @@ export default function EspaceClientPage() {
       fetch(`/api/client-portal/status?email=${encodeURIComponent(cleanEmail)}`, {
         cache: "no-store",
       }),
+      fetch(`/api/client-portal/summary?email=${encodeURIComponent(cleanEmail)}`, {
+        cache: "no-store",
+      }),
     ]);
 
     const docsData = await docsRes.json().catch(() => null);
     const msgData = await msgRes.json().catch(() => null);
     const statusData = await statusRes.json().catch(() => null);
+    const summaryData = await summaryRes.json().catch(() => null);
 
     setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
     setMessages(Array.isArray(msgData?.messages) ? msgData.messages : []);
     setClientStatus(statusData?.status || null);
+    setClientSummary(summaryData?.summary || null);
     setLoading(false);
   }
 
@@ -189,7 +195,72 @@ export default function EspaceClientPage() {
         </div>
 
         
+        
         <section className="mt-6 rounded-[2rem] bg-white p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                Dossier
+              </p>
+              <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
+                Résumé de mon dossier
+              </h2>
+            </div>
+
+            <span className="rounded-full bg-[#F15A24] px-3 py-1 text-xs font-black text-white">
+              LLC
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-5">
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Nom LLC
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                {clientSummary?.llc_name || "Dossier LLC"}
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Formule
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                {clientSummary?.formula || "—"}
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                État
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                {clientSummary?.state || "—"}
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Montant
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                {clientSummary?.amount ? `${clientSummary.amount} ${clientSummary?.currency || "USD"}` : "—"}
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Paiement
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                {clientStatus?.payment_status || "En vérification"}
+              </p>
+            </div>
+          </div>
+        </section>
+
+<section className="mt-6 rounded-[2rem] bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
