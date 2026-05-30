@@ -175,12 +175,6 @@ export default function EspaceClientPage() {
             </button>
           </div>
 
-          {previewEmail ? (
-            <div className="mt-5 rounded-[16px] border border-[#FAD7CC] bg-[#FFF7F4] px-4 py-3 text-sm font-black text-[#F15A24]">
-              Aperçu admin du compte client.
-            </div>
-          ) : null}
-
           {notice ? (
             <div className="mt-5 rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-3 text-sm font-black text-[#123A63]">
               {notice}
