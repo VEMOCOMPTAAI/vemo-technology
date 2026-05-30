@@ -42,6 +42,8 @@ export default function AdminClientPage() {
   const [replacingDocId, setReplacingDocId] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
   const [notice, setNotice] = useState("");
+  const [clientStatus, setClientStatus] = useState<any>(null);
+  const [savingStatus, setSavingStatus] = useState(false);
 
   async function loadClientData() {
     if (!email) {
@@ -51,26 +53,73 @@ export default function AdminClientPage() {
 
     setLoading(true);
 
-    const [docsRes, msgRes] = await Promise.all([
+    const [docsRes, msgRes, statusRes] = await Promise.all([
       fetch(`/api/admin/client-portal/documents?email=${encodeURIComponent(email)}`, {
         cache: "no-store",
       }),
       fetch(`/api/admin/client-portal/messages?email=${encodeURIComponent(email)}`, {
         cache: "no-store",
       }),
+      fetch(`/api/admin/client-portal/status?email=${encodeURIComponent(email)}`, {
+        cache: "no-store",
+      }),
     ]);
 
     const docsData = await docsRes.json().catch(() => null);
     const msgData = await msgRes.json().catch(() => null);
+    const statusData = await statusRes.json().catch(() => null);
 
     setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
     setMessages(Array.isArray(msgData?.messages) ? msgData.messages : []);
+    setClientStatus(statusData?.status || null);
     setLoading(false);
   }
 
   useEffect(() => {
     loadClientData();
   }, [email]);
+
+
+  async function saveClientStatus(next: any) {
+    setNotice("");
+
+    if (!email) {
+      setNotice("Email client introuvable.");
+      return;
+    }
+
+    const merged = {
+      ...(clientStatus || {}),
+      ...next,
+      email,
+      client_email: email,
+    };
+
+    setClientStatus(merged);
+    setSavingStatus(true);
+
+    try {
+      const res = await fetch("/api/admin/client-portal/status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(merged),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.ok === false) {
+        setNotice(data?.error || "Erreur sauvegarde statut.");
+        return;
+      }
+
+      setClientStatus(data.status);
+      setNotice("Statut dossier mis à jour.");
+    } finally {
+      setSavingStatus(false);
+    }
+  }
 
   async function uploadDocument() {
     setNotice("");
@@ -251,7 +300,70 @@ export default function AdminClientPage() {
           ) : null}
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        
+        <section className="mt-6 rounded-[2rem] bg-white p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                Suivi dossier
+              </p>
+              <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
+                Statuts visibles client
+              </h2>
+            </div>
+
+            <span className="rounded-full bg-[#F15A24] px-3 py-1 text-xs font-black text-white">
+              {savingStatus ? "..." : "LIVE"}
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-4">
+            <select
+              value={clientStatus?.payment_status || "En vérification"}
+              onChange={(e) => saveClientStatus({ payment_status: e.target.value })}
+              className="h-[52px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+            >
+              <option>En vérification</option>
+              <option>Payé</option>
+              <option>Refusé</option>
+              <option>Remboursé</option>
+            </select>
+
+            <select
+              value={clientStatus?.dossier_status || "En attente"}
+              onChange={(e) => saveClientStatus({ dossier_status: e.target.value })}
+              className="h-[52px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+            >
+              <option>En attente</option>
+              <option>En traitement</option>
+              <option>Documents demandés</option>
+              <option>Terminé</option>
+            </select>
+
+            <select
+              value={clientStatus?.current_step || "Réception du dossier"}
+              onChange={(e) => saveClientStatus({ current_step: e.target.value })}
+              className="h-[52px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+            >
+              <option>Réception du dossier</option>
+              <option>Vérification des informations</option>
+              <option>Dépôt auprès de l’État</option>
+              <option>Documents de formation prêts</option>
+              <option>EIN en cours</option>
+              <option>Dossier finalisé</option>
+            </select>
+
+            <input
+              value={clientStatus?.note || ""}
+              onChange={(e) => setClientStatus({ ...(clientStatus || {}), note: e.target.value })}
+              onBlur={(e) => saveClientStatus({ note: e.target.value })}
+              placeholder="Note visible client"
+              className="h-[52px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
+            />
+          </div>
+        </section>
+
+<div className="mt-6 grid gap-6 lg:grid-cols-2">
           <section className="rounded-[2rem] bg-white p-6">
             <div className="flex items-start justify-between gap-4">
               <div>

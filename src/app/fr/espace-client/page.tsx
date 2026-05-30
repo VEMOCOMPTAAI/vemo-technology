@@ -28,6 +28,7 @@ export default function EspaceClientPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
+  const [clientStatus, setClientStatus] = useState<any>(null);
   const [replySubject, setReplySubject] = useState("");
   const [replyContent, setReplyContent] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
@@ -44,20 +45,25 @@ export default function EspaceClientPage() {
 
     setLoading(true);
 
-    const [docsRes, msgRes] = await Promise.all([
+    const [docsRes, msgRes, statusRes] = await Promise.all([
       fetch(`/api/client-portal/documents?email=${encodeURIComponent(cleanEmail)}`, {
         cache: "no-store",
       }),
       fetch(`/api/client-portal/messages?email=${encodeURIComponent(cleanEmail)}`, {
         cache: "no-store",
       }),
+      fetch(`/api/client-portal/status?email=${encodeURIComponent(cleanEmail)}`, {
+        cache: "no-store",
+      }),
     ]);
 
     const docsData = await docsRes.json().catch(() => null);
     const msgData = await msgRes.json().catch(() => null);
+    const statusData = await statusRes.json().catch(() => null);
 
     setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
     setMessages(Array.isArray(msgData?.messages) ? msgData.messages : []);
+    setClientStatus(statusData?.status || null);
     setLoading(false);
   }
 
@@ -182,7 +188,60 @@ export default function EspaceClientPage() {
           ) : null}
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        
+        <section className="mt-6 rounded-[2rem] bg-white p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                Suivi
+              </p>
+              <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
+                État de mon dossier
+              </h2>
+            </div>
+
+            <span className="rounded-full bg-[#F15A24] px-3 py-1 text-xs font-black text-white">
+              En direct
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Paiement
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                {clientStatus?.payment_status || "En vérification"}
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Dossier
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                {clientStatus?.dossier_status || "En attente"}
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Étape actuelle
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                {clientStatus?.current_step || "Réception du dossier"}
+              </p>
+            </div>
+          </div>
+
+          {clientStatus?.note ? (
+            <div className="mt-4 rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-[#123A63]">
+              {clientStatus.note}
+            </div>
+          ) : null}
+        </section>
+
+<div className="mt-6 grid gap-6 lg:grid-cols-2">
           <section className="rounded-[2rem] bg-white p-6">
             <div className="flex items-center justify-between">
               <div>
