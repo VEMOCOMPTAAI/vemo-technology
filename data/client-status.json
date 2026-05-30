@@ -1,1 +1,10 @@
-{}
+{
+  "test@mail.com": {
+    "email": "test@mail.com",
+    "payment_status": "Refusé",
+    "dossier_status": "En traitement",
+    "current_step": "EIN en cours",
+    "note": "",
+    "updated_at": "2026-05-30T11:28:49.298Z"
+  }
+}

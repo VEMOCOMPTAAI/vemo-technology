@@ -318,48 +318,68 @@ export default function AdminClientPage() {
           </div>
 
           <div className="mt-5 grid gap-4 lg:grid-cols-4">
-            <select
-              value={clientStatus?.payment_status || "En vérification"}
-              onChange={(e) => saveClientStatus({ payment_status: e.target.value })}
-              className="h-[52px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
-            >
-              <option>En vérification</option>
-              <option>Payé</option>
-              <option>Refusé</option>
-              <option>Remboursé</option>
-            </select>
+            <div>
+              <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Paiement
+              </label>
+              <select
+                value={clientStatus?.payment_status || "En vérification"}
+                onChange={(e) => saveClientStatus({ payment_status: e.target.value })}
+                className="h-[52px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+              >
+                <option>En vérification</option>
+                <option>Payé</option>
+                <option>Refusé</option>
+                <option>Remboursé</option>
+              </select>
+            </div>
 
-            <select
-              value={clientStatus?.dossier_status || "En attente"}
-              onChange={(e) => saveClientStatus({ dossier_status: e.target.value })}
-              className="h-[52px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
-            >
-              <option>En attente</option>
-              <option>En traitement</option>
-              <option>Documents demandés</option>
-              <option>Terminé</option>
-            </select>
+            <div>
+              <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Dossier
+              </label>
+              <select
+                value={clientStatus?.dossier_status || "En attente"}
+                onChange={(e) => saveClientStatus({ dossier_status: e.target.value })}
+                className="h-[52px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+              >
+                <option>En attente</option>
+                <option>En traitement</option>
+                <option>Documents demandés</option>
+                <option>Terminé</option>
+              </select>
+            </div>
 
-            <select
-              value={clientStatus?.current_step || "Réception du dossier"}
-              onChange={(e) => saveClientStatus({ current_step: e.target.value })}
-              className="h-[52px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
-            >
-              <option>Réception du dossier</option>
-              <option>Vérification des informations</option>
-              <option>Dépôt auprès de l’État</option>
-              <option>Documents de formation prêts</option>
-              <option>EIN en cours</option>
-              <option>Dossier finalisé</option>
-            </select>
+            <div>
+              <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Étape actuelle
+              </label>
+              <select
+                value={clientStatus?.current_step || "Réception du dossier"}
+                onChange={(e) => saveClientStatus({ current_step: e.target.value })}
+                className="h-[52px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none focus:border-[#F15A24]"
+              >
+                <option>Réception du dossier</option>
+                <option>Vérification des informations</option>
+                <option>Dépôt auprès de l’État</option>
+                <option>Documents de formation prêts</option>
+                <option>EIN en cours</option>
+                <option>Dossier finalisé</option>
+              </select>
+            </div>
 
-            <input
-              value={clientStatus?.note || ""}
-              onChange={(e) => setClientStatus({ ...(clientStatus || {}), note: e.target.value })}
-              onBlur={(e) => saveClientStatus({ note: e.target.value })}
-              placeholder="Note visible client"
-              className="h-[52px] rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
-            />
+            <div>
+              <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                Note client
+              </label>
+              <input
+                value={clientStatus?.note || ""}
+                onChange={(e) => setClientStatus({ ...(clientStatus || {}), note: e.target.value })}
+                onBlur={(e) => saveClientStatus({ note: e.target.value })}
+                placeholder="Note visible client"
+                className="h-[52px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
+              />
+            </div>
           </div>
         </section>
 
