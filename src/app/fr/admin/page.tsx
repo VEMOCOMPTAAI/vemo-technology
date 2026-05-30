@@ -258,7 +258,7 @@ export default function AdminFinalPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F5F7FA] text-[#111827]">
+    <main className="min-h-screen bg-white text-[#111827]">
       <section className="mx-auto max-w-[1280px] px-6 py-8">
         <div className="rounded-[2rem] bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -292,7 +292,7 @@ export default function AdminFinalPage() {
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-4">
-            <div className="rounded-[20px] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+            <div className="rounded-[20px] border border-[#E6EDF5] bg-white p-5">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                 Dossiers
               </p>
@@ -301,7 +301,7 @@ export default function AdminFinalPage() {
               </p>
             </div>
 
-            <div className="rounded-[20px] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+            <div className="rounded-[20px] border border-[#E6EDF5] bg-white p-5">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                 Paiements à vérifier
               </p>
@@ -310,7 +310,7 @@ export default function AdminFinalPage() {
               </p>
             </div>
 
-            <div className="rounded-[20px] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+            <div className="rounded-[20px] border border-[#E6EDF5] bg-white p-5">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                 En traitement
               </p>
@@ -319,7 +319,7 @@ export default function AdminFinalPage() {
               </p>
             </div>
 
-            <div className="rounded-[20px] border border-[#E6EDF5] bg-[#F8FAFC] p-5">
+            <div className="rounded-[20px] border border-[#E6EDF5] bg-white p-5">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
                 Terminés
               </p>
@@ -354,14 +354,14 @@ export default function AdminFinalPage() {
           </div>
 
           {message ? (
-            <div className="mt-4 rounded-[15px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-3 text-sm font-black text-[#123A63]">
+            <div className="mt-4 rounded-[15px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63]">
               {message}
             </div>
           ) : null}
 
           <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[#E6EDF5]">
             <table className="w-full border-collapse text-left">
-              <thead className="bg-[#F8FAFC]">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-4 py-4 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
                     Client / LLC

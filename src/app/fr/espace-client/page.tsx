@@ -143,7 +143,7 @@ export default function EspaceClientPage() {
   }, [previewEmail]);
 
   return (
-    <main className="min-h-screen bg-[#F5F7FA] text-[#111827]">
+    <main className="min-h-screen bg-white text-[#111827]">
       <section className="mx-auto max-w-[1120px] px-6 py-8">
         <div className="rounded-[2rem] bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -176,7 +176,7 @@ export default function EspaceClientPage() {
           </div>
 
           {notice ? (
-            <div className="mt-5 rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-3 text-sm font-black text-[#123A63]">
+            <div className="mt-5 rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63]">
               {notice}
             </div>
           ) : null}
@@ -201,11 +201,11 @@ export default function EspaceClientPage() {
 
             <div className="mt-6 space-y-3">
               {loading ? (
-                <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
+                <div className="rounded-[16px] border border-[#E6EDF5] bg-white p-4 text-sm font-bold text-slate-500">
                   Chargement...
                 </div>
               ) : documents.length === 0 ? (
-                <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
+                <div className="rounded-[16px] border border-[#E6EDF5] bg-white p-4 text-sm font-bold text-slate-500">
                   Aucun document disponible.
                 </div>
               ) : (
@@ -258,7 +258,7 @@ export default function EspaceClientPage() {
               </span>
             </div>
 
-            <div className="mt-6 space-y-3 rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+            <div className="mt-6 space-y-3 rounded-[18px] border border-[#E6EDF5] bg-white p-4">
               <p className="text-sm font-black text-[#123A63]">
                 Répondre à VEMO
               </p>
@@ -290,11 +290,11 @@ export default function EspaceClientPage() {
 
             <div className="mt-6 space-y-3">
               {loading ? (
-                <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
+                <div className="rounded-[16px] border border-[#E6EDF5] bg-white p-4 text-sm font-bold text-slate-500">
                   Chargement...
                 </div>
               ) : messages.length === 0 ? (
-                <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
+                <div className="rounded-[16px] border border-[#E6EDF5] bg-white p-4 text-sm font-bold text-slate-500">
                   Aucun message disponible.
                 </div>
               ) : (
