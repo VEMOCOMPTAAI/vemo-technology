@@ -28,6 +28,9 @@ export default function EspaceClientPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
+  const [replySubject, setReplySubject] = useState("");
+  const [replyContent, setReplyContent] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
 
   async function loadData(targetEmail: string) {
     const cleanEmail = String(targetEmail || "").trim().toLowerCase();
@@ -56,6 +59,54 @@ export default function EspaceClientPage() {
     setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
     setMessages(Array.isArray(msgData?.messages) ? msgData.messages : []);
     setLoading(false);
+  }
+
+
+  async function sendClientReply() {
+    setNotice("");
+
+    const cleanEmail = String(email || "").trim().toLowerCase();
+
+    if (!cleanEmail) {
+      setNotice("Email client introuvable.");
+      return;
+    }
+
+    if (!replyContent.trim()) {
+      setNotice("Écris un message.");
+      return;
+    }
+
+    setSendingReply(true);
+
+    try {
+      const res = await fetch("/api/client-portal/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: cleanEmail,
+          client_email: cleanEmail,
+          subject: replySubject || "Réponse client",
+          message: replyContent,
+        }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.ok === false) {
+        setNotice(data?.error || "Erreur envoi message.");
+        return;
+      }
+
+      setReplySubject("");
+      setReplyContent("");
+      setNotice("Message envoyé.");
+      await loadData(cleanEmail);
+    } finally {
+      setSendingReply(false);
+    }
   }
 
   useEffect(() => {
@@ -213,6 +264,36 @@ export default function EspaceClientPage() {
               </span>
             </div>
 
+            <div className="mt-6 space-y-3 rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4">
+              <p className="text-sm font-black text-[#123A63]">
+                Répondre à VEMO
+              </p>
+
+              <input
+                value={replySubject}
+                onChange={(e) => setReplySubject(e.target.value)}
+                placeholder="Objet"
+                className="h-[48px] w-full rounded-[14px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
+              />
+
+              <textarea
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                placeholder="Votre message..."
+                rows={4}
+                className="w-full resize-none rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
+              />
+
+              <button
+                type="button"
+                onClick={sendClientReply}
+                disabled={sendingReply}
+                className="h-[48px] w-full rounded-[14px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:opacity-60"
+              >
+                {sendingReply ? "Envoi..." : "Envoyer"}
+              </button>
+            </div>
+
             <div className="mt-6 space-y-3">
               {loading ? (
                 <div className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] p-4 text-sm font-bold text-slate-500">
@@ -228,9 +309,15 @@ export default function EspaceClientPage() {
                     key={item.id || index}
                     className="rounded-[16px] border border-[#E6EDF5] bg-white p-4"
                   >
-                    <p className="text-sm font-black text-[#123A63]">
-                      {item.subject || "Message VEMO"}
-                    </p>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-black text-[#123A63]">
+                        {item.subject || "Message VEMO"}
+                      </p>
+
+                      <span className={item.sender === "client" ? "rounded-full bg-[#F15A24] px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white" : "rounded-full bg-[#EEF3F8] px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#123A63]"}>
+                        {item.sender === "client" ? "Client" : "VEMO"}
+                      </span>
+                    </div>
 
                     <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-slate-600">
                       {item.message || item.content || ""}

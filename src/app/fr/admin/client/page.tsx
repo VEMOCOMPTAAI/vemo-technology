@@ -420,9 +420,15 @@ export default function AdminClientPage() {
               ) : (
                 messages.map((item) => (
                   <div key={item.id} className="rounded-[16px] border border-[#E6EDF5] bg-white p-4">
-                    <p className="text-sm font-black text-[#123A63]">
-                      {item.subject || "Message VEMO"}
-                    </p>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-black text-[#123A63]">
+                        {item.subject || "Message VEMO"}
+                      </p>
+
+                      <span className={item.sender === "client" ? "rounded-full bg-[#F15A24] px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white" : "rounded-full bg-[#EEF3F8] px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#123A63]"}>
+                        {item.sender === "client" ? "Client" : "Admin"}
+                      </span>
+                    </div>
                     <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-slate-600">
                       {item.message || item.content || ""}
                     </p>
