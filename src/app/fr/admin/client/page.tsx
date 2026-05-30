@@ -324,14 +324,14 @@ export default function AdminClientPage() {
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           {url ? (
                             <a
                               href={url}
                               target="_blank"
                               rel="noreferrer"
                               title="Ouvrir"
-                              className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] bg-[#F15A24] text-white transition hover:bg-[#DB4F1C]"
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#F15A24] text-white transition hover:bg-[#DB4F1C]"
                             >
                               ↗
                             </a>
@@ -339,9 +339,9 @@ export default function AdminClientPage() {
 
                           <label
                             title="Remplacer"
-                            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-[13px] border border-[#E6EDF5] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
+                            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-[10px] border border-[#E6EDF5] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
                           >
-                            {replacingDocId === doc.id ? "…" : "↻"}
+                            <span className="text-[13px] leading-none">{replacingDocId === doc.id ? "…" : "↻"}</span>
                             <input
                               type="file"
                               className="hidden"
@@ -357,7 +357,7 @@ export default function AdminClientPage() {
                             type="button"
                             title="Supprimer"
                             onClick={() => deleteDocument(doc.id)}
-                            className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#FAD7CC] bg-[#FFF7F4] text-[#F15A24] transition hover:bg-[#F15A24] hover:text-white"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#FAD7CC] bg-[#FFF7F4] text-[#F15A24] transition hover:bg-[#F15A24] hover:text-white"
                           >
                             ×
                           </button>
