@@ -48,6 +48,41 @@ function pickOrders(payload: any): AdminOrder[] {
   return [];
 }
 
+
+async function enrichOrdersWithStatuses(items: AdminOrder[]) {
+  const normalized = items.map(normalizeOrder);
+
+  const enriched = await Promise.all(
+    normalized.map(async (order) => {
+      if (!order.email) return order;
+
+      try {
+        const res = await fetch(
+          `/api/admin/client-portal/status?email=${encodeURIComponent(order.email)}`,
+          { cache: "no-store" }
+        );
+
+        const data = await res.json().catch(() => null);
+        const status = data?.status;
+
+        if (!status) return order;
+
+        return {
+          ...order,
+          payment_status: status.payment_status || order.paymentStatus,
+          dossier_status: status.dossier_status || order.dossierStatus,
+          paymentStatus: status.payment_status || order.paymentStatus,
+          dossierStatus: status.dossier_status || order.dossierStatus,
+        };
+      } catch {
+        return order;
+      }
+    })
+  );
+
+  return enriched;
+}
+
 function normalizeOrder(item: AdminOrder) {
   const email = String(item.client_email || item.email || "").trim().toLowerCase();
 
@@ -108,7 +143,8 @@ export default function AdminFinalPage() {
         const found = pickOrders(data).map(normalizeOrder);
 
         if (found.length > 0) {
-          setOrders(found);
+          const enriched = await enrichOrdersWithStatuses(found);
+          setOrders(enriched);
           setLoading(false);
           return;
         }
@@ -199,62 +235,68 @@ export default function AdminFinalPage() {
   ) {
     setMessage("");
 
+    const email = String(order.email || order.client_email || "").trim().toLowerCase();
     const id = order.id || order.order_id;
 
-    if (!id) {
-      setMessage("ID dossier introuvable.");
+    if (!email) {
+      setMessage("Email client introuvable.");
       return;
     }
 
-    const endpoints = ["/api/admin/orders", "/api/admin/dossiers/status"];
+    const localPatch =
+      field === "payment_status"
+        ? { payment_status: value, paymentStatus: value }
+        : { dossier_status: value, dossierStatus: value };
 
-    for (const endpoint of endpoints) {
-      try {
-        const res = await fetch(endpoint, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id,
-            order_id: id,
-            [field]: value,
-          }),
-        });
-
-        if (res.ok) {
-          setOrders((prev) =>
-            prev.map((item) => {
-              const itemId = item.id || item.order_id;
-
-              if (itemId !== id) return item;
-
-              return {
-                ...item,
-                [field]: value,
-              };
-            })
-          );
-
-          setMessage("Statut mis à jour.");
-          return;
-        }
-      } catch {}
-    }
-
-    setMessage("Statut modifié localement. Route API à finaliser.");
     setOrders((prev) =>
       prev.map((item) => {
         const itemId = item.id || item.order_id;
+        const itemEmail = String(item.email || item.client_email || "").trim().toLowerCase();
 
-        if (itemId !== id) return item;
+        if ((id && itemId === id) || itemEmail === email) {
+          return {
+            ...item,
+            ...localPatch,
+          };
+        }
 
-        return {
-          ...item,
-          [field]: value,
-        };
+        return item;
       })
     );
+
+    try {
+      const currentStatusRes = await fetch(
+        `/api/admin/client-portal/status?email=${encodeURIComponent(email)}`,
+        { cache: "no-store" }
+      );
+
+      const currentStatusData = await currentStatusRes.json().catch(() => null);
+      const currentStatus = currentStatusData?.status || {};
+
+      const res = await fetch("/api/admin/client-portal/status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...currentStatus,
+          email,
+          client_email: email,
+          [field]: value,
+        }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || data?.ok === false) {
+        setMessage(data?.error || "Statut modifié localement, sauvegarde à vérifier.");
+        return;
+      }
+
+      setMessage("Statut mis à jour.");
+    } catch (e: any) {
+      setMessage(e?.message || "Statut modifié localement, sauvegarde à vérifier.");
+    }
   }
 
   return (
