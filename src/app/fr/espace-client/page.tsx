@@ -30,6 +30,7 @@ export default function EspaceClientPage() {
   const [notice, setNotice] = useState("");
   const [clientStatus, setClientStatus] = useState<any>(null);
   const [clientSummary, setClientSummary] = useState<any>(null);
+  const [clientChecklist, setClientChecklist] = useState<any>(null);
   const [replySubject, setReplySubject] = useState("");
   const [replyContent, setReplyContent] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
@@ -46,7 +47,7 @@ export default function EspaceClientPage() {
 
     setLoading(true);
 
-    const [docsRes, msgRes, statusRes, summaryRes] = await Promise.all([
+    const [docsRes, msgRes, statusRes, summaryRes, checklistRes] = await Promise.all([
       fetch(`/api/client-portal/documents?email=${encodeURIComponent(cleanEmail)}`, {
         cache: "no-store",
       }),
@@ -59,17 +60,22 @@ export default function EspaceClientPage() {
       fetch(`/api/client-portal/summary?email=${encodeURIComponent(cleanEmail)}`, {
         cache: "no-store",
       }),
+      fetch(`/api/client-portal/checklist?email=${encodeURIComponent(cleanEmail)}`, {
+        cache: "no-store",
+      }),
     ]);
 
     const docsData = await docsRes.json().catch(() => null);
     const msgData = await msgRes.json().catch(() => null);
     const statusData = await statusRes.json().catch(() => null);
     const summaryData = await summaryRes.json().catch(() => null);
+    const checklistData = await checklistRes.json().catch(() => null);
 
     setDocuments(Array.isArray(docsData?.documents) ? docsData.documents : []);
     setMessages(Array.isArray(msgData?.messages) ? msgData.messages : []);
     setClientStatus(statusData?.status || null);
     setClientSummary(summaryData?.summary || null);
+    setClientChecklist(checklistData?.checklist || null);
     setLoading(false);
   }
 
@@ -196,7 +202,40 @@ export default function EspaceClientPage() {
 
         
         
+        
         <section className="mt-6 rounded-[2rem] bg-white p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                Checklist
+              </p>
+              <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
+                Documents à fournir
+              </h2>
+            </div>
+
+            <span className="rounded-full bg-[#F15A24] px-3 py-1 text-xs font-black text-white">
+              Suivi
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-3">
+            {(clientChecklist?.items || []).map((item: any, index: number) => (
+              <div
+                key={item.key || index}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] p-4"
+              >
+                <p className="text-sm font-black text-[#123A63]">{item.label}</p>
+
+                <span className="rounded-full border border-[#E6EDF5] bg-white px-3 py-1 text-xs font-black text-[#123A63]">
+                  {item.status || "Demandé"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+<section className="mt-6 rounded-[2rem] bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
