@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import ClientPortalContent from "../../fr/espace-client/ClientPortalContent";
+import EnglishClientPortalContent from "./EnglishClientPortalContent";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,7 @@ function LoadingClientPortal() {
 export default function EnClientPortalPage() {
   return (
     <Suspense fallback={<LoadingClientPortal />}>
-      <ClientPortalContent />
+      <EnglishClientPortalContent />
     </Suspense>
   );
 }
