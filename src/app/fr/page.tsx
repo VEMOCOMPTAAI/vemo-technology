@@ -303,48 +303,25 @@ export default function FrenchHomePage() {
       <WhatsAppButton />
 
       <footer className="border-t border-[#E6EDF5] bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-4">
-          <div>
-            <p className="text-2xl font-black tracking-[-0.05em] text-[#123A63]">
-              VEMO<span className="text-[#F15A24]">TECH</span>
-            </p>
-            <p className="mt-5 text-sm font-bold leading-7 text-slate-500">
-              Accompagnement professionnel pour créer, structurer et suivre votre LLC US à distance.
-            </p>
-          </div>
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
+          <p className="text-sm font-black text-[#123A63]">
+            VEMO Technology
+          </p>
 
-          <div>
-            <p className="text-sm font-black text-[#111827]">Navigation</p>
-            <div className="mt-5 space-y-3 text-sm font-bold text-slate-500">
-              <Link href="/fr" className="block hover:text-[#F15A24]">Accueil</Link>
-              <Link href="/fr/tarifs" className="block hover:text-[#F15A24]">Tarifs</Link>
-              <Link href="/fr/contact" className="block hover:text-[#F15A24]">Contact</Link>
-            </div>
+          <div className="flex flex-wrap gap-4 text-xs font-black text-slate-400">
+            <Link href="/fr/conditions" className="hover:text-[#F15A24]">
+              Conditions
+            </Link>
+            <Link href="/fr/confidentialite" className="hover:text-[#F15A24]">
+              Confidentialité
+            </Link>
+            <Link href="/fr/remboursement" className="hover:text-[#F15A24]">
+              Remboursement
+            </Link>
           </div>
-
-          <div>
-            <p className="text-sm font-black text-[#111827]">Services</p>
-            <div className="mt-5 space-y-3 text-sm font-bold text-slate-500">
-              <Link href="/fr/commencer" className="block hover:text-[#F15A24]">LLC Formation</Link>
-              <Link href="/fr/ein" className="block hover:text-[#F15A24]">EIN</Link>
-              <Link href="/fr/banking-guidance" className="block hover:text-[#F15A24]">Banking Guidance</Link>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-sm font-black text-[#111827]">Legal</p>
-            <div className="mt-5 space-y-3 text-sm font-bold text-slate-500">
-              <Link href="/fr/conditions" className="block hover:text-[#F15A24]">Conditions</Link>
-              <Link href="/fr/confidentialite" className="block hover:text-[#F15A24]">Confidentialité</Link>
-              <Link href="/fr/remboursement" className="block hover:text-[#F15A24]">Remboursement</Link>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-[#E6EDF5] py-5 text-center text-xs font-black text-slate-400">
-          © 2026 Vemo Technology. Tous droits réservés.
         </div>
       </footer>
+
     </main>
   );
 }
