@@ -2,72 +2,54 @@ import Link from "next/link";
 
 const services = [
   {
+    icon: "L",
     title: "Création LLC",
     text: "Création de société LLC aux États-Unis pour entrepreneurs non-résidents.",
     href: "/fr/commencer",
   },
   {
+    icon: "E",
     title: "Demande EIN",
-    text: "Préparation et suivi de la demande EIN pour vos démarches bancaires et fiscales.",
-    href: "/fr/commencer",
+    text: "Service EIN seul à 29 USD ou inclus selon le pack choisi.",
+    href: "/fr/ein",
   },
   {
+    icon: "B",
     title: "Banking guidance",
-    text: "Assistance pour Stripe, Mercury, Wise, Payoneer et outils de paiement.",
-    href: "/fr/contact",
+    text: "Assistance Stripe, Mercury, Wise, Payoneer, PayPal et Shopify.",
+    href: "/fr/banking-guidance",
   },
   {
+    icon: "P",
     title: "Espace client",
-    text: "Documents, messages, statuts et suivi dossier centralisés dans un portail sécurisé.",
+    text: "Documents, messages, statuts et suivi dossier centralisés.",
     href: "/fr/connexion",
   },
 ];
 
 const steps = [
-  {
-    number: "01",
-    title: "Choisir la formule",
-    text: "Sélectionnez Starter, Standard ou Premium selon votre besoin.",
-  },
-  {
-    number: "02",
-    title: "Remplir le formulaire",
-    text: "Ajoutez vos informations, l’État choisi et les détails de votre activité.",
-  },
-  {
-    number: "03",
-    title: "Payer ou envoyer le justificatif",
-    text: "Paiement en ligne ou virement avec justificatif téléversé depuis la plateforme.",
-  },
-  {
-    number: "04",
-    title: "Suivre le dossier",
-    text: "Consultez les documents, messages et étapes depuis votre espace client.",
-  },
+  ["01", "Choisir la formule", "Starter, Standard ou Premium selon votre besoin."],
+  ["02", "Remplir le formulaire", "Ajoutez vos informations, l’État et les détails d’activité."],
+  ["03", "Payer ou envoyer le justificatif", "Stripe ou virement avec justificatif depuis la plateforme."],
+  ["04", "Suivre le dossier", "Documents, messages et statuts dans votre espace client."],
 ];
 
 const packs = [
   {
-    name: "Starter",
-    price: "129$",
     state: "New Mexico",
-    text: "Pour démarrer simplement avec les documents essentiels.",
-    features: ["Création LLC", "Frais de dépôt inclus", "Registered Agent 1 an", "US Phone Number 3 mois"],
+    items: [
+      ["Starter", "129$", "Création LLC simple avec documents essentiels.", ["Création LLC", "Frais de dépôt inclus", "Registered Agent 1 an", "US Phone Number 3 mois"]],
+      ["Standard", "149$", "LLC + EIN + assistance bancaire.", ["Tout Starter", "Demande EIN", "Assistance Stripe", "Assistance Mercury"], true],
+      ["Premium", "199$", "Accompagnement complet au lancement.", ["Tout Standard", "PayPal", "Wise / Payoneer", "Shopify 3 mois + domaine"]],
+    ],
   },
   {
-    name: "Standard",
-    price: "149$",
-    state: "New Mexico",
-    text: "Le meilleur équilibre pour LLC + EIN + assistance bancaire.",
-    features: ["Tout Starter", "Demande EIN", "Assistance Stripe", "Assistance Mercury"],
-    recommended: true,
-  },
-  {
-    name: "Premium",
-    price: "199$",
-    state: "New Mexico",
-    text: "Pour un accompagnement plus complet au lancement.",
-    features: ["Tout Standard", "PayPal", "Wise / Payoneer", "Shopify 3 mois + domaine"],
+    state: "Wyoming",
+    items: [
+      ["Starter", "179$", "Création LLC Wyoming avec documents essentiels.", ["Création LLC", "Frais de dépôt inclus", "Registered Agent 1 an", "US Phone Number 3 mois"]],
+      ["Standard", "199$", "LLC Wyoming + EIN + assistance bancaire.", ["Tout Starter", "Demande EIN", "Assistance Stripe", "Assistance Mercury"], true],
+      ["Premium", "249$", "Pack Wyoming complet pour lancement premium.", ["Tout Standard", "PayPal", "Wise / Payoneer", "Shopify 3 mois + domaine"]],
+    ],
   },
 ];
 
@@ -90,108 +72,42 @@ function WhatsAppButton() {
 function CleanHeroVisual() {
   return (
     <div className="rounded-[28px] border border-[#E6EDF5] bg-white p-5">
-      <div className="rounded-[22px] border border-[#E6EDF5] bg-white p-5">
-        <div className="flex items-center justify-between gap-4 border-b border-[#E6EDF5] pb-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[14px] border border-[#E6EDF5] bg-white text-sm font-black text-[#F15A24]">
-              V
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#F15A24]">
-                VEMO Technology
-              </p>
-              <p className="mt-1 text-sm font-black text-[#123A63]">
-                Client dashboard
-              </p>
-            </div>
-          </div>
-          <span className="rounded-full border border-[#E6EDF5] bg-white px-3 py-1 text-xs font-black text-[#123A63]">
-            Live
-          </span>
+      <div className="grid gap-4">
+        <div className="rounded-[22px] border border-[#E6EDF5] bg-white p-5">
+          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#F15A24]">VEMO Technology</p>
+          <h2 className="mt-2 text-2xl font-black tracking-[-0.05em] text-[#123A63]">LLC setup workflow</h2>
+          <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
+            Une expérience claire : commande, paiement, documents, messages et suivi.
+          </p>
         </div>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
-              Paiement
-            </p>
-            <p className="mt-3 text-sm font-black text-[#123A63]">En vérification</p>
-            <div className="mt-4 h-2 rounded-full bg-[#E6EDF5]">
-              <div className="h-2 w-2/3 rounded-full bg-[#F15A24]" />
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            ["Paiement", "En vérification"],
+            ["Dossier", "En traitement"],
+            ["Documents", "Disponibles"],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">{label}</p>
+              <p className="mt-3 text-sm font-black text-[#123A63]">{value}</p>
+              <div className="mt-4 h-2 rounded-full bg-[#E6EDF5]">
+                <div className="h-2 w-2/3 rounded-full bg-[#F15A24]" />
+              </div>
             </div>
-          </div>
-
-          <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
-              Dossier
-            </p>
-            <p className="mt-3 text-sm font-black text-[#123A63]">En traitement</p>
-            <div className="mt-4 flex gap-2">
-              <span className="h-8 w-8 rounded-full bg-[#F15A24]" />
-              <span className="h-8 w-8 rounded-full border border-[#E6EDF5] bg-white" />
-              <span className="h-8 w-8 rounded-full border border-[#E6EDF5] bg-white" />
-            </div>
-          </div>
-
-          <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
-              Documents
-            </p>
-            <p className="mt-3 text-sm font-black text-[#123A63]">Disponibles</p>
-            <div className="mt-4 rounded-[12px] border border-[#E6EDF5] bg-white px-3 py-2 text-xs font-black text-[#123A63]">
-              EIN confirmation
-            </div>
-          </div>
+          ))}
         </div>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
-                Suivi dossier
-              </p>
-              <span className="rounded-full bg-[#F15A24] px-3 py-1 text-xs font-black text-white">
-                04 étapes
-              </span>
-            </div>
-
-            <div className="mt-5 space-y-4">
-              {["Réception du dossier", "Dépôt auprès de l’État", "EIN en cours", "Dossier finalisé"].map(
-                (item, index) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <span
-                      className={[
-                        "flex h-8 w-8 items-center justify-center rounded-full text-xs font-black",
-                        index < 2
-                          ? "bg-[#F15A24] text-white"
-                          : "border border-[#E6EDF5] bg-white text-[#123A63]",
-                      ].join(" ")}
-                    >
-                      {index < 2 ? "✓" : index + 1}
-                    </span>
-                    <span className="text-sm font-black text-[#123A63]">{item}</span>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
-              Messages
-            </p>
-            <div className="mt-4 rounded-[16px] border border-[#E6EDF5] bg-white p-4">
-              <p className="text-sm font-black text-[#123A63]">VEMO</p>
-              <p className="mt-2 text-xs font-bold leading-5 text-slate-500">
-                Votre dossier LLC est en cours de vérification.
-              </p>
-            </div>
-            <div className="mt-3 rounded-[16px] border border-[#E6EDF5] bg-white p-4">
-              <p className="text-sm font-black text-[#F15A24]">Client</p>
-              <p className="mt-2 text-xs font-bold leading-5 text-slate-500">
-                Merci, document reçu.
-              </p>
-            </div>
+        <div className="rounded-[22px] border border-[#E6EDF5] bg-white p-5">
+          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Étapes du dossier</p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {["Réception", "Dépôt État", "EIN", "Finalisation"].map((item, index) => (
+              <div key={item} className="flex items-center gap-3 rounded-[16px] border border-[#E6EDF5] bg-white p-3">
+                <span className={index < 2 ? "flex h-8 w-8 items-center justify-center rounded-full bg-[#F15A24] text-xs font-black text-white" : "flex h-8 w-8 items-center justify-center rounded-full border border-[#E6EDF5] text-xs font-black text-[#123A63]"}>
+                  {index < 2 ? "✓" : index + 1}
+                </span>
+                <span className="text-sm font-black text-[#123A63]">{item}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -205,9 +121,7 @@ export default function FrenchHomePage() {
       <header className="sticky top-0 z-40 border-b border-[#E6EDF5] bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
           <Link href="/fr" className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#F15A24] text-sm font-black text-white">
-              V
-            </span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#F15A24] text-sm font-black text-white">V</span>
             <span>
               <span className="block text-lg font-black tracking-[-0.04em] text-[#123A63]">
                 VEMO <span className="text-[#F15A24]">TECH</span>
@@ -219,42 +133,18 @@ export default function FrenchHomePage() {
           </Link>
 
           <nav className="hidden items-center gap-7 text-sm font-black text-[#123A63] lg:flex">
-            <Link href="/fr" className="hover:text-[#F15A24]">
-              Accueil
-            </Link>
-            <Link href="/fr/commencer" className="hover:text-[#F15A24]">
-              Business Setup
-            </Link>
-            <Link href="/fr/tarifs" className="hover:text-[#F15A24]">
-              Tarifs
-            </Link>
-            <Link href="/fr/faq" className="hover:text-[#F15A24]">
-              FAQ
-            </Link>
-            <Link href="/fr/contact" className="hover:text-[#F15A24]">
-              Contact
-            </Link>
+            <Link href="/fr" className="hover:text-[#F15A24]">Accueil</Link>
+            <Link href="/fr/commencer" className="hover:text-[#F15A24]">Business Setup</Link>
+            <Link href="/fr/tarifs" className="hover:text-[#F15A24]">Tarifs</Link>
+            <Link href="/fr/ein" className="hover:text-[#F15A24]">EIN</Link>
+            <Link href="/fr/banking-guidance" className="hover:text-[#F15A24]">Banking</Link>
+            <Link href="/fr/contact" className="hover:text-[#F15A24]">Contact</Link>
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/en"
-              className="hidden border-l border-[#E6EDF5] pl-5 text-sm font-black text-[#123A63] hover:text-[#F15A24] sm:inline-flex"
-            >
-              EN
-            </Link>
-            <Link
-              href="/fr/connexion"
-              className="hidden rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24] sm:inline-flex"
-            >
-              Connexion
-            </Link>
-            <Link
-              href="/fr/commencer"
-              className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]"
-            >
-              Créer ma LLC
-            </Link>
+            <Link href="/en" className="hidden border-l border-[#E6EDF5] pl-5 text-sm font-black text-[#123A63] hover:text-[#F15A24] sm:inline-flex">EN</Link>
+            <Link href="/fr/connexion" className="hidden rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24] sm:inline-flex">Connexion</Link>
+            <Link href="/fr/commencer" className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]">Créer ma LLC</Link>
           </div>
         </div>
       </header>
@@ -275,16 +165,10 @@ export default function FrenchHomePage() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/fr/commencer"
-              className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]"
-            >
+            <Link href="/fr/commencer" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
               Parler à un expert
             </Link>
-            <Link
-              href="/fr/tarifs"
-              className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
-            >
+            <Link href="/fr/tarifs" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]">
               Voir les tarifs
             </Link>
           </div>
@@ -293,52 +177,40 @@ export default function FrenchHomePage() {
         <CleanHeroVisual />
       </section>
 
-      <section className="border-y border-[#E6EDF5] bg-white py-12">
+      <section className="border-y border-[#E6EDF5] bg-white py-14">
         <div className="mx-auto max-w-7xl px-6 text-center">
           <h2 className="text-[34px] font-black tracking-[-0.06em] md:text-[48px]">
             Calculez le coût de votre création LLC <span className="text-[#F15A24]">US LLC</span>
           </h2>
           <p className="mx-auto mt-4 max-w-3xl text-base font-bold leading-7 text-slate-500">
-            Un parcours clair pour choisir votre État, vos services et finaliser votre dossier sans surprise.
+            Choisissez l’État, la formule et les services adaptés à votre activité.
           </p>
-          <Link
-            href="/fr/commencer"
-            className="mt-7 inline-flex rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]"
-          >
+          <Link href="/fr/commencer" className="mt-7 inline-flex rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
             Obtenir mon coût
           </Link>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <span className="rounded-[12px] border border-[#E6EDF5] bg-white px-4 py-2 text-sm font-black text-[#F15A24]">
-            Step up to success
-          </span>
-          <h2 className="mt-8 text-[38px] font-black leading-tight tracking-[-0.065em] md:text-[52px]">
-            Nos consultants vous accompagnent en 4 étapes simples
+      <section className="mx-auto max-w-7xl px-6 py-16">
+        <div className="text-center">
+          <h2 className="text-[36px] font-black tracking-[-0.06em] md:text-[52px]">
+            Services VEMO Technology
           </h2>
-          <div className="mt-8 rounded-[24px] border border-[#E6EDF5] bg-white p-6">
-            <p className="text-sm font-bold leading-7 text-slate-500">
-              De la sélection de l’État jusqu’à la livraison finale des documents,
-              le client suit chaque étape depuis son espace VEMO.
-            </p>
-          </div>
+          <p className="mx-auto mt-4 max-w-3xl text-base font-bold leading-7 text-slate-500">
+            Des services opérationnels pour créer, suivre et organiser votre LLC.
+          </p>
         </div>
 
-        <div className="space-y-7">
-          {steps.map((step) => (
-            <div key={step.number} className="grid gap-4 sm:grid-cols-[72px_1fr]">
-              <p className="text-[34px] font-black tracking-[-0.06em] text-[#F15A24]">
-                {step.number}.
-              </p>
-              <div>
-                <h3 className="text-2xl font-black tracking-[-0.04em] text-[#111827]">
-                  {step.title}
-                </h3>
-                <p className="mt-2 text-base font-bold leading-7 text-slate-500">{step.text}</p>
-              </div>
-            </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {services.map((service) => (
+            <Link key={service.title} href={service.href} className="rounded-[22px] border border-[#E6EDF5] bg-white p-6 hover:border-[#F15A24]">
+              <span className="flex h-12 w-12 items-center justify-center rounded-[14px] border border-[#E6EDF5] bg-white text-sm font-black text-[#F15A24]">
+                {service.icon}
+              </span>
+              <h3 className="mt-8 text-xl font-black tracking-[-0.04em] text-[#123A63]">{service.title}</h3>
+              <p className="mt-4 text-sm font-bold leading-7 text-slate-500">{service.text}</p>
+              <p className="mt-5 text-sm font-black text-[#F15A24]">En savoir plus</p>
+            </Link>
           ))}
         </div>
       </section>
@@ -350,23 +222,28 @@ export default function FrenchHomePage() {
               Choisissez le bon État pour votre LLC
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-base font-bold leading-7 text-slate-500">
-              New Mexico et Wyoming sont deux options populaires pour les fondateurs non-résidents.
+              New Mexico et Wyoming sont les deux États proposés dans VEMO pour démarrer simplement.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
             {[
-              ["New Mexico", "Simple, coût réduit et maintenance légère."],
-              ["Wyoming", "Confidentialité et environnement business-friendly."],
-              ["Banking & Payments", "Stripe, PayPal, Wise, Mercury et plus."],
-            ].map(([title, text]) => (
-              <div key={title} className="rounded-[22px] border border-[#E6EDF5] bg-white p-6">
-                <div className="h-32 rounded-[18px] border border-[#E6EDF5] bg-white" />
-                <div className="mt-7 border-l-4 border-[#F15A24] pl-4">
-                  <h3 className="text-2xl font-black tracking-[-0.04em] text-[#111827]">
-                    {title}
-                  </h3>
-                  <p className="mt-3 text-sm font-bold leading-7 text-slate-500">{text}</p>
+              ["New Mexico", "À partir de 129 USD", "Option simple, discrète et économique pour beaucoup d’entrepreneurs non-résidents.", "Registered Agent renouvellement : 35 USD/an"],
+              ["Wyoming", "À partir de 179 USD", "Option business-friendly, appréciée pour son image corporate et sa confidentialité.", "Registered Agent renouvellement : 25 USD/an"],
+            ].map(([title, price, text, renewal]) => (
+              <div key={title} className="rounded-[24px] border border-[#E6EDF5] bg-white p-7">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-3xl font-black tracking-[-0.05em] text-[#111827]">{title}</h3>
+                    <p className="mt-2 text-sm font-black text-[#F15A24]">{price}</p>
+                  </div>
+                  <span className="rounded-full border border-[#E6EDF5] px-3 py-1 text-xs font-black text-[#123A63]">
+                    LLC
+                  </span>
+                </div>
+                <p className="mt-6 text-sm font-bold leading-7 text-slate-500">{text}</p>
+                <div className="mt-5 rounded-[16px] border border-[#E6EDF5] bg-white p-4 text-sm font-black text-[#123A63]">
+                  {renewal}
                 </div>
               </div>
             ))}
@@ -374,32 +251,25 @@ export default function FrenchHomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="text-center">
-          <h2 className="text-[36px] font-black tracking-[-0.06em] md:text-[52px]">
-            Services VEMO Technology
+      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr]">
+        <div>
+          <span className="rounded-[12px] border border-[#E6EDF5] bg-white px-4 py-2 text-sm font-black text-[#F15A24]">
+            Step up to success
+          </span>
+          <h2 className="mt-8 text-[38px] font-black leading-tight tracking-[-0.065em] md:text-[52px]">
+            Nos consultants vous accompagnent en 4 étapes simples
           </h2>
-          <p className="mx-auto mt-4 max-w-3xl text-base font-bold leading-7 text-slate-500">
-            Des services structurés pour créer, suivre et organiser votre LLC.
-          </p>
         </div>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {services.map((service) => (
-            <Link
-              key={service.title}
-              href={service.href}
-              className="rounded-[22px] border border-[#E6EDF5] bg-white p-6 hover:border-[#F15A24]"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-[14px] border border-[#E6EDF5] bg-white text-[#F15A24]">
-                □
-              </span>
-              <h3 className="mt-8 text-xl font-black tracking-[-0.04em] text-[#123A63]">
-                {service.title}
-              </h3>
-              <p className="mt-4 text-sm font-bold leading-7 text-slate-500">{service.text}</p>
-              <p className="mt-5 text-sm font-black text-[#F15A24]">En savoir plus</p>
-            </Link>
+        <div className="space-y-7">
+          {steps.map(([number, title, text]) => (
+            <div key={number} className="grid gap-4 sm:grid-cols-[72px_1fr]">
+              <p className="text-[34px] font-black tracking-[-0.06em] text-[#F15A24]">{number}.</p>
+              <div>
+                <h3 className="text-2xl font-black tracking-[-0.04em] text-[#111827]">{title}</h3>
+                <p className="mt-2 text-base font-bold leading-7 text-slate-500">{text}</p>
+              </div>
+            </div>
           ))}
         </div>
       </section>
@@ -408,70 +278,54 @@ export default function FrenchHomePage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.28em] text-[#F15A24]">
-                Packs
-              </p>
+              <p className="text-[11px] font-black uppercase tracking-[0.28em] text-[#F15A24]">Packs</p>
               <h2 className="mt-4 text-[36px] font-black tracking-[-0.065em] text-[#111827] md:text-[52px]">
                 Des formules simples et lisibles.
               </h2>
             </div>
-            <Link
-              href="/fr/tarifs"
-              className="rounded-[16px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]"
-            >
+            <Link href="/fr/tarifs" className="rounded-[16px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]">
               Comparer les packs
             </Link>
           </div>
 
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {packs.map((pack) => (
-              <div
-                key={pack.name}
-                className="rounded-[24px] border border-[#E6EDF5] bg-white p-6"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-2xl font-black tracking-[-0.05em] text-[#111827]">
-                      {pack.name}
-                    </h3>
-                    <p className="mt-1 text-xs font-black uppercase tracking-[0.18em] text-slate-400">
-                      {pack.state}
-                    </p>
-                  </div>
-                  {pack.recommended ? (
-                    <span className="rounded-full bg-[#F15A24] px-3 py-1 text-xs font-black text-white">
-                      Recommandé
-                    </span>
-                  ) : null}
-                </div>
+          <div className="mt-10 space-y-10">
+            {packs.map((group) => (
+              <div key={group.state}>
+                <h3 className="text-2xl font-black tracking-[-0.05em] text-[#123A63]">{group.state}</h3>
+                <div className="mt-5 grid gap-5 lg:grid-cols-3">
+                  {group.items.map(([name, price, text, features, recommended]: any) => (
+                    <div key={`${group.state}-${name}`} className="rounded-[24px] border border-[#E6EDF5] bg-white p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h4 className="text-2xl font-black tracking-[-0.05em] text-[#111827]">{name}</h4>
+                          <p className="mt-1 text-xs font-black uppercase tracking-[0.18em] text-slate-400">{group.state}</p>
+                        </div>
+                        {recommended ? (
+                          <span className="rounded-full bg-[#F15A24] px-3 py-1 text-xs font-black text-white">Recommandé</span>
+                        ) : null}
+                      </div>
 
-                <p className="mt-5 text-[42px] font-black leading-none tracking-[-0.075em] text-[#123A63]">
-                  {pack.price}
-                </p>
-                <p className="mt-4 text-sm font-bold leading-7 text-slate-500">{pack.text}</p>
+                      <p className="mt-5 text-[42px] font-black leading-none tracking-[-0.075em] text-[#123A63]">{price}</p>
+                      <p className="mt-4 text-sm font-bold leading-7 text-slate-500">{text}</p>
 
-                <div className="mt-6 space-y-3">
-                  {pack.features.map((feature) => (
-                    <div key={feature} className="flex items-center gap-3">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#E6EDF5] bg-white text-xs font-black text-[#F15A24]">
-                        ✓
-                      </span>
-                      <span className="text-sm font-bold text-[#123A63]">{feature}</span>
+                      <div className="mt-6 space-y-3">
+                        {features.map((feature: string) => (
+                          <div key={feature} className="flex items-center gap-3">
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#E6EDF5] bg-white text-xs font-black text-[#F15A24]">✓</span>
+                            <span className="text-sm font-bold text-[#123A63]">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <Link
+                        href={`/fr/commencer?state=${encodeURIComponent(group.state)}&plan=${String(name).toLowerCase()}`}
+                        className={recommended ? "mt-7 flex justify-center rounded-[16px] bg-[#F15A24] px-5 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]" : "mt-7 flex justify-center rounded-[16px] border border-[#E6EDF5] bg-white px-5 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"}
+                      >
+                        Choisir {name}
+                      </Link>
                     </div>
                   ))}
                 </div>
-
-                <Link
-                  href={`/fr/commencer?plan=${pack.name.toLowerCase()}`}
-                  className={[
-                    "mt-7 flex justify-center rounded-[16px] px-5 py-4 text-sm font-black",
-                    pack.recommended
-                      ? "bg-[#F15A24] text-white hover:bg-[#DB4F1C]"
-                      : "border border-[#E6EDF5] bg-white text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]",
-                  ].join(" ")}
-                >
-                  Choisir {pack.name}
-                </Link>
               </div>
             ))}
           </div>
@@ -487,18 +341,9 @@ export default function FrenchHomePage() {
             Commencez votre dossier, choisissez votre formule et suivez chaque étape depuis VEMO.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/fr/commencer"
-              className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]"
-            >
-              Créer ma LLC
-            </Link>
-            <Link
-              href="/fr/contact"
-              className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
-            >
-              Contacter VEMO
-            </Link>
+            <Link href="/fr/commencer" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">Créer ma LLC</Link>
+            <Link href="/fr/ein" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]">Demande EIN seule</Link>
+            <Link href="/fr/contact" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]">Contacter VEMO</Link>
           </div>
         </div>
       </section>
@@ -529,8 +374,8 @@ export default function FrenchHomePage() {
             <p className="text-sm font-black text-[#111827]">Services</p>
             <div className="mt-5 space-y-3 text-sm font-bold text-slate-500">
               <Link href="/fr/commencer" className="block hover:text-[#F15A24]">LLC Formation</Link>
-              <Link href="/fr/commencer" className="block hover:text-[#F15A24]">EIN</Link>
-              <Link href="/fr/contact" className="block hover:text-[#F15A24]">Banking Guidance</Link>
+              <Link href="/fr/ein" className="block hover:text-[#F15A24]">EIN</Link>
+              <Link href="/fr/banking-guidance" className="block hover:text-[#F15A24]">Banking Guidance</Link>
             </div>
           </div>
 
