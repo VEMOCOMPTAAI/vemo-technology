@@ -69,52 +69,6 @@ function WhatsAppButton() {
   );
 }
 
-function CleanHeroVisual() {
-  return (
-    <div className="rounded-[28px] border border-[#E6EDF5] bg-white p-5">
-      <div className="grid gap-4">
-        <div className="rounded-[22px] border border-[#E6EDF5] bg-white p-5">
-          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#F15A24]">VEMO Technology</p>
-          <h2 className="mt-2 text-2xl font-black tracking-[-0.05em] text-[#123A63]">LLC setup workflow</h2>
-          <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-            Une expérience claire : commande, paiement, documents, messages et suivi.
-          </p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          {[
-            ["Paiement", "En vérification"],
-            ["Dossier", "En traitement"],
-            ["Documents", "Disponibles"],
-          ].map(([label, value]) => (
-            <div key={label} className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">{label}</p>
-              <p className="mt-3 text-sm font-black text-[#123A63]">{value}</p>
-              <div className="mt-4 h-2 rounded-full bg-[#E6EDF5]">
-                <div className="h-2 w-2/3 rounded-full bg-[#F15A24]" />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-[22px] border border-[#E6EDF5] bg-white p-5">
-          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Étapes du dossier</p>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            {["Réception", "Dépôt État", "EIN", "Finalisation"].map((item, index) => (
-              <div key={item} className="flex items-center gap-3 rounded-[16px] border border-[#E6EDF5] bg-white p-3">
-                <span className={index < 2 ? "flex h-8 w-8 items-center justify-center rounded-full bg-[#F15A24] text-xs font-black text-white" : "flex h-8 w-8 items-center justify-center rounded-full border border-[#E6EDF5] text-xs font-black text-[#123A63]"}>
-                  {index < 2 ? "✓" : index + 1}
-                </span>
-                <span className="text-sm font-black text-[#123A63]">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function FrenchHomePage() {
   return (
     <main className="min-h-screen bg-white text-[#111827]">
@@ -149,7 +103,7 @@ export default function FrenchHomePage() {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-14 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
+      <section className="mx-auto max-w-7xl px-6 py-14">
         <div>
           <div className="inline-flex rounded-[12px] border border-[#E6EDF5] bg-white px-4 py-2 text-sm font-black text-[#123A63]">
             <span className="mr-2 text-[#F15A24]">15k+</span> entrepreneurs accompagnés
@@ -173,8 +127,6 @@ export default function FrenchHomePage() {
             </Link>
           </div>
         </div>
-
-        <CleanHeroVisual />
       </section>
 
       <section className="border-y border-[#E6EDF5] bg-white py-14">
