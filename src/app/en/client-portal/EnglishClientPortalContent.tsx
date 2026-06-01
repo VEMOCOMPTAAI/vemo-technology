@@ -47,6 +47,43 @@ function getSenderLabel(message: AnyItem) {
   return "VEMO";
 }
 
+
+function translateStatusValue(value: any) {
+  const raw = String(value || "").trim();
+
+  const dictionary: Record<string, string> = {
+    "En vérification": "Under review",
+    "En verification": "Under review",
+    "Payé": "Paid",
+    "Paye": "Paid",
+    "Refusé": "Rejected",
+    "Refuse": "Rejected",
+    "Remboursé": "Refunded",
+    "Rembourse": "Refunded",
+
+    "En attente": "Pending",
+    "En traitement": "In progress",
+    "Documents demandés": "Documents requested",
+    "Documents demandes": "Documents requested",
+    "Terminé": "Completed",
+    "Termine": "Completed",
+
+    "Réception du dossier": "File received",
+    "Reception du dossier": "File received",
+    "Vérification des informations": "Information review",
+    "Verification des informations": "Information review",
+    "Dépôt auprès de l’État": "State filing",
+    "Depot aupres de l'Etat": "State filing",
+    "Documents de formation prêts": "Formation documents ready",
+    "Documents de formation prets": "Formation documents ready",
+    "EIN en cours": "EIN in progress",
+    "Dossier finalisé": "File completed",
+    "Dossier finalise": "File completed",
+  };
+
+  return dictionary[raw] || raw || "—";
+}
+
 export default function EnglishClientPortalContent() {
   const params = useSearchParams();
 
@@ -238,7 +275,7 @@ export default function EnglishClientPortalContent() {
                 Payment
               </p>
               <p className="mt-2 text-sm font-black text-[#123A63]">
-                {clientStatus?.payment_status || "Under review"}
+                {translateStatusValue(clientStatus?.payment_status || "Under review")}
               </p>
             </div>
 
@@ -247,7 +284,7 @@ export default function EnglishClientPortalContent() {
                 File
               </p>
               <p className="mt-2 text-sm font-black text-[#123A63]">
-                {clientStatus?.dossier_status || "Pending"}
+                {translateStatusValue(clientStatus?.dossier_status || "Pending")}
               </p>
             </div>
 
@@ -256,7 +293,7 @@ export default function EnglishClientPortalContent() {
                 Current step
               </p>
               <p className="mt-2 text-sm font-black text-[#123A63]">
-                {clientStatus?.current_step || "File received"}
+                {translateStatusValue(clientStatus?.current_step || "File received")}
               </p>
             </div>
           </div>
