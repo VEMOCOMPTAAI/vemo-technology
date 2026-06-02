@@ -103,28 +103,142 @@ export default function FrenchHomePage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-14">
+      
+      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div>
-          <div className="inline-flex rounded-[12px] border border-[#E6EDF5] bg-white px-4 py-2 text-sm font-black text-[#123A63]">
-            <span className="mr-2 text-[#F15A24]">15k+</span> entrepreneurs accompagnés
+          <div className="inline-flex items-center gap-2 rounded-[12px] border border-[#E6EDF5] bg-white px-4 py-2 text-sm font-black text-[#123A63]">
+            <span className="text-[#F15A24]">15k+</span>
+            <span>entrepreneurs accompagnés</span>
           </div>
 
-          <h1 className="mt-8 max-w-4xl text-[48px] font-black leading-[0.98] tracking-[-0.075em] text-[#111827] md:text-[72px]">
-            Création de LLC US & services pour non-résidents
+          <h1 className="mt-8 max-w-4xl text-[46px] font-black leading-[0.98] tracking-[-0.075em] text-[#111827] md:text-[68px]">
+            Création de LLC US pour entrepreneurs non-résidents
           </h1>
 
           <p className="mt-6 max-w-2xl text-lg font-bold leading-8 text-slate-500">
-            VEMO Technology rend la création de LLC simple, structurée et suivie :
-            choix de l’État, paiement, documents, messages et espace client.
+            VEMO Technology vous accompagne pour créer votre LLC aux États-Unis,
+            demander votre EIN, préparer vos solutions bancaires et suivre votre dossier
+            depuis un espace client simple et centralisé.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/fr/commencer" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
-              Parler à un expert
-            </Link>
-            <Link href="/fr/tarifs" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]">
+            <a
+              href="/fr/commencer"
+              className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
+            >
+              Créer ma LLC
+            </a>
+
+            <a
+              href="/fr/tarifs"
+              className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
+            >
               Voir les tarifs
-            </Link>
+            </a>
+
+            <a
+              href="/fr/ein"
+              className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
+            >
+              EIN seul 29$
+            </a>
+          </div>
+
+          <div className="mt-10 grid max-w-2xl gap-3 sm:grid-cols-3">
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                États
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                New Mexico / Wyoming
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                Services
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                LLC + EIN + Banking
+              </p>
+            </div>
+
+            <div className="rounded-[18px] border border-[#E6EDF5] bg-white p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                Suivi
+              </p>
+              <p className="mt-2 text-sm font-black text-[#123A63]">
+                Espace client
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-[32px] border border-[#E6EDF5] bg-white p-6">
+          <div className="rounded-[26px] border border-[#E6EDF5] bg-white p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#E6EDF5] pb-5">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#F15A24]">
+                  VEMO LLC Setup
+                </p>
+                <h2 className="mt-2 text-3xl font-black tracking-[-0.06em] text-[#111827]">
+                  Votre dossier en 4 étapes
+                </h2>
+              </div>
+
+              <span className="rounded-full bg-[#F15A24] px-3 py-1 text-xs font-black text-white">
+                Online
+              </span>
+            </div>
+
+            <div className="mt-6 grid gap-4">
+              {[
+                ["01", "Choix de l’État", "New Mexico ou Wyoming selon votre besoin."],
+                ["02", "Création LLC", "Préparation du dossier et documents de création."],
+                ["03", "EIN & Banking", "Demande EIN et assistance Stripe / Mercury / Wise."],
+                ["04", "Espace client", "Documents, messages et statuts visibles en ligne."],
+              ].map(([number, title, text]) => (
+                <div
+                  key={number}
+                  className="grid gap-4 rounded-[20px] border border-[#E6EDF5] bg-white p-4 sm:grid-cols-[54px_1fr]"
+                >
+                  <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-[#F15A24] text-sm font-black text-white">
+                    {number}
+                  </span>
+
+                  <div>
+                    <h3 className="text-base font-black text-[#123A63]">
+                      {title}
+                    </h3>
+                    <p className="mt-1 text-sm font-bold leading-6 text-slate-500">
+                      {text}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <a
+                href="/fr/commencer?state=New%20Mexico"
+                className="rounded-[18px] border border-[#E6EDF5] bg-white p-4 transition hover:border-[#F15A24]"
+              >
+                <p className="text-sm font-black text-[#123A63]">New Mexico</p>
+                <p className="mt-1 text-xs font-bold text-slate-500">
+                  À partir de 129$
+                </p>
+              </a>
+
+              <a
+                href="/fr/commencer?state=Wyoming"
+                className="rounded-[18px] border border-[#E6EDF5] bg-white p-4 transition hover:border-[#F15A24]"
+              >
+                <p className="text-sm font-black text-[#123A63]">Wyoming</p>
+                <p className="mt-1 text-xs font-bold text-slate-500">
+                  À partir de 179$
+                </p>
+              </a>
+            </div>
           </div>
         </div>
       </section>
