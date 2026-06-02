@@ -1,0 +1,16 @@
+<svg width="900" height="620" viewBox="0 0 900 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="620" rx="34" fill="#FFFFFF"/>
+  <rect x="1" y="1" width="898" height="618" rx="33" stroke="#E6EDF5" stroke-width="2"/>
+  <rect x="70" y="80" width="760" height="360" rx="30" fill="#F8FAFC"/>
+  <path d="M120 390C210 280 290 330 370 245C460 150 560 190 640 115C700 60 760 84 810 50V440H120V390Z" fill="#FFF3ED"/>
+  <path d="M120 392C210 282 290 332 370 247C460 152 560 192 640 117C700 62 760 86 810 52" stroke="#F15A24" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="245" cy="315" r="34" fill="#F15A24"/>
+  <circle cx="410" cy="224" r="24" fill="#123A63"/>
+  <circle cx="640" cy="116" r="28" fill="#F15A24"/>
+  <rect x="95" y="480" width="300" height="54" rx="18" fill="#123A63"/>
+  <rect x="420" y="480" width="185" height="54" rx="18" fill="#FFFFFF" stroke="#E6EDF5" stroke-width="2"/>
+  <rect x="630" y="480" width="175" height="54" rx="18" fill="#FFFFFF" stroke="#E6EDF5" stroke-width="2"/>
+  <text x="120" y="515" font-family="Arial" font-size="24" font-weight="800" fill="#FFFFFF">New Mexico LLC</text>
+  <text x="455" y="515" font-family="Arial" font-size="18" font-weight="700" fill="#123A63">Low cost</text>
+  <text x="660" y="515" font-family="Arial" font-size="18" font-weight="700" fill="#123A63">Simple</text>
+</svg>
