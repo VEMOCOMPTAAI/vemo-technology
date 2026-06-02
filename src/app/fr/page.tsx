@@ -111,8 +111,10 @@ export default function FrenchHomePage() {
             <span>entrepreneurs accompagnés</span>
           </div>
 
-          <h1 className="mt-8 max-w-4xl text-[46px] font-black leading-[0.98] tracking-[-0.075em] text-[#111827] md:text-[68px]">
-            Création de LLC US pour entrepreneurs non-résidents
+          <h1 className="mt-8 max-w-3xl text-[42px] font-black leading-[1.05] tracking-[-0.055em] text-[#111827] md:text-[60px]">
+            Créez votre <span className="text-[#F15A24]">LLC US</span>
+            <br />
+            simplement, depuis l’étranger
           </h1>
 
           <p className="mt-6 max-w-2xl text-lg font-bold leading-8 text-slate-500">
