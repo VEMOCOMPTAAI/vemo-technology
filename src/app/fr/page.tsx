@@ -1,5 +1,4 @@
 import Link from "next/link";
-import VemoHomeEnhancements from "@/components/home/VemoHomeEnhancements";
 
 const services = [
   {
@@ -301,7 +300,6 @@ export default function FrenchHomePage() {
         </div>
       </section>
 
-      <VemoHomeEnhancements />
 
       <WhatsAppButton />
 
