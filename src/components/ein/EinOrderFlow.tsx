@@ -239,50 +239,107 @@ function CountrySearchSelect({
 }) {
   const t = copy[locale];
   const [query, setQuery] = useState("");
-  const selected = COUNTRIES.find((country) => country.code === value) || COUNTRIES.find((country) => country.code === "MA")!;
+  const [open, setOpen] = useState(false);
+
+  const selected =
+    COUNTRIES.find((country) => country.code === value) ||
+    COUNTRIES.find((country) => country.code === "MA")!;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+
     if (!q) return COUNTRIES;
+
     return COUNTRIES.filter((country) => {
       const name = getCountryName(country, locale).toLowerCase();
-      return name.includes(q) || country.code.toLowerCase().includes(q) || country.dial.includes(q);
+      return (
+        name.includes(q) ||
+        country.code.toLowerCase().includes(q) ||
+        country.dial.includes(q)
+      );
     });
   }, [query, locale]);
 
   return (
-    <div className="rounded-[16px] border border-[#E6EDF5] bg-white p-2">
-      <input
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder={`${flagEmoji(selected.code)} ${getCountryName(selected, locale)}${showDial ? ` ${selected.dial}` : ""}`}
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
         className={[
-          "w-full rounded-[12px] border bg-white px-3 py-3 text-sm font-bold outline-none",
+          "flex min-h-[56px] w-full items-center justify-between gap-3 rounded-[16px] border bg-white px-4 py-4 text-left text-sm font-black outline-none transition hover:border-[#F15A24]",
           error ? "border-red-300" : "border-[#E6EDF5]",
         ].join(" ")}
-      />
+      >
+        <span className="min-w-0 truncate text-[#123A63]">
+          {flagEmoji(selected.code)} {getCountryName(selected, locale)}
+          {showDial && selected.dial ? ` ${selected.dial}` : ""}
+        </span>
 
-      <div className="mt-2 max-h-48 overflow-auto rounded-[12px] border border-[#E6EDF5]">
-        {filtered.map((country) => (
-          <button
-            key={country.code}
-            type="button"
-            onClick={() => {
-              onChange(country.code);
-              setQuery("");
-            }}
-            className={[
-              "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm font-bold hover:bg-[#F8FAFC]",
-              country.code === value ? "text-[#F15A24]" : "text-[#123A63]",
-            ].join(" ")}
-          >
-            <span>
-              {flagEmoji(country.code)} {getCountryName(country, locale)}
-            </span>
-            {showDial ? <span className="text-slate-400">{country.dial}</span> : null}
-          </button>
-        ))}
-      </div>
+        <svg
+          viewBox="0 0 20 20"
+          className={[
+            "h-5 w-5 shrink-0 text-slate-400 transition",
+            open ? "rotate-180" : "",
+          ].join(" ")}
+          fill="none"
+        >
+          <path
+            d="M5 7.5L10 12.5L15 7.5"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {open ? (
+        <div className="absolute left-0 right-0 top-[64px] z-50 overflow-hidden rounded-[18px] border border-[#E6EDF5] bg-white shadow-[0_24px_70px_rgba(18,58,99,0.16)]">
+          <div className="border-b border-[#E6EDF5] bg-white p-3">
+            <input
+              autoFocus
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t.search}
+              className="w-full rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
+            />
+          </div>
+
+          <div className="max-h-64 overflow-auto p-2">
+            {filtered.map((country) => (
+              <button
+                key={country.code}
+                type="button"
+                onClick={() => {
+                  onChange(country.code);
+                  setQuery("");
+                  setOpen(false);
+                }}
+                className={[
+                  "flex w-full items-center justify-between gap-3 rounded-[12px] px-3 py-3 text-left text-sm font-bold transition hover:bg-[#F8FAFC]",
+                  country.code === value
+                    ? "bg-[#FFF5F0] text-[#F15A24]"
+                    : "text-[#123A63]",
+                ].join(" ")}
+              >
+                <span className="min-w-0 truncate">
+                  {flagEmoji(country.code)} {getCountryName(country, locale)}
+                </span>
+
+                {showDial ? (
+                  <span className="shrink-0 text-slate-400">{country.dial}</span>
+                ) : null}
+              </button>
+            ))}
+
+            {filtered.length === 0 ? (
+              <div className="px-3 py-5 text-center text-sm font-bold text-slate-400">
+                {locale === "fr" ? "Aucun pays trouvé" : "No country found"}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
