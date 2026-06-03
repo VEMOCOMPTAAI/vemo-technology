@@ -1,35 +1,104 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 type Locale = "fr" | "en";
 
-const DIAL_CODES: Record<string, string> = {
-  AF: "+93", AL: "+355", DZ: "+213", AS: "+1-684", AD: "+376", AO: "+244", AI: "+1-264", AG: "+1-268", AR: "+54",
-  AM: "+374", AW: "+297", AU: "+61", AT: "+43", AZ: "+994", BS: "+1-242", BH: "+973", BD: "+880", BB: "+1-246",
-  BY: "+375", BE: "+32", BZ: "+501", BJ: "+229", BM: "+1-441", BT: "+975", BO: "+591", BA: "+387", BW: "+267",
-  BR: "+55", BN: "+673", BG: "+359", BF: "+226", BI: "+257", KH: "+855", CM: "+237", CA: "+1", CV: "+238",
-  KY: "+1-345", CF: "+236", TD: "+235", CL: "+56", CN: "+86", CO: "+57", KM: "+269", CG: "+242", CD: "+243",
-  CR: "+506", CI: "+225", HR: "+385", CU: "+53", CY: "+357", CZ: "+420", DK: "+45", DJ: "+253", DM: "+1-767",
-  DO: "+1-809", EC: "+593", EG: "+20", SV: "+503", GQ: "+240", ER: "+291", EE: "+372", SZ: "+268", ET: "+251",
-  FJ: "+679", FI: "+358", FR: "+33", GA: "+241", GM: "+220", GE: "+995", DE: "+49", GH: "+233", GR: "+30",
-  GD: "+1-473", GT: "+502", GN: "+224", GW: "+245", GY: "+592", HT: "+509", HN: "+504", HK: "+852", HU: "+36",
-  IS: "+354", IN: "+91", ID: "+62", IR: "+98", IQ: "+964", IE: "+353", IL: "+972", IT: "+39", JM: "+1-876",
-  JP: "+81", JO: "+962", KZ: "+7", KE: "+254", KI: "+686", KP: "+850", KR: "+82", KW: "+965", KG: "+996",
-  LA: "+856", LV: "+371", LB: "+961", LS: "+266", LR: "+231", LY: "+218", LI: "+423", LT: "+370", LU: "+352",
-  MO: "+853", MG: "+261", MW: "+265", MY: "+60", MV: "+960", ML: "+223", MT: "+356", MH: "+692", MR: "+222",
-  MU: "+230", MX: "+52", FM: "+691", MD: "+373", MC: "+377", MN: "+976", ME: "+382", MA: "+212", MZ: "+258",
-  MM: "+95", NA: "+264", NR: "+674", NP: "+977", NL: "+31", NZ: "+64", NI: "+505", NE: "+227", NG: "+234",
-  MK: "+389", NO: "+47", OM: "+968", PK: "+92", PW: "+680", PS: "+970", PA: "+507", PG: "+675", PY: "+595",
-  PE: "+51", PH: "+63", PL: "+48", PT: "+351", PR: "+1-787", QA: "+974", RO: "+40", RU: "+7", RW: "+250",
-  KN: "+1-869", LC: "+1-758", VC: "+1-784", WS: "+685", SM: "+378", ST: "+239", SA: "+966", SN: "+221",
-  RS: "+381", SC: "+248", SL: "+232", SG: "+65", SK: "+421", SI: "+386", SB: "+677", SO: "+252", ZA: "+27",
-  SS: "+211", ES: "+34", LK: "+94", SD: "+249", SR: "+597", SE: "+46", CH: "+41", SY: "+963", TW: "+886",
-  TJ: "+992", TZ: "+255", TH: "+66", TL: "+670", TG: "+228", TO: "+676", TT: "+1-868", TN: "+216", TR: "+90",
-  TM: "+993", TV: "+688", UG: "+256", UA: "+380", AE: "+971", GB: "+44", US: "+1", UY: "+598", UZ: "+998",
-  VU: "+678", VA: "+379", VE: "+58", VN: "+84", YE: "+967", ZM: "+260", ZW: "+263",
+type Country = {
+  code: string;
+  nameFr: string;
+  nameEn: string;
+  dial: string;
 };
+
+const COUNTRIES: Country[] = [
+  { code: "AF", nameFr: "Afghanistan", nameEn: "Afghanistan", dial: "+93" },
+  { code: "AL", nameFr: "Albanie", nameEn: "Albania", dial: "+355" },
+  { code: "DZ", nameFr: "Algérie", nameEn: "Algeria", dial: "+213" },
+  { code: "AD", nameFr: "Andorre", nameEn: "Andorra", dial: "+376" },
+  { code: "AO", nameFr: "Angola", nameEn: "Angola", dial: "+244" },
+  { code: "AR", nameFr: "Argentine", nameEn: "Argentina", dial: "+54" },
+  { code: "AM", nameFr: "Arménie", nameEn: "Armenia", dial: "+374" },
+  { code: "AU", nameFr: "Australie", nameEn: "Australia", dial: "+61" },
+  { code: "AT", nameFr: "Autriche", nameEn: "Austria", dial: "+43" },
+  { code: "AZ", nameFr: "Azerbaïdjan", nameEn: "Azerbaijan", dial: "+994" },
+  { code: "BH", nameFr: "Bahreïn", nameEn: "Bahrain", dial: "+973" },
+  { code: "BD", nameFr: "Bangladesh", nameEn: "Bangladesh", dial: "+880" },
+  { code: "BE", nameFr: "Belgique", nameEn: "Belgium", dial: "+32" },
+  { code: "BJ", nameFr: "Bénin", nameEn: "Benin", dial: "+229" },
+  { code: "BR", nameFr: "Brésil", nameEn: "Brazil", dial: "+55" },
+  { code: "BG", nameFr: "Bulgarie", nameEn: "Bulgaria", dial: "+359" },
+  { code: "BF", nameFr: "Burkina Faso", nameEn: "Burkina Faso", dial: "+226" },
+  { code: "CM", nameFr: "Cameroun", nameEn: "Cameroon", dial: "+237" },
+  { code: "CA", nameFr: "Canada", nameEn: "Canada", dial: "+1" },
+  { code: "CL", nameFr: "Chili", nameEn: "Chile", dial: "+56" },
+  { code: "CN", nameFr: "Chine", nameEn: "China", dial: "+86" },
+  { code: "CO", nameFr: "Colombie", nameEn: "Colombia", dial: "+57" },
+  { code: "CI", nameFr: "Côte d’Ivoire", nameEn: "Côte d’Ivoire", dial: "+225" },
+  { code: "HR", nameFr: "Croatie", nameEn: "Croatia", dial: "+385" },
+  { code: "DK", nameFr: "Danemark", nameEn: "Denmark", dial: "+45" },
+  { code: "EG", nameFr: "Égypte", nameEn: "Egypt", dial: "+20" },
+  { code: "AE", nameFr: "Émirats arabes unis", nameEn: "United Arab Emirates", dial: "+971" },
+  { code: "EC", nameFr: "Équateur", nameEn: "Ecuador", dial: "+593" },
+  { code: "ES", nameFr: "Espagne", nameEn: "Spain", dial: "+34" },
+  { code: "EE", nameFr: "Estonie", nameEn: "Estonia", dial: "+372" },
+  { code: "US", nameFr: "États-Unis", nameEn: "United States", dial: "+1" },
+  { code: "FR", nameFr: "France", nameEn: "France", dial: "+33" },
+  { code: "GA", nameFr: "Gabon", nameEn: "Gabon", dial: "+241" },
+  { code: "DE", nameFr: "Allemagne", nameEn: "Germany", dial: "+49" },
+  { code: "GH", nameFr: "Ghana", nameEn: "Ghana", dial: "+233" },
+  { code: "GR", nameFr: "Grèce", nameEn: "Greece", dial: "+30" },
+  { code: "GN", nameFr: "Guinée", nameEn: "Guinea", dial: "+224" },
+  { code: "HK", nameFr: "Hong Kong", nameEn: "Hong Kong", dial: "+852" },
+  { code: "IN", nameFr: "Inde", nameEn: "India", dial: "+91" },
+  { code: "ID", nameFr: "Indonésie", nameEn: "Indonesia", dial: "+62" },
+  { code: "IE", nameFr: "Irlande", nameEn: "Ireland", dial: "+353" },
+  { code: "IT", nameFr: "Italie", nameEn: "Italy", dial: "+39" },
+  { code: "JP", nameFr: "Japon", nameEn: "Japan", dial: "+81" },
+  { code: "JO", nameFr: "Jordanie", nameEn: "Jordan", dial: "+962" },
+  { code: "KE", nameFr: "Kenya", nameEn: "Kenya", dial: "+254" },
+  { code: "KW", nameFr: "Koweït", nameEn: "Kuwait", dial: "+965" },
+  { code: "LB", nameFr: "Liban", nameEn: "Lebanon", dial: "+961" },
+  { code: "LU", nameFr: "Luxembourg", nameEn: "Luxembourg", dial: "+352" },
+  { code: "MY", nameFr: "Malaisie", nameEn: "Malaysia", dial: "+60" },
+  { code: "ML", nameFr: "Mali", nameEn: "Mali", dial: "+223" },
+  { code: "MT", nameFr: "Malte", nameEn: "Malta", dial: "+356" },
+  { code: "MA", nameFr: "Maroc", nameEn: "Morocco", dial: "+212" },
+  { code: "MR", nameFr: "Mauritanie", nameEn: "Mauritania", dial: "+222" },
+  { code: "MU", nameFr: "Maurice", nameEn: "Mauritius", dial: "+230" },
+  { code: "MX", nameFr: "Mexique", nameEn: "Mexico", dial: "+52" },
+  { code: "NL", nameFr: "Pays-Bas", nameEn: "Netherlands", dial: "+31" },
+  { code: "NZ", nameFr: "Nouvelle-Zélande", nameEn: "New Zealand", dial: "+64" },
+  { code: "NE", nameFr: "Niger", nameEn: "Niger", dial: "+227" },
+  { code: "NG", nameFr: "Nigéria", nameEn: "Nigeria", dial: "+234" },
+  { code: "NO", nameFr: "Norvège", nameEn: "Norway", dial: "+47" },
+  { code: "OM", nameFr: "Oman", nameEn: "Oman", dial: "+968" },
+  { code: "PK", nameFr: "Pakistan", nameEn: "Pakistan", dial: "+92" },
+  { code: "PS", nameFr: "Palestine", nameEn: "Palestine", dial: "+970" },
+  { code: "PE", nameFr: "Pérou", nameEn: "Peru", dial: "+51" },
+  { code: "PH", nameFr: "Philippines", nameEn: "Philippines", dial: "+63" },
+  { code: "PL", nameFr: "Pologne", nameEn: "Poland", dial: "+48" },
+  { code: "PT", nameFr: "Portugal", nameEn: "Portugal", dial: "+351" },
+  { code: "QA", nameFr: "Qatar", nameEn: "Qatar", dial: "+974" },
+  { code: "RO", nameFr: "Roumanie", nameEn: "Romania", dial: "+40" },
+  { code: "GB", nameFr: "Royaume-Uni", nameEn: "United Kingdom", dial: "+44" },
+  { code: "SA", nameFr: "Arabie saoudite", nameEn: "Saudi Arabia", dial: "+966" },
+  { code: "SN", nameFr: "Sénégal", nameEn: "Senegal", dial: "+221" },
+  { code: "RS", nameFr: "Serbie", nameEn: "Serbia", dial: "+381" },
+  { code: "SG", nameFr: "Singapour", nameEn: "Singapore", dial: "+65" },
+  { code: "ZA", nameFr: "Afrique du Sud", nameEn: "South Africa", dial: "+27" },
+  { code: "KR", nameFr: "Corée du Sud", nameEn: "South Korea", dial: "+82" },
+  { code: "SE", nameFr: "Suède", nameEn: "Sweden", dial: "+46" },
+  { code: "CH", nameFr: "Suisse", nameEn: "Switzerland", dial: "+41" },
+  { code: "TH", nameFr: "Thaïlande", nameEn: "Thailand", dial: "+66" },
+  { code: "TN", nameFr: "Tunisie", nameEn: "Tunisia", dial: "+216" },
+  { code: "TR", nameFr: "Turquie", nameEn: "Turkey", dial: "+90" },
+  { code: "UA", nameFr: "Ukraine", nameEn: "Ukraine", dial: "+380" },
+  { code: "UY", nameFr: "Uruguay", nameEn: "Uruguay", dial: "+598" },
+  { code: "VN", nameFr: "Vietnam", nameEn: "Vietnam", dial: "+84" },
+];
 
 function flagEmoji(region: string) {
   return region
@@ -37,38 +106,19 @@ function flagEmoji(region: string) {
     .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
 }
 
-function getCountries(locale: Locale) {
-  const regions = Object.keys(DIAL_CODES).filter((code) => code !== "EH");
-
-  const display = new Intl.DisplayNames([locale === "fr" ? "fr" : "en"], {
-    type: "region",
-  });
-
-  return regions
-    .map((code) => ({
-      code,
-      name: display.of(code) || code,
-      dial: DIAL_CODES[code] || "",
-      flag: flagEmoji(code),
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-const labels = {
+const copy = {
   fr: {
-    back: "Retour EIN",
-    step: "Étape",
-    title: "Commande EIN dédiée",
-    subtitle: "Ce formulaire ne lance pas le tunnel complet de création LLC. Il est réservé au service EIN seul.",
+    title: "Commander votre EIN en 4 étapes",
+    subtitle: "Un tunnel dédié EIN, séparé de la création LLC complète, avec validation des champs avant chaque étape.",
+    steps: ["Contact", "Société LLC", "Propriétaire", "Validation"],
     next: "Continuer",
     prev: "Retour",
-    submit: "Continuer vers paiement",
-    price: "29 USD",
-    service: "Service EIN seul",
-    steps: ["Contact", "Société LLC", "Propriétaire", "Validation"],
+    pay: "Continuer vers paiement",
+    required: "Champ obligatoire",
+    search: "Rechercher un pays ou indicatif...",
     fullName: "Nom complet",
     email: "Email",
-    phoneCountry: "Indicatif",
+    phoneCode: "Indicatif",
     phone: "Téléphone / WhatsApp",
     residenceCountry: "Pays de résidence",
     companyName: "Nom de la LLC",
@@ -83,25 +133,23 @@ const labels = {
     ownerCity: "Ville propriétaire",
     ownerZip: "Code postal propriétaire",
     ownerCountry: "Pays propriétaire",
-    businessActivity: "Activité de la société",
+    activity: "Activité de la société",
     notes: "Message ou précision",
-    summary: "Résumé de la commande",
-    paymentNotice: "Après validation, vous passerez au choix du paiement : Stripe ou virement.",
+    summary: "Résumé de la demande EIN",
+    paymentNotice: "Après validation, vous serez dirigé vers la page de paiement sécurisée : Stripe ou virement.",
   },
   en: {
-    back: "Back to EIN",
-    step: "Step",
-    title: "Dedicated EIN order",
-    subtitle: "This form does not start the full LLC formation flow. It is only for the standalone EIN service.",
+    title: "Order your EIN in 4 steps",
+    subtitle: "A dedicated EIN flow, separated from full LLC formation, with required-field validation before each step.",
+    steps: ["Contact", "LLC company", "Owner", "Review"],
     next: "Continue",
     prev: "Back",
-    submit: "Continue to payment",
-    price: "29 USD",
-    service: "Standalone EIN service",
-    steps: ["Contact", "LLC company", "Owner", "Review"],
+    pay: "Continue to payment",
+    required: "Required field",
+    search: "Search country or dial code...",
     fullName: "Full name",
     email: "Email",
-    phoneCountry: "Dial code",
+    phoneCode: "Dial code",
     phone: "Phone / WhatsApp",
     residenceCountry: "Country of residence",
     companyName: "LLC name",
@@ -116,10 +164,10 @@ const labels = {
     ownerCity: "Owner city",
     ownerZip: "Owner ZIP code",
     ownerCountry: "Owner country",
-    businessActivity: "Business activity",
+    activity: "Business activity",
     notes: "Message or details",
-    summary: "Order summary",
-    paymentNotice: "After review, you will choose your payment method: Stripe or bank transfer.",
+    summary: "EIN request summary",
+    paymentNotice: "After review, you will be redirected to the secure payment page: Stripe or bank transfer.",
   },
 };
 
@@ -135,13 +183,12 @@ type FormState = {
   llcAddress2: string;
   llcCity: string;
   llcZip: string;
-  llcCountry: string;
   ownerAddress: string;
   ownerAddress2: string;
   ownerCity: string;
   ownerZip: string;
   ownerCountry: string;
-  businessActivity: string;
+  activity: string;
   notes: string;
 };
 
@@ -157,22 +204,97 @@ const initialForm: FormState = {
   llcAddress2: "",
   llcCity: "",
   llcZip: "",
-  llcCountry: "US",
   ownerAddress: "",
   ownerAddress2: "",
   ownerCity: "",
   ownerZip: "",
   ownerCountry: "MA",
-  businessActivity: "",
+  activity: "",
   notes: "",
 };
 
+const requiredByStep: Record<number, (keyof FormState)[]> = {
+  0: ["fullName", "email", "phone", "residenceCountry"],
+  1: ["companyName", "formationState", "llcAddress", "llcCity", "llcZip"],
+  2: ["ownerAddress", "ownerCity", "ownerZip", "ownerCountry", "activity"],
+  3: [],
+};
+
+function getCountryName(country: Country, locale: Locale) {
+  return locale === "fr" ? country.nameFr : country.nameEn;
+}
+
+function CountrySearchSelect({
+  locale,
+  value,
+  onChange,
+  showDial = false,
+  error = false,
+}: {
+  locale: Locale;
+  value: string;
+  onChange: (value: string) => void;
+  showDial?: boolean;
+  error?: boolean;
+}) {
+  const t = copy[locale];
+  const [query, setQuery] = useState("");
+  const selected = COUNTRIES.find((country) => country.code === value) || COUNTRIES.find((country) => country.code === "MA")!;
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return COUNTRIES;
+    return COUNTRIES.filter((country) => {
+      const name = getCountryName(country, locale).toLowerCase();
+      return name.includes(q) || country.code.toLowerCase().includes(q) || country.dial.includes(q);
+    });
+  }, [query, locale]);
+
+  return (
+    <div className="rounded-[16px] border border-[#E6EDF5] bg-white p-2">
+      <input
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder={`${flagEmoji(selected.code)} ${getCountryName(selected, locale)}${showDial ? ` ${selected.dial}` : ""}`}
+        className={[
+          "w-full rounded-[12px] border bg-white px-3 py-3 text-sm font-bold outline-none",
+          error ? "border-red-300" : "border-[#E6EDF5]",
+        ].join(" ")}
+      />
+
+      <div className="mt-2 max-h-48 overflow-auto rounded-[12px] border border-[#E6EDF5]">
+        {filtered.map((country) => (
+          <button
+            key={country.code}
+            type="button"
+            onClick={() => {
+              onChange(country.code);
+              setQuery("");
+            }}
+            className={[
+              "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm font-bold hover:bg-[#F8FAFC]",
+              country.code === value ? "text-[#F15A24]" : "text-[#123A63]",
+            ].join(" ")}
+          >
+            <span>
+              {flagEmoji(country.code)} {getCountryName(country, locale)}
+            </span>
+            {showDial ? <span className="text-slate-400">{country.dial}</span> : null}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Field({
   label,
+  error,
   children,
 }: {
   label: string;
-  children: React.ReactNode;
+  error?: string;
+  children: ReactNode;
 }) {
   return (
     <label className="grid gap-2">
@@ -180,46 +302,82 @@ function Field({
         {label}
       </span>
       {children}
+      {error ? <span className="text-xs font-black text-red-500">{error}</span> : null}
     </label>
   );
 }
 
 export default function EinOrderFlow({ locale }: { locale: Locale }) {
   const router = useRouter();
-  const t = labels[locale];
-  const countries = useMemo(() => getCountries(locale), [locale]);
+  const t = copy[locale];
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(initialForm);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
+    setErrors((current) => ({ ...current, [key]: undefined }));
   }
 
-  function countryOptions(showDial = false) {
-    return countries.map((country) => (
-      <option key={country.code} value={country.code}>
-        {country.flag} {country.name}
-        {showDial && country.dial ? ` (${country.dial})` : ""}
-      </option>
-    ));
+  function detectCountryFromPhone(value: string) {
+    const normalized = value.replace(/\s/g, "");
+    if (!normalized.startsWith("+")) return;
+    const matched = [...COUNTRIES]
+      .sort((a, b) => b.dial.length - a.dial.length)
+      .find((country) => normalized.startsWith(country.dial.replace(/\s/g, "")));
+    if (matched) {
+      update("phoneCountry", matched.code);
+    }
   }
 
-  function input(key: keyof FormState, placeholder = "", required = true) {
-    return (
-      <input
-        required={required}
-        value={form[key]}
-        onChange={(event) => update(key, event.target.value)}
-        className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]"
-        placeholder={placeholder}
-      />
-    );
+  function input(key: keyof FormState, placeholder = "", multiline = false) {
+    const common = {
+      value: form[key],
+      onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        update(key, event.target.value);
+        if (key === "phone") detectCountryFromPhone(event.target.value);
+      },
+      className: [
+        "rounded-[16px] border bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]",
+        errors[key] ? "border-red-300" : "border-[#E6EDF5]",
+      ].join(" "),
+      placeholder,
+    };
+
+    return multiline ? <textarea rows={4} {...common} /> : <input {...common} />;
+  }
+
+  function validate(targetStep = step) {
+    const required = requiredByStep[targetStep] || [];
+    const nextErrors: Partial<Record<keyof FormState, string>> = {};
+
+    required.forEach((key) => {
+      if (!String(form[key] || "").trim()) {
+        nextErrors[key] = t.required;
+      }
+    });
+
+    if (targetStep === 0 && form.email && !form.email.includes("@")) {
+      nextErrors.email = locale === "fr" ? "Email invalide" : "Invalid email";
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  }
+
+  function next() {
+    if (!validate(step)) return;
+    setStep((current) => Math.min(3, current + 1));
   }
 
   function goToPayment() {
+    if (!validate(3)) return;
+
     const query = new URLSearchParams({
       service: "ein",
       amount: "29",
+      pack: "ein_only",
+      packName: "EIN Only",
       fullName: form.fullName,
       email: form.email,
       companyName: form.companyName,
@@ -233,8 +391,8 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
     <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
       <div>
         <div className="inline-flex items-center gap-2 rounded-[12px] border border-[#E6EDF5] bg-white px-4 py-2 text-sm font-black text-[#123A63]">
-          <span className="text-[#F15A24]">{t.price}</span>
-          <span>{t.service}</span>
+          <span className="text-[#F15A24]">29 USD</span>
+          <span>{locale === "fr" ? "Service EIN seul" : "Standalone EIN service"}</span>
         </div>
 
         <h1 className="mt-8 max-w-3xl text-[42px] font-black leading-[1.05] tracking-[-0.055em] text-[#111827] md:text-[60px]">
@@ -263,12 +421,12 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
               <button
                 key={label}
                 type="button"
-                onClick={() => setStep(index)}
+                onClick={() => {
+                  if (index <= step || validate(step)) setStep(index);
+                }}
                 className={[
                   "flex items-center gap-3 rounded-[18px] border p-4 text-left transition",
-                  step === index
-                    ? "border-[#F15A24] text-[#123A63]"
-                    : "border-[#E6EDF5] text-slate-500",
+                  step === index ? "border-[#F15A24] text-[#123A63]" : "border-[#E6EDF5] text-slate-500",
                 ].join(" ")}
               >
                 <span
@@ -277,7 +435,7 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
                     step === index ? "bg-[#F15A24] text-white" : "border border-[#E6EDF5] bg-white",
                   ].join(" ")}
                 >
-                  {index + 1}
+                  {String(index + 1).padStart(2, "0")}
                 </span>
                 <span className="text-sm font-black">{label}</span>
               </button>
@@ -289,7 +447,7 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
       <div className="rounded-[32px] border border-[#E6EDF5] bg-white p-6">
         <div className="border-b border-[#E6EDF5] pb-5">
           <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#F15A24]">
-            {t.step} {step + 1}/4
+            {locale === "fr" ? "Étape" : "Step"} {step + 1}/4
           </p>
           <h2 className="mt-2 text-3xl font-black tracking-[-0.06em] text-[#111827]">
             {t.steps[step]}
@@ -300,31 +458,19 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
           {step === 0 ? (
             <>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t.fullName}>{input("fullName", locale === "fr" ? "Votre nom" : "Your name")}</Field>
-                <Field label={t.email}>{input("email", "email@example.com")}</Field>
+                <Field label={t.fullName} error={errors.fullName}>{input("fullName", locale === "fr" ? "Votre nom" : "Your name")}</Field>
+                <Field label={t.email} error={errors.email}>{input("email", "email@example.com")}</Field>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-[0.8fr_1.2fr]">
-                <Field label={t.phoneCountry}>
-                  <select
-                    value={form.phoneCountry}
-                    onChange={(event) => update("phoneCountry", event.target.value)}
-                    className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]"
-                  >
-                    {countryOptions(true)}
-                  </select>
+              <div className="grid gap-4 md:grid-cols-[0.95fr_1.05fr]">
+                <Field label={t.phoneCode} error={errors.phoneCountry}>
+                  <CountrySearchSelect locale={locale} value={form.phoneCountry} onChange={(value) => update("phoneCountry", value)} showDial />
                 </Field>
-                <Field label={t.phone}>{input("phone", "+212...")}</Field>
+                <Field label={t.phone} error={errors.phone}>{input("phone", "+212...")}</Field>
               </div>
 
-              <Field label={t.residenceCountry}>
-                <select
-                  value={form.residenceCountry}
-                  onChange={(event) => update("residenceCountry", event.target.value)}
-                  className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]"
-                >
-                  {countryOptions(false)}
-                </select>
+              <Field label={t.residenceCountry} error={errors.residenceCountry}>
+                <CountrySearchSelect locale={locale} value={form.residenceCountry} onChange={(value) => update("residenceCountry", value)} />
               </Field>
             </>
           ) : null}
@@ -332,13 +478,15 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
           {step === 1 ? (
             <>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t.companyName}>{input("companyName", "Example LLC")}</Field>
-                <Field label={t.formationState}>
+                <Field label={t.companyName} error={errors.companyName}>{input("companyName", "Example LLC")}</Field>
+                <Field label={t.formationState} error={errors.formationState}>
                   <select
-                    required
                     value={form.formationState}
                     onChange={(event) => update("formationState", event.target.value)}
-                    className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]"
+                    className={[
+                      "rounded-[16px] border bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]",
+                      errors.formationState ? "border-red-300" : "border-[#E6EDF5]",
+                    ].join(" ")}
                   >
                     <option value="">{locale === "fr" ? "Choisir" : "Choose"}</option>
                     <option value="New Mexico">New Mexico</option>
@@ -348,20 +496,18 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
                 </Field>
               </div>
 
-              <Field label={t.llcAddress}>{input("llcAddress", locale === "fr" ? "Adresse complète de la LLC" : "Full LLC address")}</Field>
-              <Field label={t.llcAddress2}>{input("llcAddress2", locale === "fr" ? "Appartement, suite..." : "Apt, suite...", false)}</Field>
+              <Field label={t.llcAddress} error={errors.llcAddress}>{input("llcAddress", locale === "fr" ? "Adresse complète de la LLC" : "Full LLC address")}</Field>
+              <Field label={t.llcAddress2}>{input("llcAddress2", locale === "fr" ? "Appartement, suite..." : "Apt, suite...")}</Field>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <Field label={t.llcCity}>{input("llcCity", locale === "fr" ? "Ville" : "City")}</Field>
-                <Field label={t.llcZip}>{input("llcZip", locale === "fr" ? "Code postal" : "ZIP code")}</Field>
+                <Field label={t.llcCity} error={errors.llcCity}>{input("llcCity", locale === "fr" ? "Ville" : "City")}</Field>
+                <Field label={t.llcZip} error={errors.llcZip}>{input("llcZip", locale === "fr" ? "Code postal" : "ZIP code")}</Field>
                 <Field label={t.llcCountry}>
-                  <select
-                    value={form.llcCountry}
-                    onChange={(event) => update("llcCountry", event.target.value)}
-                    className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]"
-                  >
-                    {countryOptions(false)}
-                  </select>
+                  <input
+                    value={locale === "fr" ? "🇺🇸 États-Unis" : "🇺🇸 United States"}
+                    readOnly
+                    className="rounded-[16px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-4 text-sm font-black text-[#123A63] outline-none"
+                  />
                 </Field>
               </div>
             </>
@@ -369,68 +515,44 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
 
           {step === 2 ? (
             <>
-              <Field label={t.ownerAddress}>{input("ownerAddress", locale === "fr" ? "Adresse complète du propriétaire" : "Full owner address")}</Field>
-              <Field label={t.ownerAddress2}>{input("ownerAddress2", locale === "fr" ? "Appartement, suite..." : "Apt, suite...", false)}</Field>
+              <Field label={t.ownerAddress} error={errors.ownerAddress}>{input("ownerAddress", locale === "fr" ? "Adresse complète du propriétaire" : "Full owner address")}</Field>
+              <Field label={t.ownerAddress2}>{input("ownerAddress2", locale === "fr" ? "Appartement, suite..." : "Apt, suite...")}</Field>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <Field label={t.ownerCity}>{input("ownerCity", locale === "fr" ? "Ville" : "City")}</Field>
-                <Field label={t.ownerZip}>{input("ownerZip", locale === "fr" ? "Code postal" : "ZIP code")}</Field>
-                <Field label={t.ownerCountry}>
-                  <select
-                    value={form.ownerCountry}
-                    onChange={(event) => update("ownerCountry", event.target.value)}
-                    className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]"
-                  >
-                    {countryOptions(false)}
-                  </select>
+                <Field label={t.ownerCity} error={errors.ownerCity}>{input("ownerCity", locale === "fr" ? "Ville" : "City")}</Field>
+                <Field label={t.ownerZip} error={errors.ownerZip}>{input("ownerZip", locale === "fr" ? "Code postal" : "ZIP code")}</Field>
+                <Field label={t.ownerCountry} error={errors.ownerCountry}>
+                  <CountrySearchSelect locale={locale} value={form.ownerCountry} onChange={(value) => update("ownerCountry", value)} />
                 </Field>
               </div>
 
-              <Field label={t.businessActivity}>
-                <textarea
-                  required
-                  value={form.businessActivity}
-                  onChange={(event) => update("businessActivity", event.target.value)}
-                  rows={4}
-                  className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]"
-                  placeholder={locale === "fr" ? "Décrivez l’activité de la société..." : "Describe the company activity..."}
-                />
-              </Field>
+              <Field label={t.activity} error={errors.activity}>{input("activity", locale === "fr" ? "Décrivez l’activité de la société..." : "Describe the company activity...", true)}</Field>
             </>
           ) : null}
 
           {step === 3 ? (
             <>
               <div className="rounded-[22px] border border-[#E6EDF5] bg-white p-5">
-                <p className="text-sm font-black uppercase tracking-[0.2em] text-[#F15A24]">
-                  {t.summary}
-                </p>
+                <p className="text-sm font-black uppercase tracking-[0.2em] text-[#F15A24]">{t.summary}</p>
                 <div className="mt-5 grid gap-3 text-sm font-bold text-[#123A63]">
                   <p>{t.fullName}: {form.fullName || "-"}</p>
                   <p>{t.email}: {form.email || "-"}</p>
                   <p>{t.companyName}: {form.companyName || "-"}</p>
                   <p>{t.formationState}: {form.formationState || "-"}</p>
-                  <p>{t.price}: {t.service}</p>
+                  <p>{t.llcCountry}: {locale === "fr" ? "États-Unis" : "United States"}</p>
+                  <p>Prix: 29 USD</p>
                 </div>
               </div>
 
-              <Field label={t.notes}>
-                <textarea
-                  value={form.notes}
-                  onChange={(event) => update("notes", event.target.value)}
-                  rows={4}
-                  className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]"
-                  placeholder={locale === "fr" ? "Ajoutez une précision sur votre situation..." : "Add any useful detail..."}
-                />
-              </Field>
+              <Field label={t.notes}>{input("notes", locale === "fr" ? "Ajoutez une précision..." : "Add useful details...", true)}</Field>
 
               <div className="rounded-[22px] border border-[#E6EDF5] bg-white p-5">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm font-black text-[#123A63]">{t.service}</p>
+                    <p className="text-sm font-black text-[#123A63]">{locale === "fr" ? "Service EIN seul" : "Standalone EIN service"}</p>
                     <p className="mt-1 text-xs font-bold text-slate-500">{t.paymentNotice}</p>
                   </div>
-                  <p className="text-3xl font-black tracking-[-0.06em] text-[#F15A24]">{t.price}</p>
+                  <p className="text-3xl font-black tracking-[-0.06em] text-[#F15A24]">29 USD</p>
                 </div>
               </div>
             </>
@@ -448,20 +570,12 @@ export default function EinOrderFlow({ locale }: { locale: Locale }) {
           </button>
 
           {step < 3 ? (
-            <button
-              type="button"
-              onClick={() => setStep((current) => Math.min(3, current + 1))}
-              className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]"
-            >
+            <button type="button" onClick={next} className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
               {t.next}
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={goToPayment}
-              className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]"
-            >
-              {t.submit}
+            <button type="button" onClick={goToPayment} className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
+              {t.pay}
             </button>
           )}
         </div>
