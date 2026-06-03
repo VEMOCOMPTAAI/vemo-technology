@@ -56,7 +56,7 @@ export default function FrenchEinPage() {
             <Link href="/en/ein" className="hidden border-l border-[#E6EDF5] pl-5 text-sm font-black text-[#123A63] hover:text-[#F15A24] sm:inline-flex">
               EN
             </Link>
-            <Link href="/fr/commencer?service=ein" className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]">
+            <Link href="/fr/order-ein" className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]">
               Demander EIN
             </Link>
           </div>
@@ -82,7 +82,7 @@ export default function FrenchEinPage() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/fr/commencer?service=ein" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#DB4F1C]">
+            <Link href="/fr/order-ein" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#DB4F1C]">
               Commander EIN 29 USD
             </Link>
             <Link href="/fr/contact" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]">
@@ -152,7 +152,7 @@ export default function FrenchEinPage() {
             Commandez le service EIN seul ou choisissez un pack LLC complet incluant la demande EIN.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href="/fr/commencer?service=ein" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
+            <Link href="/fr/order-ein" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
               Commander EIN
             </Link>
             <Link href="/fr/tarifs" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]">

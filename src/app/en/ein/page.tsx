@@ -54,7 +54,7 @@ export default function EnglishEinPage() {
             <Link href="/fr/ein" className="hidden border-l border-[#E6EDF5] pl-5 text-sm font-black text-[#123A63] hover:text-[#F15A24] sm:inline-flex">
               FR
             </Link>
-            <Link href="/en/start?service=ein" className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]">
+            <Link href="/en/order-ein" className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]">
               Apply for EIN
             </Link>
           </div>
@@ -80,7 +80,7 @@ export default function EnglishEinPage() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/en/start?service=ein" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#DB4F1C]">
+            <Link href="/en/order-ein" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#DB4F1C]">
               Order EIN 29 USD
             </Link>
             <Link href="/en/contact" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]">
@@ -150,7 +150,7 @@ export default function EnglishEinPage() {
             Order the standalone EIN service or choose a full LLC package including EIN application.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href="/en/start?service=ein" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
+            <Link href="/en/order-ein" className="rounded-[16px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white hover:bg-[#DB4F1C]">
               Order EIN
             </Link>
             <Link href="/en/pricing" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]">
