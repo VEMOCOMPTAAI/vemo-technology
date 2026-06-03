@@ -242,34 +242,89 @@ export default function EinPaymentLikeLlc({
                     </div>
                   </div>
 
-                  <div className="mt-5 rounded-[18px] border border-[#E6EDF5] bg-white p-4">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
-                      {t.cardInfo}
-                    </p>
+                  <div className="mt-5 rounded-[22px] border border-[#E6EDF5] bg-white p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F15A24]">
+                          Stripe Checkout
+                        </p>
+                        <p className="mt-2 text-sm font-black text-[#123A63]">
+                          {t.cardBrands}
+                        </p>
+                      </div>
 
-                    <div className="mt-3 flex items-center gap-3 rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#E6EDF5] bg-white">
-                        💳
-                      </span>
-                      <span className="text-sm font-black text-[#123A63]">{t.cardBrands}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-[9px] border border-[#E6EDF5] bg-white px-2.5 py-1.5 text-[10px] font-black text-[#123A63]">
+                          VISA
+                        </span>
+                        <span className="rounded-[9px] border border-[#E6EDF5] bg-white px-2.5 py-1.5 text-[10px] font-black text-[#123A63]">
+                          MC
+                        </span>
+                        <span className="rounded-[9px] border border-[#E6EDF5] bg-white px-2.5 py-1.5 text-[10px] font-black text-[#123A63]">
+                          AMEX
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="mt-3 grid gap-3 md:grid-cols-[1.4fr_0.8fr_0.6fr]">
-                      <input
-                        inputMode="numeric"
-                        placeholder={t.cardNumber}
-                        className="rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
-                      />
-                      <input
-                        inputMode="numeric"
-                        placeholder={t.expiry}
-                        className="rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
-                      />
-                      <input
-                        inputMode="numeric"
-                        placeholder={t.cvc}
-                        className="rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold text-[#123A63] outline-none focus:border-[#F15A24]"
-                      />
+                    <div className="mt-5 rounded-[20px] border border-[#E6EDF5] bg-white p-4">
+                      <label className="grid gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                          {t.cardNumber}
+                        </span>
+                        <div className="flex items-center gap-3 rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 focus-within:border-[#F15A24]">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border border-[#E6EDF5] bg-white text-sm">
+                            💳
+                          </span>
+                          <input
+                            inputMode="numeric"
+                            placeholder="4242 4242 4242 4242"
+                            className="min-w-0 flex-1 bg-transparent text-sm font-bold text-[#123A63] outline-none placeholder:text-slate-400"
+                          />
+                        </div>
+                      </label>
+
+                      <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr]">
+                        <label className="grid gap-2">
+                          <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                            {t.expiry}
+                          </span>
+                          <input
+                            inputMode="numeric"
+                            placeholder={locale === "fr" ? "MM / AA" : "MM / YY"}
+                            className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold text-[#123A63] outline-none placeholder:text-slate-400 focus:border-[#F15A24]"
+                          />
+                        </label>
+
+                        <label className="grid gap-2">
+                          <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                            {t.cvc}
+                          </span>
+                          <input
+                            inputMode="numeric"
+                            placeholder="123"
+                            className="rounded-[16px] border border-[#E6EDF5] bg-white px-4 py-4 text-sm font-bold text-[#123A63] outline-none placeholder:text-slate-400 focus:border-[#F15A24]"
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 rounded-[18px] border border-[#E6EDF5] bg-white p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                            {locale === "fr" ? "Paiement sécurisé par Stripe" : "Secured by Stripe"}
+                          </p>
+                          <p className="mt-1 text-sm font-bold text-slate-500">
+                            {locale === "fr"
+                              ? "Le module réel Stripe sera connecté avec les clés Stripe."
+                              : "The real Stripe module will be connected using Stripe keys."}
+                          </p>
+                        </div>
+
+                        <span className="rounded-[12px] bg-[#F15A24] px-3 py-2 text-xs font-black text-white">
+                          SSL
+                        </span>
+                      </div>
                     </div>
                   </div>
 
