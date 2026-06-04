@@ -20,8 +20,8 @@ const copy = {
     passwordInvalid: "Mot de passe invalide",
     passwordMismatch: "Les mots de passe ne correspondent pas",
     verificationTitle: "Vérification",
-    verificationText: "Après création du compte, vous pourrez accéder à votre espace, suivre le statut EIN et envoyer les documents ou justificatifs nécessaires.",
-    portal: "Créer le compte et accéder à l’espace client",
+    verificationText: "Après création du compte, un email de vérification sera requis avant d’accéder à l’espace client.",
+    portal: "Créer le compte et vérifier mon email",
   },
   en: {
     eyebrow: "EIN client account",
@@ -37,8 +37,8 @@ const copy = {
     passwordInvalid: "Invalid password",
     passwordMismatch: "Passwords do not match",
     verificationTitle: "Verification",
-    verificationText: "After account creation, you can access your portal, track EIN status and upload any required document or payment proof.",
-    portal: "Create account and access client portal",
+    verificationText: "After account creation, email verification is required before accessing the client portal.",
+    portal: "Create account and verify my email",
   },
 };
 
@@ -61,8 +61,8 @@ export default function EinAccountForm({
 
   const portalUrl =
     locale === "fr"
-      ? `/fr/espace-client?email=${encodeURIComponent(clientEmail)}`
-      : `/en/client-portal?email=${encodeURIComponent(clientEmail)}`;
+      ? `/fr/ein-verify?email=${encodeURIComponent(clientEmail)}`
+      : `/en/ein-verify?email=${encodeURIComponent(clientEmail)}`;
 
   const loginUrl = locale === "fr" ? "/fr/connexion" : "/en/login";
 
