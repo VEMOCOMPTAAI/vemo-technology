@@ -31,10 +31,10 @@ export default async function EnglishEinVerifyPage({
           </Link>
 
           <Link
-            href="/en/login"
+            href="/en/connexion"
             className="rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
           >
-            Log in
+            Sign in
           </Link>
         </div>
       </header>
@@ -85,10 +85,10 @@ export default async function EnglishEinVerifyPage({
             </button>
 
             <Link
-              href="/en/login"
+              href="/en/connexion"
               className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
             >
-              Log in
+              Sign in
             </Link>
           </div>
 

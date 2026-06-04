@@ -64,7 +64,7 @@ export default function EinAccountForm({
       ? `/fr/ein-verify?email=${encodeURIComponent(clientEmail)}`
       : `/en/ein-verify?email=${encodeURIComponent(clientEmail)}`;
 
-  const loginUrl = locale === "fr" ? "/fr/connexion" : "/en/login";
+  const loginUrl = locale === "fr" ? "/fr/connexion" : "/en/connexion";
 
   function validate() {
     const nextErrors: {

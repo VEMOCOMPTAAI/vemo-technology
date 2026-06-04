@@ -307,7 +307,7 @@ export default function VemoClientSpacePremium({ lang = "fr" }: { lang?: Lang })
             <div className="flex items-center border-r border-[#E8E2DC] pr-4">
               {lang === "fr" ? (
                 <a
-                  href={`/en/client-space${clientEmail ? `?email=${encodeURIComponent(clientEmail)}` : ""}`}
+                  href={`/en/client-portal${clientEmail ? `?email=${encodeURIComponent(clientEmail)}` : ""}`}
                   className="px-2 text-sm font-black text-[#111827] transition hover:text-[#F15A24]"
                 >
                   EN

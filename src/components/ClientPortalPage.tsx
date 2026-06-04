@@ -331,7 +331,7 @@ export default function ClientPortalPage({ lang }: { lang: Lang }) {
                 FR
               </a>
               <a
-                href="/en/espace-client"
+                href="/en/client-portal"
                 className={cn(
                   "rounded-xl px-3 py-2 text-xs font-black",
                   lang === "en" ? "bg-[#F15A24] text-white" : "text-slate-700"

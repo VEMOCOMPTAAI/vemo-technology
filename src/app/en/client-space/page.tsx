@@ -1,22 +1,11 @@
-import { Suspense } from "react";
-import EnglishClientPortalContent from "../client-portal/EnglishClientPortalContent";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-function LoadingClientPortal() {
-  return (
-    <main className="min-h-screen bg-[#F5F7FA] px-6 py-12 text-[#111827]">
-      <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
-        <p className="text-sm font-black text-[#F15A24]">Loading client portal...</p>
-      </div>
-    </main>
-  );
-}
-
-export default function EnClientSpacePage() {
-  return (
-    <Suspense fallback={<LoadingClientPortal />}>
-      <EnglishClientPortalContent />
-    </Suspense>
-  );
+export default async function EnglishClientSpaceAliasPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const email = Array.isArray(params.email) ? params.email[0] || "" : params.email || "";
+  redirect(`/en/client-portal${email ? `?email=${encodeURIComponent(email)}` : ""}`);
 }

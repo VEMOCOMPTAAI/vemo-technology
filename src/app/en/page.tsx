@@ -168,8 +168,8 @@ export default function EnglishHomePage() {
             <Link href="/fr" className="hidden border-l border-[#E6EDF5] pl-5 text-sm font-black text-[#123A63] hover:text-[#F15A24] sm:inline-flex">
               FR
             </Link>
-            <Link href="/en/login" className="hidden rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24] sm:inline-flex">
-              Login
+            <Link href="/en/connexion" className="hidden rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24] sm:inline-flex">
+              Sign in
             </Link>
             <Link href="/en/start" className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]">
               Start my LLC

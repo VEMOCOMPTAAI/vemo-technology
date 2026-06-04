@@ -37,7 +37,7 @@ export default function EnglishLoginPage() {
         });
       }
 
-      router.push("/en/espace-client");
+      router.push("/en/client-portal");
     } catch (error) {
       setMessage(
         error instanceof Error

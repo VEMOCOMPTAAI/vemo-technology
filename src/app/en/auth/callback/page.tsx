@@ -8,7 +8,7 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/en/espace-client";
+  const next = searchParams.get("next") || "/en/client-portal";
   const [message, setMessage] = useState("Confirmation du compte...");
 
   useEffect(() => {
