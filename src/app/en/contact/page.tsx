@@ -24,7 +24,7 @@ export default function ContactEnPage() {
             </p>
           </div>
 
-          <div className="mx-auto mt-9 max-w-3xl rounded-[28px] border border-[#DDE7F2] bg-white p-6 shadow-sm">
+          <div className="mx-auto mt-9 max-w-3xl rounded-[28px] border border-[#DDE7F2] bg-white p-6">
             <div className="mb-6 border-b border-[#E6EDF5] pb-5">
               <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">
                 Secure form

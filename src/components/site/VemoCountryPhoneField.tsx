@@ -76,7 +76,7 @@ export default function VemoCountryPhoneField({ locale }: { locale: Locale }) {
   const valid = phone.length === 0 || (phone.length >= country.min && phone.length <= country.max);
 
   return (
-    <div className="grid gap-3 md:grid-cols-[170px_1fr]">
+    <div className="grid gap-3 md:grid-cols-[150px_1fr]">
       <div className="relative">
         <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
           {isFr ? "Indicatif" : "Code"}
@@ -91,11 +91,11 @@ export default function VemoCountryPhoneField({ locale }: { locale: Locale }) {
             <span>{country.flag}</span>
             <span>{country.dial}</span>
           </span>
-          <span className="text-[#F15A24]">⌄</span>
+          <span className="text-slate-400">▾</span>
         </button>
 
         {open && (
-          <div className="absolute z-50 mt-2 w-[300px] overflow-hidden rounded-[18px] border border-[#DDE7F2] bg-white shadow-xl">
+          <div className="absolute z-50 mt-2 w-[280px] overflow-hidden rounded-[18px] border border-[#DDE7F2] bg-white">
             <div className="border-b border-[#E6EDF5] p-3">
               <input
                 value={q}

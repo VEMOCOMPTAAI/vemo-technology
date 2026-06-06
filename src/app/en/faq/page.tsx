@@ -37,7 +37,7 @@ export default function FaqEnPage() {
             {faqs.map(([q, a], index) => {
               const isOpen = openIndex === index;
               return (
-                <article key={q} className="overflow-hidden rounded-[20px] border border-[#DDE7F2] bg-white shadow-sm">
+                <article key={q} className="overflow-hidden rounded-[20px] border border-[#DDE7F2] bg-white">
                   <button type="button" onClick={() => setOpenIndex(isOpen ? null : index)} className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
                     <span className="text-base font-black tracking-[-0.02em] md:text-lg">{q}</span>
                     <span className={(isOpen ? "rotate-45 bg-[#F15A24] text-white" : "border border-[#DDE7F2] bg-white text-[#F15A24]") + " flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xl font-black transition"}>+</span>
