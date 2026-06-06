@@ -5,9 +5,11 @@ export default function VemoWhatsAppButton() {
       target="_blank"
       rel="noreferrer"
       aria-label="WhatsApp Vemo Technology"
-      className="fixed bottom-6 right-6 z-[80] flex h-14 w-14 items-center justify-center rounded-full bg-[#F15A24] text-2xl font-black text-white shadow-[0_18px_45px_rgba(241,90,36,0.35)] transition hover:-translate-y-1 hover:bg-[#DB4F1C]"
+      className="fixed bottom-6 right-6 z-[80] flex h-14 w-14 items-center justify-center rounded-full bg-[#F15A24] text-white shadow-[0_18px_45px_rgba(241,90,36,0.35)] transition hover:-translate-y-1 hover:bg-[#DB4F1C]"
     >
-      <span className="leading-none">☏</span>
+      <svg viewBox="0 0 32 32" className="h-7 w-7" fill="currentColor">
+        <path d="M16.02 3.2A12.6 12.6 0 0 0 5.1 22.1L3.4 28.8l6.85-1.62A12.6 12.6 0 1 0 16.02 3.2Zm0 22.92a10.35 10.35 0 0 1-5.28-1.44l-.38-.23-4.07.96.99-3.95-.25-.4a10.35 10.35 0 1 1 8.99 5.06Zm5.68-7.75c-.31-.16-1.84-.91-2.12-1.01-.28-.11-.49-.16-.7.15-.2.31-.8 1.01-.98 1.22-.18.2-.36.23-.67.08-.31-.16-1.31-.48-2.5-1.54-.92-.82-1.55-1.84-1.73-2.15-.18-.31-.02-.48.14-.63.14-.14.31-.36.47-.54.15-.18.2-.31.31-.52.1-.2.05-.39-.03-.54-.08-.16-.7-1.68-.95-2.3-.25-.6-.5-.52-.7-.53h-.59c-.2 0-.54.08-.82.39-.28.31-1.08 1.05-1.08 2.56s1.11 2.98 1.26 3.18c.16.2 2.18 3.33 5.28 4.67.74.32 1.32.51 1.77.65.74.24 1.42.2 1.95.12.6-.09 1.84-.75 2.1-1.47.26-.72.26-1.34.18-1.47-.08-.13-.28-.2-.59-.36Z" />
+      </svg>
     </a>
   );
 }
