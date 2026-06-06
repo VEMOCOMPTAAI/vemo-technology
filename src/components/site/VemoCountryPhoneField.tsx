@@ -136,7 +136,7 @@ export default function VemoCountryPhoneField({ locale }: { locale: Locale }) {
           required
           value={phone}
           onChange={(e) => handlePhone(e.target.value)}
-          placeholder={isFr ? "708069471 ou +212708069471" : "708069471 or +212708069471"}
+          placeholder="0663000000"
           className={[
             "h-12 rounded-[14px] border bg-white px-4 text-sm font-bold outline-none focus:border-[#F15A24]",
             valid ? "border-[#DDE7F2]" : "border-red-300",
