@@ -1,3 +1,4 @@
+import VemoPublicHeader from "@/components/site/VemoPublicHeader";
 import Link from "next/link";
 
 const tools = [
@@ -11,30 +12,10 @@ const tools = [
 
 export default function BankingGuidancePage() {
   return (
-    <main className="min-h-screen bg-white text-[#111827]">
-      <header className="border-b border-[#E6EDF5] bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link href="/fr" className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#F15A24] text-sm font-black text-white">
-              V
-            </span>
-            <span>
-              <span className="block text-lg font-black tracking-[-0.04em] text-[#123A63]">
-                VEMO <span className="text-[#F15A24]">TECH</span>
-              </span>
-              <span className="block text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
-                Banking guidance
-              </span>
-            </span>
-          </Link>
-
-          <Link href="/fr/contact" className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white">
-            Demander assistance
-          </Link>
-        </div>
-      </header>
-
-      <section className="mx-auto max-w-7xl px-6 py-16">
+    <>
+      <VemoPublicHeader locale="fr" />
+      <main className="min-h-screen bg-white text-[#111827]">
+<section className="mx-auto max-w-7xl px-6 py-16">
         <p className="text-center text-[11px] font-black uppercase tracking-[0.28em] text-[#F15A24]">
           Banking & payments
         </p>
@@ -73,5 +54,6 @@ export default function BankingGuidancePage() {
         </div>
       </section>
     </main>
+    </>
   );
 }

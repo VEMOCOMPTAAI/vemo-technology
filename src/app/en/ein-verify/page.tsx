@@ -1,3 +1,4 @@
+import VemoPublicHeader from "@/components/site/VemoPublicHeader";
 import Link from "next/link";
 
 function valueOf(input: string | string[] | undefined) {
@@ -13,33 +14,10 @@ export default async function EnglishEinVerifyPage({
   const email = valueOf(params.email);
 
   return (
-    <main className="min-h-screen bg-white text-[#111827]">
-      <header className="border-b border-[#E6EDF5] bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link href="/en" className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#F15A24] text-sm font-black text-white">
-              V
-            </span>
-            <span>
-              <span className="block text-lg font-black text-[#123A63]">
-                VEMO<span className="text-[#F15A24]">TECH</span>
-              </span>
-              <span className="block text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
-                Client account verification
-              </span>
-            </span>
-          </Link>
-
-          <Link
-            href="/en/connexion"
-            className="rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
-          >
-            Sign in
-          </Link>
-        </div>
-      </header>
-
-      <section className="mx-auto max-w-4xl px-6 py-16">
+    <>
+      <VemoPublicHeader locale="en" />
+      <main className="min-h-screen bg-white text-[#111827]">
+<section className="mx-auto max-w-4xl px-6 py-16">
         <div className="rounded-[32px] border border-[#E6EDF5] bg-white p-8 text-center md:p-12">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#F15A24] text-2xl font-black text-white">
             ✓
@@ -85,7 +63,7 @@ export default async function EnglishEinVerifyPage({
             </button>
 
             <Link
-              href="/en/connexion"
+              href="/en/start"
               className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
             >
               Sign in
@@ -104,5 +82,6 @@ export default async function EnglishEinVerifyPage({
         </div>
       </section>
     </main>
+    </>
   );
 }

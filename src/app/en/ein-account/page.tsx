@@ -1,3 +1,4 @@
+import VemoPublicHeader from "@/components/site/VemoPublicHeader";
 import EinAccountForm from "@/components/ein/EinAccountForm";
 
 function valueOf(input: string | string[] | undefined) {
@@ -14,7 +15,9 @@ export default async function EnglishEinAccountPage({
   const companyName = valueOf(params.companyName);
 
   return (
-    <main className="min-h-screen bg-white text-[#111827]">
+    <>
+      <VemoPublicHeader locale="en" />
+      <main className="min-h-screen bg-white text-[#111827]">
       <section className="mx-auto max-w-5xl px-6 py-16">
         <div className="rounded-[32px] border border-[#E6EDF5] bg-white p-8">
           <p className="text-[11px] font-black uppercase tracking-[0.28em] text-[#F15A24]">
@@ -33,5 +36,6 @@ export default async function EnglishEinAccountPage({
         </div>
       </section>
     </main>
+    </>
   );
 }

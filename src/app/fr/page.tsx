@@ -1,3 +1,4 @@
+import VemoPublicHeader from "@/components/site/VemoPublicHeader";
 import Link from "next/link";
 
 const services = [
@@ -15,7 +16,7 @@ const services = [
   },
   {
     icon: "M4 10h16M6 10V8l6-4 6 4v2M7 10v8M12 10v8M17 10v8M5 18h14",
-    title: "Banking guidance",
+    title: "US LLC for non-residents",
     text: "Assistance Stripe, Mercury, Wise, Payoneer, PayPal et Shopify.",
     href: "/fr/banking-guidance",
   },
@@ -23,7 +24,7 @@ const services = [
     icon: "M5 5h14v10H5V5Zm3 14h8M9 9h6M9 12h4",
     title: "Espace client",
     text: "Documents, messages, statuts et suivi dossier centralisés.",
-    href: "/fr/connexion",
+    href: "/fr/commencer",
   },
 ];
 
@@ -138,47 +139,10 @@ function WhatsAppButton() {
 
 export default function FrenchHomePage() {
   return (
-    <main className="min-h-screen bg-white text-[#111827]">
-      <header className="sticky top-0 z-40 border-b border-[#E6EDF5] bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
-          <Link href="/fr" className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#F15A24] text-sm font-black text-white">
-              V
-            </span>
-            <span>
-              <span className="block text-lg font-black tracking-[-0.04em] text-[#123A63]">
-                VEMO <span className="text-[#F15A24]">TECH</span>
-              </span>
-              <span className="block text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
-                US LLC pour non-résidents
-              </span>
-            </span>
-          </Link>
-
-          <nav className="hidden items-center gap-7 text-sm font-black text-[#123A63] lg:flex">
-            <Link href="/fr" className="hover:text-[#F15A24]">Accueil</Link>
-            <Link href="/fr/commencer" className="hover:text-[#F15A24]">Business Setup</Link>
-            <Link href="/fr/tarifs" className="hover:text-[#F15A24]">Tarifs</Link>
-            <Link href="/fr/ein" className="hover:text-[#F15A24]">EIN</Link>
-            <Link href="/fr/banking-guidance" className="hover:text-[#F15A24]">Banking</Link>
-            <Link href="/fr/contact" className="hover:text-[#F15A24]">Contact</Link>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link href="/en" className="hidden border-l border-[#E6EDF5] pl-5 text-sm font-black text-[#123A63] hover:text-[#F15A24] sm:inline-flex">
-              EN
-            </Link>
-            <Link href="/fr/connexion" className="hidden rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24] sm:inline-flex">
-              Connexion
-            </Link>
-            <Link href="/fr/commencer" className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white hover:bg-[#DB4F1C]">
-              Créer ma LLC
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+    <>
+      <VemoPublicHeader locale="fr" />
+      <main className="min-h-screen bg-white text-[#111827]">
+<section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div>
           <div className="inline-flex items-center gap-2 rounded-[12px] border border-[#E6EDF5] bg-white px-4 py-2 text-sm font-black text-[#123A63]">
             <span className="text-[#F15A24]">15k+</span>
@@ -519,5 +483,6 @@ export default function FrenchHomePage() {
         </div>
       </footer>
     </main>
+    </>
   );
 }

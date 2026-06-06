@@ -1,3 +1,4 @@
+import VemoPublicHeader from "@/components/site/VemoPublicHeader";
 import { LegalPageShell } from "@/components/LegalPageShell";
 
 export default function EnglishFAQPage() {

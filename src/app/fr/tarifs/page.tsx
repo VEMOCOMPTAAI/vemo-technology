@@ -1,5 +1,7 @@
 "use client";
 
+import VemoPublicHeader from "@/components/site/VemoPublicHeader";
+
 import { useEffect, useMemo, useState } from "react";
 
 export const dynamic = "force-dynamic";
@@ -100,44 +102,10 @@ export default function TarifsPage() {
   }, [packs]);
 
   return (
-    <main className="min-h-screen bg-white text-[#111827]">
-      <header className="border-b border-[#E8EEF6] bg-white">
-        <div className="mx-auto flex max-w-[1060px] items-center justify-between px-6 py-4">
-          <a href="/fr" className="shrink-0">
-            <div className="text-[24px] font-black uppercase leading-none tracking-[-0.06em]">
-              <span className="text-[#123A63]">VEMO</span>
-              <span className="text-[#F15A24]">TECH</span>
-            </div>
-            <div className="mt-1 text-[8.5px] font-black uppercase tracking-[0.28em] text-slate-500">
-              US LLC POUR NON-RÉSIDENTS
-            </div>
-          </a>
-
-          <nav className="hidden items-center gap-7 lg:flex">
-            <a href="/fr" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">
-              Accueil
-            </a>
-            <a href="/fr/tarifs" className="text-sm font-bold text-[#F15A24]">
-              Tarifs
-            </a>
-            <a href="/fr/faq" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">
-              FAQ
-            </a>
-            <a href="/fr/contact" className="text-sm font-bold text-[#123A63] hover:text-[#F15A24]">
-              Contact
-            </a>
-          </nav>
-
-          <a
-            href="/fr/commencer"
-            className="inline-flex h-[42px] items-center justify-center rounded-[13px] bg-[#F15A24] px-5 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
-          >
-            Démarrer →
-          </a>
-        </div>
-      </header>
-
-      <section className="mx-auto max-w-[980px] px-6 py-7">
+    <>
+      <VemoPublicHeader locale="fr" />
+      <main className="min-h-screen bg-white text-[#111827]">
+<section className="mx-auto max-w-[980px] px-6 py-7">
         <div className="text-center">
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#F15A24]">
             Tarifs
@@ -251,5 +219,6 @@ export default function TarifsPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }
