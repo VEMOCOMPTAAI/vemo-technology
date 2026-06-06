@@ -95,7 +95,7 @@ export default function AdminConnexionPage() {
   return (
     <main className="min-h-screen bg-[#F7FAFC] px-6 py-12">
       <div className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-xl items-center justify-center">
-        <section className="w-full rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_28px_80px_rgba(18,58,99,0.10)] md:p-10">
+        <section className="w-full rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 md:p-10">
           <AdminLogo />
 
           <div className="mt-10">
@@ -123,7 +123,7 @@ export default function AdminConnexionPage() {
                 onChange={(event) => setEmail(event.target.value)}
                 required
                 autoComplete="email"
-                className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold text-[#111827] outline-none transition placeholder:text-slate-400 focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold text-[#111827] outline-none transition placeholder:text-slate-400 focus:border-[#F15A24]/10"
               />
             </label>
 
@@ -138,7 +138,7 @@ export default function AdminConnexionPage() {
                 required
                 autoComplete="current-password"
                 placeholder="Mot de passe admin"
-                className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold text-[#111827] outline-none transition placeholder:text-slate-400 focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold text-[#111827] outline-none transition placeholder:text-slate-400 focus:border-[#F15A24]/10"
               />
             </label>
 
@@ -151,7 +151,7 @@ export default function AdminConnexionPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#D94A1B] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Connexion..." : "Se connecter →"}
             </button>

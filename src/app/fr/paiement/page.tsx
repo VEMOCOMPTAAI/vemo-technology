@@ -23,7 +23,7 @@ export default function PaymentChoicePage() {
               <li>✓ Confirmation immédiate</li>
               <li>✓ Redirection vers vérification compte</li>
             </ul>
-            <Link href="/fr/stripe" className="mt-8 inline-flex rounded-[12px] bg-[#F15A24] px-7 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)]">
+            <Link href="/fr/stripe" className="mt-8 inline-flex rounded-[12px] bg-[#F15A24] px-7 py-4 text-sm font-black text-white">
               Continuer avec Stripe →
             </Link>
           </VemoCard>

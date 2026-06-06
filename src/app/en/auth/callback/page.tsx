@@ -50,7 +50,7 @@ function CallbackContent() {
   return (
     <section className="py-16">
       <div className="mx-auto max-w-3xl px-6">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-xl shadow-slate-200/70">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-8 text-center">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-[#F15A24]">
             Email confirmation
           </p>

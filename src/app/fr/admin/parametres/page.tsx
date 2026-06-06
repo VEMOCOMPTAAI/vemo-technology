@@ -124,7 +124,7 @@ export default function AdminPacksSettingsPage() {
   return (
     <main className="min-h-screen bg-[#F5F8FB] px-6 py-8 text-[#111827]">
       <section className="mx-auto max-w-7xl">
-        <header className="rounded-[2rem] border border-[#E6EDF5] bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.05)]">
+        <header className="rounded-[2rem] border border-[#E6EDF5] bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <a href="/fr" className="inline-flex flex-col">
@@ -181,7 +181,7 @@ export default function AdminPacksSettingsPage() {
         </header>
 
         <section className="mt-7 grid gap-6 md:grid-cols-2">
-          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-6 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
+          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-6">
             <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
               Registered Agent
             </p>
@@ -233,7 +233,7 @@ export default function AdminPacksSettingsPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-6 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
+          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-6">
             <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
               Source centrale
             </p>
@@ -257,7 +257,7 @@ export default function AdminPacksSettingsPage() {
             payload.packs.map((pack, index) => (
               <article
                 key={pack.id}
-                className={`rounded-[2rem] border bg-white p-6 shadow-[0_22px_60px_rgba(15,23,42,0.06)] ${
+                className={`rounded-[2rem] border bg-white p-6 ${
                   pack.recommended ? "border-[#F15A24]" : "border-[#E6EDF5]"
                 }`}
               >
@@ -364,7 +364,7 @@ export default function AdminPacksSettingsPage() {
             type="button"
             onClick={save}
             disabled={saving}
-            className="h-[56px] rounded-[18px] bg-[#F15A24] px-8 text-sm font-black text-white shadow-[0_18px_40px_rgba(241,90,36,0.22)] transition hover:bg-[#DB4F1C] disabled:opacity-60"
+            className="h-[56px] rounded-[18px] bg-[#F15A24] px-8 text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:opacity-60"
           >
             {saving ? "Sauvegarde..." : "Sauvegarder les paramètres"}
           </button>

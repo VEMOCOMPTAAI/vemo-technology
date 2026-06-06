@@ -131,7 +131,7 @@ export default function ClientLoginPage() {
     <main className="min-h-screen bg-[#F5F8FB] px-6 py-10 text-[#111827]">
       <section className="mx-auto flex min-h-[calc(100vh-80px)] max-w-6xl items-center">
         <div className="grid w-full gap-8 lg:grid-cols-[1fr_0.85fr]">
-          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
+          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
             <a href="/fr" className="inline-flex flex-col">
               <div className="text-[30px] font-black uppercase leading-none tracking-[-0.06em]">
                 <span className="text-[#123A63]">VEMO</span>
@@ -163,7 +163,7 @@ export default function ClientLoginPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
+          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
             <h2 className="text-[32px] font-black tracking-[-0.06em] text-[#111827]">
               Se connecter
             </h2>

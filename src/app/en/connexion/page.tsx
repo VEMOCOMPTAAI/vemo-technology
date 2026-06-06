@@ -76,7 +76,7 @@ export default function EnglishLoginPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <div className="flex rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
+            <div className="flex rounded-2xl border border-slate-200 bg-white p-1">
               <a href="/fr/connexion" className="rounded-xl px-3 py-2 text-xs font-black text-slate-700">
                 FR
               </a>
@@ -87,7 +87,7 @@ export default function EnglishLoginPage() {
 
             <a
               href="/en/commencer"
-              className="rounded-2xl bg-[#F15A24] px-6 py-3 text-sm font-black text-white shadow-lg shadow-orange-900/10"
+              className="rounded-2xl bg-[#F15A24] px-6 py-3 text-sm font-black text-white"
             >
               Start →
             </a>
@@ -96,7 +96,7 @@ export default function EnglishLoginPage() {
       </header>
 
       <section className="mx-auto flex min-h-[calc(100vh-76px)] max-w-xl items-center px-6 py-16">
-        <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70">
+        <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-8">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-[#F15A24]">
             Client sign in
           </p>
@@ -116,7 +116,7 @@ export default function EnglishLoginPage() {
               </span>
               <input
                 type="email"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]/10"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="email@domain.com"
@@ -129,7 +129,7 @@ export default function EnglishLoginPage() {
               </span>
               <input
                 type="password"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-bold outline-none focus:border-[#F15A24]/10"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 onKeyDown={(event) => {
@@ -143,7 +143,7 @@ export default function EnglishLoginPage() {
               type="button"
               onClick={login}
               disabled={loading}
-              className="rounded-2xl bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-lg shadow-orange-900/20 disabled:bg-slate-300"
+              className="rounded-2xl bg-[#F15A24] px-6 py-4 text-sm font-black text-white disabled:bg-slate-300"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>

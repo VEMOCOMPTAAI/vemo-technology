@@ -49,7 +49,7 @@ export default function TestSupabasePage() {
 
   return (
     <main className="min-h-screen bg-slate-50 p-10 text-[#111a33]">
-      <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 shadow-xl">
+      <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8">
         <h1 className="text-3xl font-black">Test Supabase</h1>
 
         <p className="mt-4 text-slate-600">

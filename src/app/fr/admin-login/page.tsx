@@ -74,7 +74,7 @@ export default function AdminLoginPage() {
   return (
     <main className="min-h-screen bg-[#f7f9fb] text-slate-950">
       <section className="mx-auto flex min-h-screen max-w-md items-center px-6">
-        <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70">
+        <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-8">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F15A24] text-lg font-black text-white">
               V
@@ -109,7 +109,7 @@ export default function AdminLoginPage() {
               }
             }}
             placeholder="Mot de passe admin"
-            className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+            className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold outline-none focus:border-[#F15A24]/10"
           />
 
           <button

@@ -57,7 +57,7 @@ function AccountCreationContent() {
                 </p>
               </div>
             ) : (
-              <div className="mx-auto mt-6 max-w-2xl rounded-[1.5rem] border border-[#E8E2DC] bg-white p-5 text-left shadow-[0_16px_40px_rgba(18,58,99,0.06)]">
+              <div className="mx-auto mt-6 max-w-2xl rounded-[1.5rem] border border-[#E8E2DC] bg-white p-5 text-left">
                 <p className="text-sm font-black uppercase tracking-[0.16em] text-[#F15A24]">
                   Paiement par carte confirmé
                 </p>
@@ -86,7 +86,7 @@ function AccountCreationContent() {
           <form
             method="post"
             action="/api/client-portal/verify-account"
-            className="mx-auto mt-10 max-w-2xl rounded-[2rem] border border-[#E8E2DC] bg-white p-7 shadow-[0_22px_60px_rgba(18,58,99,0.08)]"
+            className="mx-auto mt-10 max-w-2xl rounded-[2rem] border border-[#E8E2DC] bg-white p-7"
           >
             <input type="hidden" name="payment" value={payment} />
             <input type="hidden" name="status" value={isBankPending ? "pending_verification" : "paid"} />
@@ -103,7 +103,7 @@ function AccountCreationContent() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="email@domain.com"
-                  className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold outline-none transition focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                  className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold outline-none transition focus:border-[#F15A24]/10"
                 />
               </label>
 
@@ -117,7 +117,7 @@ function AccountCreationContent() {
                   required
                   minLength={8}
                   placeholder="Au moins 8 caractères"
-                  className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold outline-none transition focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                  className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold outline-none transition focus:border-[#F15A24]/10"
                 />
               </label>
 
@@ -131,14 +131,14 @@ function AccountCreationContent() {
                   required
                   minLength={8}
                   placeholder="Confirmer le mot de passe"
-                  className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold outline-none transition focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
+                  className="w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold outline-none transition focus:border-[#F15A24]/10"
                 />
               </label>
             </div>
 
             <button
               type="submit"
-              className="mt-6 w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
+              className="mt-6 w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#D94A1B]"
             >
               Créer mon compte et accéder à l’espace client →
             </button>

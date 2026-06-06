@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export default function PaymentSuccessPage() {
   return (
     <main className="vemo-white-page min-h-screen bg-white px-6 py-20 text-[#202838]">
-      <section className="mx-auto max-w-3xl rounded-[18px] border border-[#E8E2DC] bg-white p-10 text-center shadow-[0_18px_50px_rgba(18,58,99,.08)]">
+      <section className="mx-auto max-w-3xl rounded-[18px] border border-[#E8E2DC] bg-white p-10 text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#ECFDF3] text-3xl">✓</div>
         <h1 className="mt-6 text-4xl font-black tracking-[-0.04em]">Paiement confirmé</h1>
         <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-slate-600">

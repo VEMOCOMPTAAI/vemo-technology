@@ -76,7 +76,7 @@ export default function VemoCountryPhoneField({ locale }: { locale: Locale }) {
   const valid = phone.length === 0 || (phone.length >= country.min && phone.length <= country.max);
 
   return (
-    <div className="grid gap-3 md:grid-cols-[150px_1fr]">
+    <div className="grid gap-3 md:grid-cols-[145px_1fr]">
       <div className="relative">
         <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
           {isFr ? "Indicatif" : "Code"}
@@ -85,23 +85,22 @@ export default function VemoCountryPhoneField({ locale }: { locale: Locale }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex h-12 w-full items-center justify-between rounded-[14px] border border-[#DDE7F2] bg-white px-3 text-sm font-black text-[#111827] outline-none hover:border-[#F15A24]"
+          className="flex h-12 w-full items-center justify-center rounded-[14px] border border-[#DDE7F2] bg-white px-2 text-sm font-black text-[#111827] outline-none hover:border-[#F15A24]"
         >
           <span className="flex items-center gap-2">
             <span>{country.flag}</span>
             <span>{country.dial}</span>
           </span>
-          <span className="text-slate-400">▾</span>
         </button>
 
         {open && (
-          <div className="absolute z-50 mt-2 w-[280px] overflow-hidden rounded-[18px] border border-[#DDE7F2] bg-white">
+          <div className="absolute z-50 mt-2 w-[270px] overflow-hidden rounded-[18px] border border-[#DDE7F2] bg-white">
             <div className="border-b border-[#E6EDF5] p-3">
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={isFr ? "Rechercher..." : "Search..."}
-                className="h-10 w-full rounded-[12px] border border-[#DDE7F2] px-3 text-sm font-bold outline-none focus:border-[#F15A24]"
+                className="h-10 w-full rounded-[12px] border border-[#DDE7F2] px-2 text-sm font-bold outline-none focus:border-[#F15A24]"
               />
             </div>
 

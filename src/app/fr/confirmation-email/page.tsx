@@ -55,7 +55,7 @@ function ConfirmationEmailContent() {
       <SiteHeader lang="fr" />
 
       <section className="px-6 py-20">
-        <div className="mx-auto max-w-2xl rounded-[2rem] border border-[#E8E2DC] bg-white p-8 text-center shadow-[0_22px_60px_rgba(18,58,99,0.08)]">
+        <div className="mx-auto max-w-2xl rounded-[2rem] border border-[#E8E2DC] bg-white p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#FFF7F2] text-2xl">
             ✉️
           </div>
@@ -99,7 +99,7 @@ function ConfirmationEmailContent() {
             type="button"
             onClick={resendEmail}
             disabled={!email || resendStatus === "loading"}
-            className="mt-7 inline-flex rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-7 inline-flex rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#D94A1B] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {resendStatus === "loading" ? "Envoi en cours..." : "Renvoyer l’email de confirmation"}
           </button>

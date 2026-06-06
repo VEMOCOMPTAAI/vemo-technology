@@ -50,7 +50,7 @@ export default function BankTransferPage() {
               <a
                 href="https://wa.me/212708069471"
                 target="_blank"
-                className="mt-5 inline-flex rounded-[14px] bg-[#25D366] px-5 py-4 text-sm font-black text-white shadow-[0_14px_28px_rgba(37,211,102,.18)]"
+                className="mt-5 inline-flex rounded-[14px] bg-[#25D366] px-5 py-4 text-sm font-black text-white"
               >
                 Contacter via WhatsApp →
               </a>
@@ -90,7 +90,7 @@ export default function BankTransferPage() {
 
               <input type="hidden" name="lang" value="fr" />
 
-              <button className="md:col-span-2 min-h-[54px] rounded-[14px] bg-[#F15A24] text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)]">
+              <button className="md:col-span-2 min-h-[54px] rounded-[14px] bg-[#F15A24] text-sm font-black text-white">
                 Envoyer le justificatif et continuer →
               </button>
             </div>

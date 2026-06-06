@@ -18,7 +18,7 @@ export default function PaymentSuccessPage() {
 
   return (
     <main className="min-h-screen bg-white px-6 py-20">
-      <div className="mx-auto max-w-xl rounded-[2rem] border border-[#E8E2DC] bg-white p-8 text-center shadow-[0_22px_60px_rgba(18,58,99,0.08)]">
+      <div className="mx-auto max-w-xl rounded-[2rem] border border-[#E8E2DC] bg-white p-8 text-center">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F15A24]">
           Paiement confirmé
         </p>

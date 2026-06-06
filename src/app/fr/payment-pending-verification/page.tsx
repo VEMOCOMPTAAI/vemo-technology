@@ -87,7 +87,7 @@ export default function PaymentPendingVerificationPage() {
         </a>
 
         <div className="mt-10 grid gap-7 lg:grid-cols-[1fr_0.85fr]">
-          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
+          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-[#F15A24]/20 bg-[#FFF7F2] text-2xl">
               ⏳
             </div>
@@ -150,7 +150,7 @@ export default function PaymentPendingVerificationPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8 shadow-[0_22px_60px_rgba(15,23,42,0.06)]">
+          <div className="rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
             <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
               Espace client
             </p>
