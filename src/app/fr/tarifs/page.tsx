@@ -105,7 +105,7 @@ export default function TarifsPage() {
   return (
     <>
       <VemoPublicHeader locale="fr" />
-      <main className="min-h-screen bg-white text-[#111827]">
+      <main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
 <section className="mx-auto max-w-[980px] px-6 py-7">
         <div className="text-center">
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#F15A24]">

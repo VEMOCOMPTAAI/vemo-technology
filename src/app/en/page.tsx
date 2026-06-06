@@ -141,7 +141,7 @@ export default function EnglishHomePage() {
   return (
     <>
       <VemoPublicHeader locale="en" />
-      <main className="min-h-screen bg-white text-[#111827]">
+      <main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
 <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div>
           <div className="inline-flex items-center gap-2 rounded-[12px] border border-[#E6EDF5] bg-white px-4 py-2 text-sm font-black text-[#123A63]">

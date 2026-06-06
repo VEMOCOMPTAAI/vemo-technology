@@ -117,7 +117,7 @@ export default function PricingPage() {
     <>
       <VemoPublicHeader locale="en" />
 
-      <main className="min-h-screen bg-white text-[#111827]">
+      <main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
         <section className="mx-auto max-w-[980px] px-6 py-7">
           <div className="text-center">
             <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#F15A24]">
