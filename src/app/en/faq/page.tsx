@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import VemoPublicHeader from "@/components/site/VemoPublicHeader";
 import VemoPublicFooter from "@/components/site/VemoPublicFooter";
@@ -30,12 +33,14 @@ const faqs = [
 ];
 
 export default function FaqEnPage() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
   return (
     <>
       <VemoPublicHeader locale="en" />
 
       <main className="min-h-screen bg-white text-[#111827]">
-        <section className="mx-auto max-w-6xl px-6 py-16">
+        <section className="mx-auto max-w-5xl px-6 py-16">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#F15A24]">
               FAQ
@@ -50,27 +55,45 @@ export default function FaqEnPage() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-5 md:grid-cols-2">
-            {faqs.map((item, index) => (
-              <article
-                key={item.q}
-                className="rounded-[28px] border border-[#DDE7F2] bg-white p-7 shadow-sm"
-              >
-                <div className="flex items-start gap-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[#F15A24] text-xs font-black text-white">
-                    {index + 1}
-                  </span>
-                  <div>
-                    <h2 className="text-xl font-black tracking-[-0.03em] text-[#111827]">
+          <div className="mt-12 space-y-4">
+            {faqs.map((item, index) => {
+              const isOpen = openIndex === index;
+
+              return (
+                <article
+                  key={item.q}
+                  className="overflow-hidden rounded-[26px] border border-[#DDE7F2] bg-white shadow-sm"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    className="flex w-full items-center justify-between gap-5 px-7 py-6 text-left"
+                  >
+                    <span className="text-xl font-black tracking-[-0.03em] text-[#111827]">
                       {item.q}
-                    </h2>
-                    <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
-                      {item.a}
-                    </p>
-                  </div>
-                </div>
-              </article>
-            ))}
+                    </span>
+
+                    <span
+                      className={
+                        isOpen
+                          ? "flex h-10 w-10 shrink-0 rotate-45 items-center justify-center rounded-full bg-[#F15A24] text-2xl font-black text-white transition"
+                          : "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#DDE7F2] bg-white text-2xl font-black text-[#F15A24] transition"
+                      }
+                    >
+                      +
+                    </span>
+                  </button>
+
+                  {isOpen && (
+                    <div className="border-t border-[#E6EDF5] bg-[#F8FAFC] px-7 py-6">
+                      <p className="text-base font-bold leading-8 text-slate-600">
+                        {item.a}
+                      </p>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
           </div>
 
           <div className="mt-12 rounded-[32px] border border-[#DDE7F2] bg-[#F8FAFC] p-8 text-center">
@@ -80,13 +103,21 @@ export default function FaqEnPage() {
             <p className="mx-auto mt-4 max-w-2xl text-sm font-bold leading-7 text-slate-600">
               Contact VEMO before starting your order to choose the right package.
             </p>
-            <div className="mt-6 flex justify-center">
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link
                 href="/en/contact"
                 className="rounded-[14px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
               >
                 Contact VEMO →
               </Link>
+              <a
+                href="https://wa.me/212708069471"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-[14px] border border-[#DDE7F2] bg-white px-6 py-4 text-sm font-black text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
+              >
+                WhatsApp
+              </a>
             </div>
           </div>
         </section>

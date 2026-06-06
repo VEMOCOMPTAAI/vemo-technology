@@ -74,16 +74,6 @@ export default function VemoPublicFooter({ locale }: { locale: Locale }) {
       <div className="border-t border-white/10 px-6 py-5 text-center text-xs font-bold text-white/55">
         © 2026 Vemo Technology. All rights reserved.
       </div>
-
-      <a
-        href="https://wa.me/"
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#F15A24] text-xl font-black text-white shadow-xl transition hover:bg-[#DB4F1C]"
-        aria-label="WhatsApp"
-      >
-        ☎
-      </a>
     </footer>
   );
 }
