@@ -1,4 +1,6 @@
+import Link from "next/link";
 import VemoPublicHeader from "@/components/site/VemoPublicHeader";
+import VemoPublicFooter from "@/components/site/VemoPublicFooter";
 
 const faqs = [
   {
@@ -15,11 +17,15 @@ const faqs = [
   },
   {
     q: "Les frais de dépôt de l’État sont-ils inclus ?",
-    a: "Oui, les frais de dépôt de l’État sont inclus dans les packs affichés.",
+    a: "Oui. Les frais de dépôt de l’État sont inclus dans les packs affichés.",
   },
   {
     q: "Est-ce que le Registered Agent est inclus ?",
-    a: "Oui, le Registered Agent est inclus la première année. Le renouvellement dépend de l’État choisi.",
+    a: "Oui. Le Registered Agent est inclus la première année. Le renouvellement dépend de l’État choisi.",
+  },
+  {
+    q: "Puis-je ouvrir Stripe, Mercury, Wise ou Payoneer après la création ?",
+    a: "VEMO prépare et organise votre dossier pour faciliter les démarches, mais l’acceptation finale dépend de chaque plateforme.",
   },
 ];
 
@@ -29,37 +35,63 @@ export default function FaqFrPage() {
       <VemoPublicHeader locale="fr" />
 
       <main className="min-h-screen bg-white text-[#111827]">
-        <section className="mx-auto max-w-5xl px-6 py-16">
-          <div className="text-center">
+        <section className="mx-auto max-w-6xl px-6 py-16">
+          <div className="mx-auto max-w-4xl text-center">
             <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#F15A24]">
               FAQ
             </p>
 
-            <h1 className="mt-3 text-[44px] font-black tracking-[-0.05em] text-[#111827] md:text-[56px]">
+            <h1 className="mt-4 text-[44px] font-black tracking-[-0.06em] text-[#111827] md:text-[64px]">
               Questions fréquentes
             </h1>
 
-            <p className="mx-auto mt-5 max-w-3xl text-lg font-bold leading-8 text-slate-600">
+            <p className="mx-auto mt-6 max-w-3xl text-lg font-bold leading-8 text-slate-600">
               Les réponses essentielles avant de créer votre LLC américaine avec Vemo Technology.
             </p>
           </div>
 
-          <div className="mt-12 space-y-5">
-            {faqs.map((item) => (
-              <div
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            {faqs.map((item, index) => (
+              <article
                 key={item.q}
-                className="rounded-[26px] border border-[#DDE7F2] bg-white p-8 shadow-sm"
+                className="rounded-[28px] border border-[#DDE7F2] bg-white p-7 shadow-sm"
               >
-                <h2 className="text-2xl font-black tracking-[-0.03em] text-[#111827]">
-                  {item.q}
-                </h2>
-                <p className="mt-5 text-base font-bold leading-8 text-slate-600">
-                  {item.a}
-                </p>
-              </div>
+                <div className="flex items-start gap-4">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[#F15A24] text-xs font-black text-white">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <h2 className="text-xl font-black tracking-[-0.03em] text-[#111827]">
+                      {item.q}
+                    </h2>
+                    <p className="mt-4 text-sm font-bold leading-7 text-slate-600">
+                      {item.a}
+                    </p>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
+
+          <div className="mt-12 rounded-[32px] border border-[#DDE7F2] bg-[#F8FAFC] p-8 text-center">
+            <h2 className="text-3xl font-black tracking-[-0.04em] text-[#111827]">
+              Vous avez une autre question ?
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-sm font-bold leading-7 text-slate-600">
+              Contactez VEMO avant de démarrer votre dossier pour choisir la bonne formule.
+            </p>
+            <div className="mt-6 flex justify-center">
+              <Link
+                href="/fr/contact"
+                className="rounded-[14px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
+              >
+                Contacter VEMO →
+              </Link>
+            </div>
+          </div>
         </section>
+
+        <VemoPublicFooter locale="fr" />
       </main>
     </>
   );

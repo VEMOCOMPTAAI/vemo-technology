@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import VemoPublicHeader from "@/components/site/VemoPublicHeader";
+import VemoPublicFooter from "@/components/site/VemoPublicFooter";
 
 type StateKey = "new-mexico" | "wyoming";
 
@@ -215,6 +216,8 @@ export default function PricingPage() {
             ))}
           </div>
         </section>
+      
+        <VemoPublicFooter locale="en" />
       </main>
     </>
   );

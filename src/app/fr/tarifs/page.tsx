@@ -1,6 +1,7 @@
 "use client";
 
 import VemoPublicHeader from "@/components/site/VemoPublicHeader";
+import VemoPublicFooter from "@/components/site/VemoPublicFooter";
 
 import { useEffect, useMemo, useState } from "react";
 
@@ -218,7 +219,9 @@ export default function TarifsPage() {
           })}
         </div>
       </section>
-    </main>
+    
+        <VemoPublicFooter locale="fr" />
+      </main>
     </>
   );
 }
