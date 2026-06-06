@@ -1,9 +1,63 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type Locale = "fr" | "en";
 
+const alternatePaths: Record<string, string> = {
+  "/fr": "/en",
+  "/en": "/fr",
+
+  "/fr/tarifs": "/en/pricing",
+  "/en/pricing": "/fr/tarifs",
+
+  "/fr/faq": "/en/faq",
+  "/en/faq": "/fr/faq",
+
+  "/fr/contact": "/en/contact",
+  "/en/contact": "/fr/contact",
+
+  "/fr/commencer": "/en/start",
+  "/en/start": "/fr/commencer",
+
+  "/fr/banking-guidance": "/en/banking-guidance",
+  "/en/banking-guidance": "/fr/banking-guidance",
+
+  "/fr/ein": "/en/ein",
+  "/en/ein": "/fr/ein",
+
+  "/fr/order-ein": "/en/order-ein",
+  "/en/order-ein": "/fr/order-ein",
+
+  "/fr/ein-payment": "/en/ein-payment",
+  "/en/ein-payment": "/fr/ein-payment",
+
+  "/fr/ein-account": "/en/ein-account",
+  "/en/ein-account": "/fr/ein-account",
+
+  "/fr/ein-verify": "/en/ein-verify",
+  "/en/ein-verify": "/fr/ein-verify",
+};
+
+function getAlternatePath(pathname: string, locale: Locale) {
+  const cleanPath = pathname.split("?")[0].replace(/\/$/, "") || pathname;
+
+  if (alternatePaths[cleanPath]) {
+    return alternatePaths[cleanPath];
+  }
+
+  if (locale === "fr") {
+    return cleanPath.replace(/^\/fr/, "/en");
+  }
+
+  return cleanPath.replace(/^\/en/, "/fr");
+}
+
 export default function VemoPublicHeader({ locale }: { locale: Locale }) {
+  const pathname = usePathname();
   const isFr = locale === "fr";
+  const languageHref = getAlternatePath(pathname || (isFr ? "/fr" : "/en"), locale);
 
   const nav = isFr
     ? [
@@ -51,7 +105,7 @@ export default function VemoPublicHeader({ locale }: { locale: Locale }) {
 
         <div className="flex items-center gap-3">
           <Link
-            href={isFr ? "/en" : "/fr"}
+            href={languageHref}
             className="hidden rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24] sm:inline-flex"
           >
             {isFr ? "EN" : "FR"}
