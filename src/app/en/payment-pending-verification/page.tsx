@@ -1,11 +1,22 @@
-import Link from "next/link";
+"use client";
 
-export default function EnPaymentPendingVerificationPage({
-  searchParams,
-}: {
-  searchParams?: { email?: string };
-}) {
-  const email = searchParams?.email || "";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+
+export default function EnPaymentPendingVerificationPage() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") || "";
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  async function createAccount() {
+    await fetch("/api/client-portal/create-account", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, confirmPassword }),
+    });
+  }
 
   return (
     <main className="min-h-screen bg-[#F6F9FC] px-6 py-12 text-[#111827]">
@@ -19,7 +30,7 @@ export default function EnPaymentPendingVerificationPage({
             Bank transfer payment
           </p>
 
-          <h1 className="max-w-xl text-4xl font-black tracking-[-0.04em] text-[#111827]">
+          <h1 className="max-w-xl text-4xl font-black tracking-[-0.04em]">
             Payment pending verification
           </h1>
 
@@ -44,17 +55,11 @@ export default function EnPaymentPendingVerificationPage({
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/en/contact"
-              className="rounded-[14px] border border-[#DDE7F2] bg-white px-6 py-4 text-sm font-black text-[#111827]"
-            >
+            <Link href="/en/contact" className="rounded-[14px] border border-[#DDE7F2] bg-white px-6 py-4 text-sm font-black">
               Contact
             </Link>
 
-            <Link
-              href="/en"
-              className="rounded-[14px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white"
-            >
+            <Link href="/en" className="rounded-[14px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white">
               Back home
             </Link>
           </div>
@@ -65,7 +70,7 @@ export default function EnPaymentPendingVerificationPage({
             Client space
           </p>
 
-          <h2 className="text-3xl font-black tracking-[-0.04em] text-[#111827]">
+          <h2 className="text-3xl font-black tracking-[-0.04em]">
             Create your client access
           </h2>
 
@@ -74,14 +79,14 @@ export default function EnPaymentPendingVerificationPage({
             receive your documents.
           </p>
 
-          <form className="mt-8 grid gap-5">
+          <div className="mt-8 grid gap-5">
             <label className="grid gap-2">
               <span className="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">
                 Email
               </span>
               <input
-                name="email"
-                defaultValue={email}
+                value={email}
+                readOnly
                 className="h-14 rounded-[16px] border border-[#DDE7F2] bg-white px-4 text-sm font-black text-[#123A63] outline-none"
               />
             </label>
@@ -91,8 +96,9 @@ export default function EnPaymentPendingVerificationPage({
                 Password
               </span>
               <input
-                name="password"
                 type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
                 className="h-14 rounded-[16px] border border-[#DDE7F2] bg-white px-4 text-sm font-black text-[#123A63] outline-none"
               />
             </label>
@@ -102,30 +108,28 @@ export default function EnPaymentPendingVerificationPage({
                 Confirm password
               </span>
               <input
-                name="confirmPassword"
                 type="password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
                 className="h-14 rounded-[16px] border border-[#DDE7F2] bg-white px-4 text-sm font-black text-[#123A63] outline-none"
               />
             </label>
 
-            <div className="rounded-[16px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-black text-emerald-700">
-              Confirmation email sent.
-            </div>
-
             <button
               type="button"
+              onClick={createAccount}
               className="h-14 rounded-[16px] bg-[#F15A24] text-sm font-black text-white"
             >
               Create my client space →
             </button>
 
             <Link
-              href="/en/login"
-              className="flex h-14 items-center justify-center rounded-[16px] border border-[#DDE7F2] bg-white text-sm font-black text-[#111827]"
+              href={`/en/login?email=${encodeURIComponent(email)}`}
+              className="flex h-14 items-center justify-center rounded-[16px] border border-[#DDE7F2] bg-white text-sm font-black"
             >
               Sign in
             </Link>
-          </form>
+          </div>
         </div>
       </section>
     </main>
