@@ -8,26 +8,37 @@ import { VEMO_LLC_PACKS, getVemoLlcPackFeatures, getVemoLlcPackPrice } from "@/l
 
 
 function translateEnServiceLabel(value: string) {
-  return String(value)
-    .replaceAll("LLC formation documents", "LLC formation documents")
-    .replaceAll("LLC formation documents", "LLC formation documents")
-    .replaceAll("EIN application", "EIN application")
-    .replaceAll("US phone number included for 3 months", "US phone number included for 3 months")
-    .replaceAll("US phone number included for 3 months", "US phone number included for 3 months")
-    .replaceAll("Shopify included for 3 months + 1-year domain name", "Shopify included for 3 months + 1-year domain name")
-    .replaceAll("Shopify included for 3 months + 1-year domain name", "Shopify included for 3 months + 1-year domain name")
-    .replaceAll("Shopify included for 3 months + 1-year domain name", "Shopify included for 3 months + 1-year domain name")
-    .replaceAll("Shopify included for 3 months + 1-year domain name", "Shopify included for 3 months + 1-year domain name")
-    .replaceAll("Stripe / PayPal assistance", "Stripe / PayPal assistance")
-    .replaceAll("Wise / Mercury / Payoneer assistance", "Wise / Mercury / Payoneer assistance");
+  const label = String(value || "");
+
+  const dictionary: Record<string, string> = {
+    "LLC formation documents": "LLC formation documents",
+    "LLC formation documents": "LLC formation documents",
+    "EIN application": "EIN application",
+    "US phone number included for 3 months": "US phone number included for 3 months",
+    "US phone number included for 3 months": "US phone number included for 3 months",
+    "Shopify included for 3 months + 1-year domain name": "Shopify included for 3 months + 1-year domain name",
+    "Shopify included for 3 months + 1-year domain name": "Shopify included for 3 months + 1-year domain name",
+    "Shopify included for 3 months + 1-year domain name": "Shopify included for 3 months + 1-year domain name",
+    "Shopify included for 3 months + 1-year domain name": "Shopify included for 3 months + 1-year domain name",
+    "Stripe / PayPal assistance": "Stripe / PayPal assistance",
+    "Wise / Mercury / Payoneer assistance": "Wise / Mercury / Payoneer assistance",
+  };
+
+  return dictionary[label] || label;
 }
 
 function translateEnServiceList(value: unknown) {
   if (Array.isArray(value)) {
     return value.map((item) => translateEnServiceLabel(String(item))).join(", ");
   }
+
   return translateEnServiceLabel(String(value || "—"));
 }
+
+
+
+
+
 
 
 
