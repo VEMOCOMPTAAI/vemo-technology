@@ -12,6 +12,7 @@ function LoadingClientPortal() {
       <ClientPortalTopMenu lang="fr" />
 
 
+
       <ClientPortalMenu lang="fr" />
 
       <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#E6EDF5] bg-white p-8">

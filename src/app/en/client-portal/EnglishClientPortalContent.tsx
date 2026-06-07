@@ -205,6 +205,7 @@ export default function EnglishClientPortalContent() {
       <ClientPortalTopMenu lang="en" />
 
 
+
       <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="rounded-[2rem] bg-white p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
