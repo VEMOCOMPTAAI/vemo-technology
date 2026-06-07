@@ -422,7 +422,7 @@ function PaymentCardElement({
         return;
       }
 
-      window.location.href = `/fr/payment-success?email=${encodeURIComponent(emailValue)}`;
+      window.location.href = `/en/payment-success?email=${encodeURIComponent(emailValue)}`;
     } catch (e: any) {
       setError(e?.message || "Erreur payment Stripe.");
     } finally {
@@ -962,7 +962,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
         return;
       }
 
-      window.location.href = `/fr/payment-pending-verification?email=${encodeURIComponent(email)}`;
+      window.location.href = `/en/payment-pending-verification?email=${encodeURIComponent(email)}`;
     } catch (e: any) {
       setError(e?.message || "Erreur transfer.");
     } finally {
@@ -1014,7 +1014,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
             <a href={lang === "fr" ? "/fr" : "/en"}>{t.home}</a>
             <a href={lang === "fr" ? "/fr/tarifs" : "/en/pricing"}>{t.pricing}</a>
             <a href="/fr/faq">{t.faq}</a>
-            <a href="/fr/contact">{t.contact}</a>
+            <a href="/en/contact">{t.contact}</a>
           </nav>
 
           <div className="flex items-center gap-3">
