@@ -46,7 +46,7 @@ const FORMULA_PREVIEW: Record<
     ],
   },
   standard: {
-    subtitle: "La formule recommandée pour la plupart des non-résidents.",
+    subtitle: "La package recommandée pour la plupart des non-residents.",
     bullets: [
       "Tout Starter +",
       "Demande EIN",
@@ -174,7 +174,7 @@ function syncedPlanFeatures(planId: string, state: string) {
 
 function visibleSelectableServices(services: string[]) {
   const hiddenKeywords = [
-    "Documents de création LLC",
+    "Documents de formation LLC",
     "Frais de dépôt",
     "Renouvellement Registered Agent",
     "Registered Agent offert",
@@ -333,7 +333,7 @@ function PaymentCardElement({
     }
 
     if (!amount || amount <= 0) {
-      setError("Montant invalide. Merci de choisir une formule avant le paiement.");
+      setError("Montant invalide. Merci de selectedr une package avant le paiement.");
       return;
     }
 
@@ -811,7 +811,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
   async function createOrder(method: PaymentMethod) {
     if (!selectedPlan || !finalPrice) {
-      throw new Error("Merci de choisir une formule.");
+      throw new Error("Merci de selectedr une package.");
     }
 
     const manager = memberRole === "Member" ? managerName : memberName;
@@ -854,7 +854,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     const data = await res.json().catch(() => null);
 
     if (!res.ok || data?.ok === false) {
-      throw new Error(data?.error || "Erreur création dossier.");
+      throw new Error(data?.error || "Erreur formation dossier.");
     }
 
     setDossierNumber(data?.dossier_number || "");
@@ -1032,9 +1032,9 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 0 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Choisissez l’State de création</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Choose the formation state</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  L’State doit être choisi avant la formule, car les prix et les délais peuvent changer.
+                  Choose the state before selecting a package, because pricing and timelines may vary.
                 </p>
 
                 <div className="mt-6 grid gap-5 md:grid-cols-2">
@@ -1055,7 +1055,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         <div className="flex items-start justify-between gap-4">
                           <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-                              State de création
+                              Formation state
                             </p>
                             <h3 className="mt-2 text-2xl font-black tracking-[-0.04em] text-[#123A63]">
                               {s}
@@ -1072,7 +1072,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         <p className="mt-4 text-sm font-bold leading-7 text-slate-500">
                           {s === "New Mexico"
                             ? "Privacy, optimized cost, and a simple structure for non-resident entrepreneurs."
-                            : "State reconnu, image corporate plus forte et traitement généralement plus rapide."}
+                            : "Recognized state, stronger corporate image, and generally faster processing."}
                         </p>
                       </button>
                     );
@@ -1084,10 +1084,10 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
             {step === 1 && (
               <>
                 <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">
-                  Choisissez votre formule
+                  Choisissez votre package
                 </h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Les prix affichés sont adaptés à l’State sélectionné : {state}.
+                  Les pricing affichés sont adaptés à l’State sélectionné : {state}.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -1322,7 +1322,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   {selectableServices.length === 0 ? (
                     <div className="md:col-span-2 rounded-[1.3rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5 text-sm font-black text-slate-500">
-                      Aucun service supplémentaire à sélectionner pour cette formule.
+                      Aucun service supplémentaire à sélectionner pour cette package.
                     </div>
                   ) : selectableServices.map((service) => (
                     <button
@@ -1412,7 +1412,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       Payment sécurisé
                     </h1>
                     <p className="mt-4 max-w-2xl text-[15px] font-semibold leading-8 text-slate-500">
-                      Finalisez votre dossier en choisissant votre mode de paiement.
+                      Finalisez votre dossier en selectedssant votre mode de paiement.
                       La carte bancaire est sélectionnée par défaut.
                     </p>
                   </div>
