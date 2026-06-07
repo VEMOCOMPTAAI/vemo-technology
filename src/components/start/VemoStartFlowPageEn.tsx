@@ -6,6 +6,23 @@ import { loadStripe } from "@stripe/stripe-js";
 import { VEMO_COUNTRIES, flagFromIso, type VemoCountry } from "@/lib/vemoCountries";
 import { VEMO_LLC_PACKS, getVemoLlcPackFeatures, getVemoLlcPackPrice } from "@/lib/vemoLlcPacks";
 
+
+function translateEnServiceLabel(value: string) {
+  return value
+    .replaceAll("Documents de création LLC", "LLC formation documents")
+    .replaceAll("Documents de creation LLC", "LLC formation documents")
+    .replaceAll("Demande EIN", "EIN application")
+    .replaceAll("US Phone Number offert 3 mois", "US phone number included for 3 months")
+    .replaceAll("US Phone Number included for 3 mois", "US phone number included for 3 months")
+    .replaceAll("Shopify offert 3 mois + nom de domaine 1 an", "Shopify included for 3 months + 1-year domain name")
+    .replaceAll("Shopify offert 3 mois + domaine 1 an", "Shopify included for 3 months + 1-year domain name")
+    .replaceAll("Shopify included for 3 mois + nom de domaine 1 an", "Shopify included for 3 months + 1-year domain name")
+    .replaceAll("Shopify included for 3 months + nom de domaine 1 an", "Shopify included for 3 months + 1-year domain name")
+    .replaceAll("Assistance Stripe / PayPal", "Stripe / PayPal assistance")
+    .replaceAll("Assistance Wise / Mercury / Payoneer", "Wise / Mercury / Payoneer assistance");
+}
+
+
 type Lang = "fr" | "en";
 type PlanId = "" | "starter" | "standard" | "premium";
 type PaymentMethod = "card" | "bank_transfer";
