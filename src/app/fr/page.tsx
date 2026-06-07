@@ -10,7 +10,7 @@ const services = [
   },
   {
     icon: "M8 7h8M8 11h8M8 15h5M6 3h12a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 0 1 2-2Z",
-    title: "Demande EIN",
+    title: "EIN application",
     text: "Service EIN seul à 29 USD ou inclus selon le pack choisi.",
     href: "/fr/ein",
   },
@@ -66,7 +66,7 @@ const packGroups = [
         name: "Standard",
         price: "149$",
         text: "LLC + EIN + assistance bancaire.",
-        features: ["Tout Starter", "Demande EIN", "Assistance Stripe", "Assistance Mercury"],
+        features: ["Tout Starter", "EIN application", "Assistance Stripe", "Assistance Mercury"],
         recommended: true,
       },
       {
@@ -90,7 +90,7 @@ const packGroups = [
         name: "Standard",
         price: "199$",
         text: "LLC Wyoming + EIN + assistance bancaire.",
-        features: ["Tout Starter", "Demande EIN", "Assistance Stripe", "Assistance Mercury"],
+        features: ["Tout Starter", "EIN application", "Assistance Stripe", "Assistance Mercury"],
         recommended: true,
       },
       {
@@ -193,7 +193,7 @@ export default function FrenchHomePage() {
             {[
               ["01", "Choix de l’État", "New Mexico ou Wyoming selon votre besoin."],
               ["02", "Création LLC", "Préparation du dossier et documents de création."],
-              ["03", "EIN & Banking", "Demande EIN et assistance Stripe / Mercury / Wise."],
+              ["03", "EIN & Banking", "EIN application et assistance Stripe / Mercury / Wise."],
               ["04", "Espace client", "Documents, messages et statuts visibles en ligne."],
             ].map(([number, title, text]) => (
               <div key={number} className="grid gap-4 rounded-[20px] border border-[#E6EDF5] bg-white p-4 sm:grid-cols-[54px_1fr]">
@@ -428,7 +428,7 @@ export default function FrenchHomePage() {
               Créer ma LLC
             </Link>
             <Link href="/fr/ein" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]">
-              Demande EIN seule
+              EIN application seule
             </Link>
             <Link href="/fr/contact" className="rounded-[16px] border border-[#E6EDF5] bg-white px-6 py-4 text-sm font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]">
               Contacter VEMO

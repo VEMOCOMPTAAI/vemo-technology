@@ -54,7 +54,7 @@ export default function VemoPublicFooter({ locale }: { locale: Locale }) {
               Banking Guidance
             </Link>
             <Link href={isFr ? "/fr/order-ein" : "/en/order-ein"} className="hover:text-white">
-              {isFr ? "Demande EIN seule" : "EIN only"}
+              {isFr ? "EIN application seule" : "EIN only"}
             </Link>
           </div>
         </div>

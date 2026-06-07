@@ -560,14 +560,14 @@ export default function AdminClientPortalManager() {
                           setDocKey(value);
 
                           if (value === "company_document") setDocTitle("Company Document");
-                          if (value === "operating_agreement") setDocTitle("Demande EIN");
+                          if (value === "operating_agreement") setDocTitle("EIN application");
                           if (value === "ein_letter") setDocTitle("EIN Letter");
                           if (value === "other") setDocTitle("Document");
                         }}
                         className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-black outline-none transition focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
                       >
                         <option value="company_document">Company Document</option>
-                        <option value="operating_agreement">Demande EIN</option>
+                        <option value="operating_agreement">EIN application</option>
                         <option value="ein_letter">EIN Letter</option>
                         <option value="other">Autre document</option>
                       </select>

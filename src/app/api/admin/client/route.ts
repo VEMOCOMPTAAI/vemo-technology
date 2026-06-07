@@ -134,7 +134,7 @@ export async function POST(request: Request) {
           status: "paid",
           payment_status: "paid",
           services: [
-            "Demande EIN",
+            "EIN application",
             "EIN",
             "Registered Agent",
             "Suivi administratif"
@@ -161,7 +161,7 @@ export async function POST(request: Request) {
           dossier_progress: 20,
           dossier_status_label: "Paiement confirmé",
           services: [
-            "Demande EIN",
+            "EIN application",
             "EIN",
             "Registered Agent",
             "Suivi administratif"
@@ -265,7 +265,7 @@ export async function POST(request: Request) {
           admin_comment: "Document officiel de formation."
         },
         {
-          title: "Demande EIN",
+          title: "EIN application",
           document_key: "operating_agreement",
           status: "pending",
           required: false,

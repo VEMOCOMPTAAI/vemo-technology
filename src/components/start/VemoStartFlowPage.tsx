@@ -49,7 +49,7 @@ const FORMULA_PREVIEW: Record<
     subtitle: "La formule recommandée pour la plupart des non-résidents.",
     bullets: [
       "Tout Starter +",
-      "Demande EIN",
+      "EIN application",
       "Assistance Stripe + Mercury",
     ],
   },
@@ -58,7 +58,7 @@ const FORMULA_PREVIEW: Record<
     bullets: [
       "Tout Standard +",
       "Outils de paiement internationaux",
-      "Shopify offert 3 mois + domaine 1 an",
+      "Shopify included for 3 months + 1-year domain name",
     ],
   },
 };
@@ -174,7 +174,7 @@ function syncedPlanFeatures(planId: string, state: string) {
 
 function visibleSelectableServices(services: string[]) {
   const hiddenKeywords = [
-    "Documents de création LLC",
+    "LLC formation documents",
     "Frais de dépôt",
     "Renouvellement Registered Agent",
     "Registered Agent offert",

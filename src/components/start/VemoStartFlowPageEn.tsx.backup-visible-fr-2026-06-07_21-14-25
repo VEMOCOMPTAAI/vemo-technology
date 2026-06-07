@@ -246,7 +246,7 @@ function CountryPicker({
 
   return (
     <div className="relative">
-      {label ? <span className="mb-2 block text-sm font-black text-[#123A63]">{translateEnServiceLabel(String(label))}</span> : null}
+      {label ? <span className="mb-2 block text-sm font-black text-[#123A63]">{label}</span> : null}
 
       <button
         type="button"
@@ -397,7 +397,7 @@ function PaymentCardElement({
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
-            Card payment
+            Payment par card
           </p>
           <h3 className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#0F172A]">
             Secure payment
@@ -898,7 +898,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     setError("");
 
     if (!bankProofFile) {
-      setError("Merci d’uploader le payment proof de transfer.");
+      setError("Merci d’uploader le justificatif de virement.");
       return;
     }
 
@@ -920,13 +920,13 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       const data = await res.json().catch(() => null);
 
       if (!res.ok || data?.ok === false) {
-        setError(data?.error || "Erreur upload payment proof.");
+        setError(data?.error || "Erreur upload justificatif.");
         return;
       }
 
       window.location.href = `/fr/payment-pending-verification?email=${encodeURIComponent(email)}`;
     } catch (e: any) {
-      setError(e?.message || "Erreur transfer.");
+      setError(e?.message || "Erreur virement.");
     } finally {
       setBusy(false);
     }
@@ -936,7 +936,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     setError("");
 
     if (!canContinue()) {
-      if (step === 4) setError("Merci de vérifier le nom complet, l’email et le numéro de phone.");
+      if (step === 4) setError("Merci de vérifier le nom complet, l’email et le numéro de téléphone.");
       else if (step === 7) setError("Merci de select au moins un service inclus.");
       else if (step === 8) setError("Merci de confirmer les informations avant le payment.");
       else setError("Please complete this step before continuing.");
@@ -1002,7 +1002,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
           <div className="grid gap-2 md:grid-cols-5 lg:grid-cols-10">
             {t.steps.map((label, index) => (
               <button
-                key={translateEnServiceLabel(String(label))}
+                key={label}
                 type="button"
                 onClick={() => setStep(index)}
                 className={`min-h-[76px] rounded-[14px] border p-3 text-left transition ${
@@ -1018,7 +1018,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 }`}>
                   {String(index + 1).padStart(2, "0")}
                 </div>
-                <div className="text-[11px] font-black">{translateEnServiceLabel(String(label))}</div>
+                <div className="text-[11px] font-black">{label}</div>
               </button>
             ))}
           </div>
@@ -1140,12 +1140,12 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
                         <div className="mt-5 space-y-3">
                           {preview.bullets.map((item) => (
-                            <div key={translateEnServiceLabel(String(item))} className="flex items-start gap-2">
+                            <div key={item} className="flex items-start gap-2">
                               <span className="mt-[2px] text-[13px] font-black text-[#F15A24]">
                                 ✓
                               </span>
                               <span className="text-[14px] font-black leading-5 text-[#123A63]">
-                                {translateEnServiceLabel(String(item))}
+                                {item}
                               </span>
                             </div>
                           ))}
@@ -1173,7 +1173,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Designator</span>
                     <select value={designator} onChange={(e) => setDesignator(e.target.value)} className={inputClass()}>
-                      {designators.map((item) => <option key={translateEnServiceLabel(String(item))} value={translateEnServiceLabel(String(item))}>{translateEnServiceLabel(String(item))}</option>)}
+                      {designators.map((item) => <option key={item} value={item}>{item}</option>)}
                     </select>
                   </label>
 
@@ -1326,7 +1326,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     </div>
                   ) : selectableServices.map((service) => (
                     <button
-                      key={translateEnServiceLabel(String(service))}
+                      key={service}
                       type="button"
                       onClick={() => toggleService(service)}
                       className={`flex min-h-[70px] items-center gap-3 rounded-[1.3rem] border bg-white p-4 text-left text-sm font-black text-[#123A63] transition ${
@@ -1344,7 +1344,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       >
                         {selectedServices.includes(service) ? "✓" : "+"}
                       </span>
-                      <span>{translateEnServiceLabel(String(service))}</span>
+                      <span>{service}</span>
                     </button>
                   ))}
                 </div>
@@ -1378,7 +1378,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     ["City", addressCity],
                     ["ZIP code", addressPostalCode],
                     ["Country adresse", countryDisplayName(addressCountry, lang)],
-                    ["Selected services", selectedServices.length ? selectedServices.join(", ") : "—"],
+                    ["Services selecteds", selectedServices.length ? selectedServices.join(", ") : "—"],
                   ].map(([key, value]) => (
                     <div key={key} className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{key}</p>
@@ -1395,7 +1395,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     className="mt-1 h-4 w-4 shrink-0 accent-[#F15A24]"
                   />
                   <span>
-                    I confirm that the information provided is correct and I agree to continue to secure payment.
+                    Je confirme que les informations fournies sont correctes et j’accepte de continuer vers le payment secure.
                   </span>
                 </label>
               </>
@@ -1412,8 +1412,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       Secure payment
                     </h1>
                     <p className="mt-4 max-w-2xl text-[15px] font-semibold leading-8 text-slate-500">
-                      Complete your case en selecting votre mode de payment.
-                      La card payment est selected par défaut.
+                      Finalisez votre case en selectedssant votre mode de payment.
+                      La card bank est selected par défaut.
                     </p>
                   </div>
 
@@ -1493,14 +1493,14 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                           <div>
                             <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
-                              Bank transfer payment
+                              Payment par virement
                             </p>
                             <h3 className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#0F172A]">
                               Upload payment proof
                             </h3>
                             <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-slate-500">
-                              Contact VEMO on WhatsApp puis ajoutez le payment proof.
-                              Your case will then move to pending verification.
+                              Contactez VEMO sur WhatsApp puis ajoutez le justificatif.
+                              Votre case passera ensuite en attente de verification.
                             </p>
                           </div>
 

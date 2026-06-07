@@ -98,7 +98,7 @@ const plans: Plan[] = [
         "Création de la société LLC",
         "Frais de dépôt de l’État inclus",
         "Agent enregistré inclus la 1re année",
-        "Demande EIN incluse",
+        "EIN application incluse",
         "Numéro de téléphone US inclus pendant 3 mois",
         "Suivi administratif de base",
       ],
@@ -169,7 +169,7 @@ const services: Service[] = [
   {
     id: "ein",
     minPlan: "starter",
-    name: { fr: "Demande EIN", en: "EIN application" },
+    name: { fr: "EIN application", en: "EIN application" },
     desc: {
       fr: "Incluse selon l’État : 3 à 7 jours ouvrés Wyoming, 10 à 30 jours ouvrés New Mexico.",
       en: "Included depending on the state: 3 to 7 business days for Wyoming, 10 to 30 business days for New Mexico.",
@@ -378,12 +378,12 @@ function localNumber(phone: string, country: CountryOption) {
 function getEinDescription(jurisdiction: Jurisdiction, lang: Lang) {
   if (jurisdiction === "Wyoming") {
     return lang === "fr"
-      ? "Demande EIN incluse — délai estimé : 3 à 7 jours ouvrés."
+      ? "EIN application incluse — délai estimé : 3 à 7 jours ouvrés."
       : "EIN application included — estimated timeline: 3 to 7 business days.";
   }
 
   return lang === "fr"
-    ? "Demande EIN incluse — délai estimé : 10 à 30 jours ouvrés."
+    ? "EIN application incluse — délai estimé : 10 à 30 jours ouvrés."
     : "EIN application included — estimated timeline: 10 to 30 business days.";
 }
 function money(value: number) {
