@@ -38,27 +38,27 @@ const FORMULA_PREVIEW: Record<
   }
 > = {
   starter: {
-    subtitle: "L’essentiel pour lancer votre LLC.",
+    subtitle: "The essentials to launch your LLC.",
     bullets: [
-      "Création LLC",
-      "Frais de dépôt inclus",
-      "Registered Agent offert 1 an",
+      "LLC formation",
+      "Filing fees included",
+      "Registered Agent included for 1 year",
     ],
   },
   standard: {
-    subtitle: "La package recommandée pour la plupart des non-residents.",
+    subtitle: "The recommended package for most non-residents.",
     bullets: [
-      "Tout Starter +",
-      "Demande EIN",
-      "Assistance Stripe + Mercury",
+      "Everything in Starter +",
+      "EIN application",
+      "Stripe + Mercury assistance",
     ],
   },
   premium: {
-    subtitle: "L’offre complète pour structurer votre activité.",
+    subtitle: "The complete offer to structure your business.",
     bullets: [
-      "Tout Standard +",
-      "Outils de paiement internationaux",
-      "Shopify offert 3 mois + domaine 1 an",
+      "Everything in Standard +",
+      "Outils de payment internationaux",
+      "Shopify included for 3 months + domain for 1 year",
     ],
   },
 };
@@ -74,7 +74,7 @@ const activitySectors = [
   "Import / Export",
   "Holding / Investment",
   "Travel / Tourism",
-  "Autre activité",
+  "Autre activity",
 ];
 
 const designators = ["LLC", "L.L.C.", "Limited Liability Company"];
@@ -304,12 +304,12 @@ function PaymentCardElement({
   billingName,
   billingEmail,
   amount,
-  dossierNumber,
+  caseNumber,
 }: {
   billingName: string;
   billingEmail: string;
   amount: number;
-  dossierNumber: string;
+  caseNumber: string;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -333,14 +333,14 @@ function PaymentCardElement({
     }
 
     if (!amount || amount <= 0) {
-      setError("Montant invalide. Merci de selectedr une package avant le paiement.");
+      setError("Montant invalide. Merci de selectedr une package avant le payment.");
       return;
     }
 
     const card = elements.getElement(CardElement);
 
     if (!card) {
-      setError("Le champ carte est introuvable.");
+      setError("Le champ card est introuvable.");
       return;
     }
 
@@ -357,7 +357,7 @@ function PaymentCardElement({
           amount,
           currency: "USD",
           email: emailValue,
-          dossier_number: dossierNumber,
+          case_number: caseNumber,
           billing_name: name
         })
       });
@@ -365,7 +365,7 @@ function PaymentCardElement({
       const intent = await intentRes.json().catch(() => null);
 
       if (!intentRes.ok || intent?.ok === false || !intent?.clientSecret) {
-        setError(intent?.error || "Impossible de préparer le paiement Stripe.");
+        setError(intent?.error || "Impossible de préparer le payment Stripe.");
         return;
       }
 
@@ -386,7 +386,7 @@ function PaymentCardElement({
 
       window.location.href = `/fr/payment-success?email=${encodeURIComponent(emailValue)}`;
     } catch (e: any) {
-      setError(e?.message || "Erreur paiement Stripe.");
+      setError(e?.message || "Erreur payment Stripe.");
     } finally {
       setBusy(false);
     }
@@ -397,13 +397,13 @@ function PaymentCardElement({
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
-            Payment par carte
+            Payment par card
           </p>
           <h3 className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#0F172A]">
-            Payment sécurisé
+            Secure payment
           </h3>
           <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-slate-500">
-            Saisissez vos informations de facturation et votre carte directement dans cette page.
+            Enter your billing information and card details directly on this page.
           </p>
         </div>
 
@@ -420,7 +420,7 @@ function PaymentCardElement({
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block">
           <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
-            Last name de facturation
+            Last name de billing
           </span>
           <input
             value={name}
@@ -432,12 +432,12 @@ function PaymentCardElement({
 
         <label className="block">
           <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
-            Email de facturation
+            Email de billing
           </span>
           <input
             value={emailValue}
             onChange={(e) => setEmailValue(e.target.value)}
-            placeholder="facturation@domaine.com"
+            placeholder="billing@domaine.com"
             className="h-[56px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
           />
         </label>
@@ -450,7 +450,7 @@ function PaymentCardElement({
           </div>
           <div>
             <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
-              Informations carte
+              Informations card
             </p>
             <p className="text-sm font-bold text-[#123A63]">
               Visa, Mastercard, American Express...
@@ -494,7 +494,7 @@ function PaymentCardElement({
         disabled={busy || !stripe || !elements || !amount}
         className="mt-6 h-[58px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {busy ? "Traitement du paiement..." : `Pay $${amount}`}
+        {busy ? "Traitement du payment..." : `Pay $${amount}`}
       </button>
     </div>
   );
@@ -680,7 +680,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   const [confirmSummary, setConfirmSummary] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
-  const [dossierNumber, setDossierNumber] = useState("");
+  const [caseNumber, setDossierNumber] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [autoStripeAttempted, setAutoStripeAttempted] = useState(false);
   const [bankProofFile, setBankProofFile] = useState<File | null>(null);
@@ -854,10 +854,10 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     const data = await res.json().catch(() => null);
 
     if (!res.ok || data?.ok === false) {
-      throw new Error(data?.error || "Erreur formation dossier.");
+      throw new Error(data?.error || "Erreur formation case.");
     }
 
-    setDossierNumber(data?.dossier_number || "");
+    setDossierNumber(data?.case_number || "");
     return data;
   }
 
@@ -866,7 +866,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     setBusy(true);
 
     try {
-      const order = dossierNumber ? { dossier_number: dossierNumber } : await createOrder("card");
+      const order = caseNumber ? { case_number: caseNumber } : await createOrder("card");
 
       const intentRes = await fetch("/api/payments/create-intent", {
         method: "POST",
@@ -875,20 +875,20 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
           amount: finalPrice,
           currency: "USD",
           email,
-          dossier_number: order.dossier_number || dossierNumber,
+          case_number: order.case_number || caseNumber,
         }),
       });
 
       const intent = await intentRes.json().catch(() => null);
 
       if (!intentRes.ok || intent?.ok === false || !intent?.clientSecret) {
-        setError(intent?.error || "Impossible de préparer le paiement Stripe.");
+        setError(intent?.error || "Impossible de préparer le payment Stripe.");
         return;
       }
 
       setClientSecret(intent.clientSecret);
     } catch (e: any) {
-      setError(e?.message || "Erreur préparation paiement.");
+      setError(e?.message || "Erreur préparation payment.");
     } finally {
       setBusy(false);
     }
@@ -905,11 +905,11 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     setBusy(true);
 
     try {
-      const order = dossierNumber ? { dossier_number: dossierNumber } : await createOrder("bank_transfer");
+      const order = caseNumber ? { case_number: caseNumber } : await createOrder("bank_transfer");
 
       const form = new FormData();
       form.append("email", email);
-      form.append("dossier_number", order.dossier_number || dossierNumber);
+      form.append("case_number", order.case_number || caseNumber);
       form.append("file", bankProofFile);
 
       const res = await fetch("/api/orders/bank-transfer-proof", {
@@ -937,9 +937,9 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
     if (!canContinue()) {
       if (step === 4) setError("Merci de vérifier le nom complet, l’email et le numéro de téléphone.");
-      else if (step === 7) setError("Merci de sélectionner au moins un service inclus.");
-      else if (step === 8) setError("Merci de confirmer les informations avant le paiement.");
-      else setError("Merci de compléter cette step avant de continuer.");
+      else if (step === 7) setError("Merci de select au moins un service inclus.");
+      else if (step === 8) setError("Merci de confirmer les informations avant le payment.");
+      else setError("Please complete this step before continuing.");
       return;
     }
 
@@ -1084,10 +1084,10 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
             {step === 1 && (
               <>
                 <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">
-                  Choisissez votre package
+                  Choose your package
                 </h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Les pricing affichés sont adaptés à l’State sélectionné : {state}.
+                  The displayed pricing is based on the selected state: {state}.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -1187,14 +1187,14 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 3 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Activity business</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Business activity</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Choisissez le secteur puis décrivez clairement l’activité prévue.
+                  Choose the sector and clearly describe the planned business activity.
                 </p>
 
                 <div className="mt-6 grid gap-4">
                   <label>
-                    <span className="mb-2 block text-sm font-black text-[#123A63]">Secteur d’activité</span>
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Sector d’activity</span>
                     <select value={activitySector} onChange={(e) => setActivitySector(e.target.value)} className={inputClass()}>
                       {activitySectors.map((sector) => <option key={sector} value={sector}>{sector}</option>)}
                     </select>
@@ -1202,7 +1202,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
                   <label>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Business activity description</span>
-                    <textarea value={activityDescription} onChange={(e) => setActivityDescription(e.target.value)} className={textareaClass()} placeholder="Ex : consulting en ligne, services digitaux, logiciel, e-commerce..." />
+                    <textarea value={activityDescription} onChange={(e) => setActivityDescription(e.target.value)} className={textareaClass()} placeholder="Ex : online consulting, digital services, software, e-commerce..." />
                   </label>
                 </div>
               </>
@@ -1210,14 +1210,14 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 4 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Informations du compte</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Account information</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Email et téléphone doivent être valides. Le Maroc est sélectionné par défaut.
+                  Email and phone must be valid. Morocco is selected by default.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   <label>
-                    <span className="mb-2 block text-sm font-black text-[#123A63]">Last name complet</span>
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Full last name</span>
                     <input
                       value={fullName}
                       onChange={(e) => {
@@ -1236,7 +1236,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     {email && !emailIsValid(email) ? <p className="mt-2 text-xs font-black text-red-600">Email invalide.</p> : null}
                   </label>
 
-                  <CountryPicker label="Country de résidence" valueIso={countryIso} onChange={(country) => setCountryIso(country.iso)} lang={lang} />
+                  <CountryPicker label="Country of residence" valueIso={countryIso} onChange={(country) => setCountryIso(country.iso)} lang={lang} />
 
                   <div>
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Phone / WhatsApp</span>
@@ -1252,21 +1252,21 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 5 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Member principal</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Main member</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Renseignez les informations du propriétaire ou membre principal. Le nom du client est suggéré automatiquement.
+                  Enter the owner or main member information. The client name is suggested automatically.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-[1fr_1fr_220px]">
                   <label>
-                    <span className="mb-2 block text-sm font-black text-[#123A63]">Last name du membre</span>
-                    <input value={memberName} onChange={(e) => setMemberName(e.target.value)} className={inputClass()} placeholder="Last name complet" />
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Member last name</span>
+                    <input value={memberName} onChange={(e) => setMemberName(e.target.value)} className={inputClass()} placeholder="Full last name" />
                   </label>
 
                   <CountryPicker label="Country" valueIso={memberCountryIso} onChange={(country) => setMemberCountryIso(country.iso)} lang={lang} />
 
                   <label>
-                    <span className="mb-2 block text-sm font-black text-[#123A63]">Rôle</span>
+                    <span className="mb-2 block text-sm font-black text-[#123A63]">Role</span>
                     <select value={memberRole} onChange={(e) => setMemberRole(e.target.value)} className={inputClass()}>
                       <option value="Member">Member</option>
                       <option value="Manager">Manager</option>
@@ -1286,15 +1286,15 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 6 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Address du client</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Client address</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Address utilisée pour le dossier et la facturation. Le pays est suggéré depuis les informations du propriétaire.
+                  Address used for the case and billing. The country is suggested from the owner information.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-3">
                   <label className="md:col-span-3">
                     <span className="mb-2 block text-sm font-black text-[#123A63]">Address</span>
-                    <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass()} placeholder="Address complète" />
+                    <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass()} placeholder="Full address" />
                   </label>
 
                   <label>
@@ -1314,15 +1314,15 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 7 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Services inclus</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Included services</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Sélectionnez les services à activer dans votre pack : {selectedPlan?.label || "—"}.
+                  Select the services to activate in your package: {selectedPlan?.label || "—"}.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   {selectableServices.length === 0 ? (
                     <div className="md:col-span-2 rounded-[1.3rem] border border-[#E3EAF2] bg-[#F8FAFC] p-5 text-sm font-black text-slate-500">
-                      Aucun service supplémentaire à sélectionner pour cette package.
+                      No additional service to select for this package.
                     </div>
                   ) : selectableServices.map((service) => (
                     <button
@@ -1353,9 +1353,9 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
             {step === 8 && (
               <>
-                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Summary avant paiement</h1>
+                <h1 className="mt-2 text-3xl font-black tracking-[-0.06em]">Pre-payment summary</h1>
                 <p className="mt-3 text-sm font-bold leading-7 text-slate-500">
-                  Vérifiez les informations avant de continuer vers le paiement sécurisé.
+                  Review the information before continuing to secure payment.
                 </p>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -1364,21 +1364,21 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     ["Package", selectedPlan?.label || "—"],
                     ["LLC name", `${llcName} ${designator}`.trim()],
                     ["Alternative name", alternativeName],
-                    ["Secteur", activitySector],
+                    ["Sector", activitySector],
                     ["Activity", activityDescription],
                     ["Client", fullName],
                     ["Email", email],
-                    ["Country du client", countryDisplayName(selectedCountry, lang)],
+                    ["Client country", countryDisplayName(selectedCountry, lang)],
                     ["Phone", `${phoneCountry.dial} ${phone}`],
-                    ["Member principal", memberName],
+                    ["Main member", memberName],
                     ["Country du membre", countryDisplayName(memberCountry, lang)],
-                    ["Rôle", memberRole],
+                    ["Role", memberRole],
                     ["Manager", memberRole === "Member" ? managerName : memberName],
                     ["Address", address],
                     ["City", addressCity],
                     ["ZIP code", addressPostalCode],
                     ["Country adresse", countryDisplayName(addressCountry, lang)],
-                    ["Services sélectionnés", selectedServices.length ? selectedServices.join(", ") : "—"],
+                    ["Services selecteds", selectedServices.length ? selectedServices.join(", ") : "—"],
                   ].map(([key, value]) => (
                     <div key={key} className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{key}</p>
@@ -1395,7 +1395,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     className="mt-1 h-4 w-4 shrink-0 accent-[#F15A24]"
                   />
                   <span>
-                    Je confirme que les informations fournies sont correctes et j’accepte de continuer vers le paiement sécurisé.
+                    Je confirme que les informations fournies sont correctes et j’accepte de continuer vers le payment secure.
                   </span>
                 </label>
               </>
@@ -1409,11 +1409,11 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       Step 10
                     </p>
                     <h1 className="mt-2 text-[42px] font-black tracking-[-0.06em] text-[#0F172A]">
-                      Payment sécurisé
+                      Secure payment
                     </h1>
                     <p className="mt-4 max-w-2xl text-[15px] font-semibold leading-8 text-slate-500">
-                      Finalisez votre dossier en selectedssant votre mode de paiement.
-                      La carte bancaire est sélectionnée par défaut.
+                      Finalisez votre case en selectedssant votre mode de payment.
+                      La card bank est selected par défaut.
                     </p>
                   </div>
 
@@ -1431,7 +1431,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                   <div className="grid gap-5 md:grid-cols-2">
                     <label className="block">
                       <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
-                        Last name de facturation
+                        Last name de billing
                       </span>
                       <input
                         value={fullName}
@@ -1443,12 +1443,12 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
                     <label className="block">
                       <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
-                        Email de facturation
+                        Email de billing
                       </span>
                       <input
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="facturation@domaine.com"
+                        placeholder="billing@domaine.com"
                         className="h-[56px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-bold text-[#123A63] outline-none transition focus:border-[#F15A24]"
                       />
                     </label>
@@ -1456,7 +1456,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
 
                   <div className="mt-6">
                     <span className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
-                      Méthode de paiement
+                      Méthode de payment
                     </span>
 
                     <select
@@ -1467,8 +1467,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       }}
                       className="h-[56px] w-full rounded-[16px] border border-[#E6EDF5] bg-white px-4 text-sm font-black text-[#123A63] outline-none transition focus:border-[#F15A24]"
                     >
-                      <option value="card">Carte bancaire</option>
-                      <option value="bank_transfer">Virement bancaire</option>
+                      <option value="card">Card payment</option>
+                      <option value="bank_transfer">Bank transfer</option>
                     </select>
                   </div>
 
@@ -1484,7 +1484,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                             billingName={fullName}
                             billingEmail={email}
                             amount={finalPrice || 0}
-                            dossierNumber={dossierNumber}
+                            caseNumber={caseNumber}
                           />
                         </Elements>
                       )
@@ -1496,11 +1496,11 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                               Payment par virement
                             </p>
                             <h3 className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#0F172A]">
-                              Envoi du justificatif
+                              Upload payment proof
                             </h3>
                             <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-slate-500">
                               Contactez VEMO sur WhatsApp puis ajoutez le justificatif.
-                              Votre dossier passera ensuite en attente de vérification.
+                              Votre case passera ensuite en attente de verification.
                             </p>
                           </div>
 
@@ -1520,7 +1520,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                               Step 01
                             </p>
                             <p className="mt-2 text-sm font-black text-[#123A63]">
-                              Contacter VEMO
+                              Contact VEMO
                             </p>
                           </div>
 
@@ -1529,7 +1529,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                               Step 02
                             </p>
                             <p className="mt-2 text-sm font-black text-[#123A63]">
-                              Uploader le justificatif
+                              Upload payment proof
                             </p>
                           </div>
 
@@ -1538,7 +1538,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                               Step 03
                             </p>
                             <p className="mt-2 text-sm font-black text-[#123A63]">
-                              Vérification admin
+                              Admin verification
                             </p>
                           </div>
                         </div>
@@ -1557,7 +1557,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                           disabled={busy}
                           className="mt-5 h-[58px] w-full rounded-[18px] bg-[#F15A24] text-sm font-black text-white transition hover:bg-[#DB4F1C] disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          {busy ? "Envoi du justificatif..." : "Uploader le justificatif et continuer →"}
+                          {busy ? "Upload payment proof..." : "Upload payment proof et continuer →"}
                         </button>
                       </div>
                     )}
@@ -1611,7 +1611,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
               {[
                 ["State", state, "Included"],
                 ["Service package", selectedPlan?.label || "To choose", selectedPlan ? `$${finalPrice}` : "—"],
-                ["Services", selectableServices.length ? (selectedServices.length ? `${selectedServices.length} sélectionné(s)` : "À sélectionner") : "Included in the package", "$0"],
+                ["Services", selectableServices.length ? (selectedServices.length ? `${selectedServices.length} selected(s)` : "To select") : "Included in the package", "$0"],
               ].map(([key, value, price]) => (
                 <div key={key} className="flex items-start justify-between gap-4">
                   <div>
