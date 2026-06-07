@@ -1,5 +1,7 @@
 "use client";
 
+import ClientEmailMemory from "@/components/client-portal/ClientEmailMemory";
+
 import { useMemo, useState } from "react";
 
 export const dynamic = "force-dynamic";
@@ -74,7 +76,7 @@ export default function PaymentPendingVerificationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F5F8FB] px-6 py-12 text-[#111827]">
+    <><ClientEmailMemory /><main className="min-h-screen bg-[#F5F8FB] px-6 py-12 text-[#111827]">
       <section className="mx-auto max-w-5xl">
         <a href="/fr" className="inline-flex flex-col">
           <div className="text-[28px] font-black uppercase leading-none tracking-[-0.06em]">
@@ -233,6 +235,6 @@ export default function PaymentPendingVerificationPage() {
           </div>
         </div>
       </section>
-    </main>
+    </main></>
   );
 }

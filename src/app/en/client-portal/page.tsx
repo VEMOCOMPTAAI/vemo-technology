@@ -1,3 +1,5 @@
+import ClientPortalMenu from "@/components/client-portal/ClientPortalMenu";
+import ClientEmailMemory from "@/components/client-portal/ClientEmailMemory";
 import { Suspense } from "react";
 import EnglishClientPortalContent from "./EnglishClientPortalContent";
 
@@ -5,11 +7,13 @@ export const dynamic = "force-dynamic";
 
 function LoadingClientPortal() {
   return (
-    <main className="min-h-screen bg-[#F5F7FA] px-6 py-12 text-[#111827]">
+    <><ClientEmailMemory redirectWhenMissing targetPath="/en/client-portal" /><main className="min-h-screen bg-[#F5F7FA] px-6 py-12 text-[#111827]">
+      <ClientPortalMenu lang="en" />
+
       <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
         <p className="text-sm font-black text-[#F15A24]">Loading client portal...</p>
       </div>
-    </main>
+    </main></>
   );
 }
 

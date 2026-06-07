@@ -714,3 +714,10 @@ button[data-vemo-upload-button="true"]::after {
   background: transparent !important;
   background-image: none !important;
 }
+
+/* VEMO client portal: old Home button removed */
+.vemo-client-hide-home a[href="/"],
+.vemo-client-hide-home a[href="/en"],
+.vemo-client-hide-home a[href="/fr"] {
+  display: none !important;
+}
