@@ -1,7 +1,5 @@
-import VemoStartFlowPage from "@/components/start/VemoStartFlowPage";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-export default function StartPage() {
-  return <VemoStartFlowPage lang="en" />;
+export default function EnCommencerRedirect() {
+  redirect("/en/start");
 }

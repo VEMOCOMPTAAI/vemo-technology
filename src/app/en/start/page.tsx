@@ -1,18 +1,7 @@
-import LLCFormationWizard from "@/components/LLCFormationWizard";
-import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import VemoStartFlowPage from "@/components/start/VemoStartFlowPage";
 
-export default function EnglishStartPage() {
-  return (
-    <main className="min-h-screen text-[#111a33]">
-      <SiteHeader lang="en" active="start" />
-      <LLCFormationWizard lang="en" />
-      <SiteFooter lang="en" />
-    </main>
-  );
+export const dynamic = "force-dynamic";
+
+export default function CommencerPage() {
+  return <VemoStartFlowPage lang="en" />;
 }
-
-
-
-
-
-
