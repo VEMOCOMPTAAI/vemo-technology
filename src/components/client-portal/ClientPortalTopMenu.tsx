@@ -54,6 +54,8 @@ export default function ClientPortalTopMenu({ lang }: { lang: "en" | "fr" }) {
           lang: "FR",
           refresh: "Refresh",
           switchHref: `/fr/espace-client${query}`,
+          homeHref: `/en/client-portal${query}`,
+          subtitle: "US LLC for non-residents",
         }
       : {
           files: "Mes fichiers",
@@ -63,18 +65,20 @@ export default function ClientPortalTopMenu({ lang }: { lang: "en" | "fr" }) {
           lang: "EN",
           refresh: "Actualiser",
           switchHref: `/en/client-portal${query}`,
+          homeHref: `/fr/espace-client${query}`,
+          subtitle: "US LLC pour non-résidents",
         };
 
   return (
     <header className="vemo-client-top-nav fixed left-0 right-0 top-0 z-[90] border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between px-6">
-        <Link href={lang === "en" ? `/en/client-portal${query}` : `/fr/espace-client${query}`} className="leading-none">
+        <Link href={labels.homeHref} className="leading-none">
           <div className="text-[22px] font-black tracking-[-0.04em]">
             <span className="text-[#123A63]">VEMO</span>
             <span className="text-[#F15A24]">TECH</span>
           </div>
           <div className="mt-1 text-[9px] font-black uppercase tracking-[0.38em] text-[#64748B]">
-            US LLC for non-residents
+            {labels.subtitle}
           </div>
         </Link>
 

@@ -11,6 +11,7 @@ function LoadingClientPortal() {
     <><ClientEmailMemory redirectWhenMissing targetPath="/fr/espace-client" /><main className="min-h-screen bg-[#F5F7FA] px-6 py-12 text-[#111827]">
       <ClientPortalTopMenu lang="fr" />
 
+
       <ClientPortalMenu lang="fr" />
 
       <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
