@@ -397,7 +397,7 @@ function PaymentCardElement({
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
-            Payment par card
+            Card payment
           </p>
           <h3 className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#0F172A]">
             Secure payment
@@ -898,7 +898,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     setError("");
 
     if (!bankProofFile) {
-      setError("Merci d’uploader le justificatif de virement.");
+      setError("Merci d’uploader le payment proof de transfer.");
       return;
     }
 
@@ -920,13 +920,13 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       const data = await res.json().catch(() => null);
 
       if (!res.ok || data?.ok === false) {
-        setError(data?.error || "Erreur upload justificatif.");
+        setError(data?.error || "Erreur upload payment proof.");
         return;
       }
 
       window.location.href = `/fr/payment-pending-verification?email=${encodeURIComponent(email)}`;
     } catch (e: any) {
-      setError(e?.message || "Erreur virement.");
+      setError(e?.message || "Erreur transfer.");
     } finally {
       setBusy(false);
     }
@@ -936,7 +936,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
     setError("");
 
     if (!canContinue()) {
-      if (step === 4) setError("Merci de vérifier le nom complet, l’email et le numéro de téléphone.");
+      if (step === 4) setError("Merci de vérifier le nom complet, l’email et le numéro de phone.");
       else if (step === 7) setError("Merci de select au moins un service inclus.");
       else if (step === 8) setError("Merci de confirmer les informations avant le payment.");
       else setError("Please complete this step before continuing.");
@@ -1395,7 +1395,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     className="mt-1 h-4 w-4 shrink-0 accent-[#F15A24]"
                   />
                   <span>
-                    Je confirme que les informations fournies sont correctes et j’accepte de continuer vers le payment secure.
+                    I confirm that the information provided is correct and I agree to continue to secure payment.
                   </span>
                 </label>
               </>
@@ -1412,8 +1412,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       Secure payment
                     </h1>
                     <p className="mt-4 max-w-2xl text-[15px] font-semibold leading-8 text-slate-500">
-                      Finalisez votre case en selectedssant votre mode de payment.
-                      La card bank est selected par défaut.
+                      Finalisez votre case en selecting votre mode de payment.
+                      La card payment est selected par défaut.
                     </p>
                   </div>
 
@@ -1493,13 +1493,13 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                         <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                           <div>
                             <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
-                              Payment par virement
+                              Bank transfer payment
                             </p>
                             <h3 className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#0F172A]">
                               Upload payment proof
                             </h3>
                             <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-slate-500">
-                              Contactez VEMO sur WhatsApp puis ajoutez le justificatif.
+                              Contactez VEMO sur WhatsApp puis ajoutez le payment proof.
                               Votre case passera ensuite en attente de verification.
                             </p>
                           </div>
