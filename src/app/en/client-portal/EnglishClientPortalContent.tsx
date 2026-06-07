@@ -1,6 +1,5 @@
 "use client";
 
-import ClientPortalTopMenu from "@/components/client-portal/ClientPortalTopMenu";
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -202,7 +201,6 @@ export default function EnglishClientPortalContent() {
 
   return (
     <main className="min-h-screen bg-[#F5F7FA] text-[#111827]">
-      <ClientPortalTopMenu lang="en" />
 
 
 

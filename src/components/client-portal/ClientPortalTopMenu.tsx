@@ -26,16 +26,15 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
     const hideOldButtons = () => {
       document.querySelectorAll("a,button").forEach((el) => {
         const text = (el.textContent || "").trim().toLowerCase();
-        const inNewHeader = (el as HTMLElement).closest(".vemo-client-top-nav");
+        const inHeader = (el as HTMLElement).closest(".vemo-client-top-nav");
 
-        if (!inNewHeader && ["home", "accueil", "refresh", "actualiser"].includes(text)) {
+        if (!inHeader && ["home", "accueil", "refresh", "actualiser"].includes(text)) {
           (el as HTMLElement).style.display = "none";
         }
       });
     };
 
     hideOldButtons();
-
     const observer = new MutationObserver(hideOldButtons);
     observer.observe(document.body, { childList: true, subtree: true });
 
@@ -44,7 +43,7 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
 
   const query = email ? `?email=${encodeURIComponent(email)}` : "";
 
-  const copy =
+  const c =
     lang === "fr"
       ? {
           files: "Mes fichiers",
@@ -53,9 +52,9 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           status: "Statut",
           lang: "EN",
           refresh: "Actualiser",
-          hrefLang: `/en/client-portal${query}`,
-          hrefLogo: `/fr/espace-client${query}`,
-          subtitle: "US LLC pour non-résidents",
+          switchHref: `/en/client-portal${query}`,
+          homeHref: `/fr/espace-client${query}`,
+          sub: "US LLC pour non-résidents",
         }
       : {
           files: "My files",
@@ -64,37 +63,37 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           status: "Status",
           lang: "FR",
           refresh: "Refresh",
-          hrefLang: `/fr/espace-client${query}`,
-          hrefLogo: `/en/client-portal${query}`,
-          subtitle: "US LLC for non-residents",
+          switchHref: `/fr/espace-client${query}`,
+          homeHref: `/en/client-portal${query}`,
+          sub: "US LLC for non-residents",
         };
 
   return (
-    <header className="vemo-client-top-nav fixed left-0 right-0 top-0 z-[100] border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
+    <header className="vemo-client-top-nav fixed left-0 right-0 top-0 z-[999] border-b border-[#E6EDF5] bg-white">
       <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between px-6">
-        <Link href={copy.hrefLogo} className="leading-none">
+        <Link href={c.homeHref} className="leading-none">
           <div className="text-[22px] font-black tracking-[-0.04em]">
             <span className="text-[#123A63]">VEMO</span>
             <span className="text-[#F15A24]">TECH</span>
           </div>
           <div className="mt-1 text-[9px] font-black uppercase tracking-[0.38em] text-[#64748B]">
-            {copy.subtitle}
+            {c.sub}
           </div>
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-black text-[#111827] md:flex">
-          <a href="#documents" className="hover:text-[#F15A24]">{copy.files}</a>
-          <a href="#services" className="hover:text-[#F15A24]">{copy.services}</a>
-          <a href="#messages" className="hover:text-[#F15A24]">{copy.messages}</a>
-          <a href="#status" className="hover:text-[#F15A24]">{copy.status}</a>
+          <a href="#documents" className="hover:text-[#F15A24]">{c.files}</a>
+          <a href="#services" className="hover:text-[#F15A24]">{c.services}</a>
+          <a href="#messages" className="hover:text-[#F15A24]">{c.messages}</a>
+          <a href="#status" className="hover:text-[#F15A24]">{c.status}</a>
         </nav>
 
         <div className="flex items-center gap-3">
           <Link
-            href={copy.hrefLang}
+            href={c.switchHref}
             className="inline-flex h-11 items-center justify-center rounded-[14px] border border-[#DDE7F2] bg-white px-5 text-sm font-black text-[#111827]"
           >
-            {copy.lang}
+            {c.lang}
           </Link>
 
           <button
@@ -102,7 +101,7 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
             onClick={() => window.location.reload()}
             className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[#F15A24] px-6 text-sm font-black text-white"
           >
-            {copy.refresh}
+            {c.refresh}
           </button>
         </div>
       </div>
