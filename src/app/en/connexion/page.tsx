@@ -37,7 +37,7 @@ export default function EnglishLoginPage() {
         });
       }
 
-      router.push("/en/client-portal");
+      router.push(`/en/client-portal?email=${encodeURIComponent(email)}`);
     } catch (error) {
       setMessage(
         error instanceof Error
