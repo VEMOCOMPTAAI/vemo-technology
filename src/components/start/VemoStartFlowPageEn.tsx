@@ -1378,7 +1378,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                     ["City", addressCity],
                     ["ZIP code", addressPostalCode],
                     ["Country adresse", countryDisplayName(addressCountry, lang)],
-                    ["Services selecteds", selectedServices.length ? selectedServices.join(", ") : "—"],
+                    ["Selected services", selectedServices.length ? selectedServices.join(", ") : "—"],
                   ].map(([key, value]) => (
                     <div key={key} className="rounded-[1.2rem] border border-[#E3EAF2] bg-[#F8FAFC] p-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{key}</p>
@@ -1412,7 +1412,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                       Secure payment
                     </h1>
                     <p className="mt-4 max-w-2xl text-[15px] font-semibold leading-8 text-slate-500">
-                      Finalisez votre case en selecting votre mode de payment.
+                      Complete your case en selecting votre mode de payment.
                       La card payment est selected par défaut.
                     </p>
                   </div>
@@ -1499,8 +1499,8 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                               Upload payment proof
                             </h3>
                             <p className="mt-2 max-w-xl text-sm font-semibold leading-7 text-slate-500">
-                              Contactez VEMO sur WhatsApp puis ajoutez le payment proof.
-                              Votre case passera ensuite en attente de verification.
+                              Contact VEMO on WhatsApp puis ajoutez le payment proof.
+                              Your case will then move to pending verification.
                             </p>
                           </div>
 
