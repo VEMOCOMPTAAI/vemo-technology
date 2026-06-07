@@ -950,6 +950,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
   }
 
   function back() {
+    if (step === 0) return;
     setError("");
     if (step > 0) {
       setStep(step - 1);
@@ -1575,7 +1576,6 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
               <button
                 type="button"
                 onClick={back}
-                disabled={step === 0}
                 className="rounded-[12px] border border-[#E3EAF2] bg-[#F8FAFC] px-6 py-3 text-sm font-black text-[#123A63] disabled:opacity-40"
               >
                 {t.back}
