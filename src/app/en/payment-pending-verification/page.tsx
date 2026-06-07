@@ -1,3 +1,5 @@
+"use client";
+
 import PaymentPendingClient from "./PaymentPendingClient";
 
 export const dynamic = "force-dynamic";

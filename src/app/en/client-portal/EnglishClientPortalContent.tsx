@@ -1,5 +1,7 @@
 "use client";
 
+import ClientPortalTopMenu from "@/components/client-portal/ClientPortalTopMenu";
+
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -200,6 +202,8 @@ export default function EnglishClientPortalContent() {
 
   return (
     <main className="min-h-screen bg-[#F5F7FA] text-[#111827]">
+      <ClientPortalTopMenu lang="en" />
+
       <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="rounded-[2rem] bg-white p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -260,7 +264,7 @@ export default function EnglishClientPortalContent() {
                 Progress
               </p>
               <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
-                My file status
+                <span id="status"></span>My file status
               </h2>
             </div>
 
@@ -313,7 +317,7 @@ export default function EnglishClientPortalContent() {
                   Documents
                 </p>
                 <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
-                  Available documents
+                  <span id="documents"></span>Available documents
                 </h2>
               </div>
 
@@ -366,7 +370,7 @@ export default function EnglishClientPortalContent() {
                   Messages
                 </p>
                 <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
-                  Communication with VEMO
+                  <span id="messages"></span>Communication with VEMO
                 </h2>
               </div>
 

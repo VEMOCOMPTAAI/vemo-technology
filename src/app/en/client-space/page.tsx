@@ -1,3 +1,4 @@
+import ClientPortalTopMenu from "@/components/client-portal/ClientPortalTopMenu";
 import ClientPortalMenu from "@/components/client-portal/ClientPortalMenu";
 import ClientEmailMemory from "@/components/client-portal/ClientEmailMemory";
 import { redirect } from "next/navigation";
