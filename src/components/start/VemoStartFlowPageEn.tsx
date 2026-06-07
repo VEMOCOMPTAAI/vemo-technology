@@ -8,19 +8,29 @@ import { VEMO_LLC_PACKS, getVemoLlcPackFeatures, getVemoLlcPackPrice } from "@/l
 
 
 function translateEnServiceLabel(value: string) {
-  return value
-    .replaceAll("Documents de création LLC", "LLC formation documents")
-    .replaceAll("Documents de creation LLC", "LLC formation documents")
-    .replaceAll("Demande EIN", "EIN application")
-    .replaceAll("US Phone Number offert 3 mois", "US phone number included for 3 months")
-    .replaceAll("US Phone Number included for 3 mois", "US phone number included for 3 months")
-    .replaceAll("Shopify offert 3 mois + nom de domaine 1 an", "Shopify included for 3 months + 1-year domain name")
-    .replaceAll("Shopify offert 3 mois + domaine 1 an", "Shopify included for 3 months + 1-year domain name")
-    .replaceAll("Shopify included for 3 mois + nom de domaine 1 an", "Shopify included for 3 months + 1-year domain name")
-    .replaceAll("Shopify included for 3 months + nom de domaine 1 an", "Shopify included for 3 months + 1-year domain name")
-    .replaceAll("Assistance Stripe / PayPal", "Stripe / PayPal assistance")
-    .replaceAll("Assistance Wise / Mercury / Payoneer", "Wise / Mercury / Payoneer assistance");
+  return String(value)
+    .replaceAll("LLC formation documents", "LLC formation documents")
+    .replaceAll("LLC formation documents", "LLC formation documents")
+    .replaceAll("EIN application", "EIN application")
+    .replaceAll("US phone number included for 3 months", "US phone number included for 3 months")
+    .replaceAll("US phone number included for 3 months", "US phone number included for 3 months")
+    .replaceAll("Shopify included for 3 months + 1-year domain name", "Shopify included for 3 months + 1-year domain name")
+    .replaceAll("Shopify included for 3 months + 1-year domain name", "Shopify included for 3 months + 1-year domain name")
+    .replaceAll("Shopify included for 3 months + 1-year domain name", "Shopify included for 3 months + 1-year domain name")
+    .replaceAll("Shopify included for 3 months + 1-year domain name", "Shopify included for 3 months + 1-year domain name")
+    .replaceAll("Stripe / PayPal assistance", "Stripe / PayPal assistance")
+    .replaceAll("Wise / Mercury / Payoneer assistance", "Wise / Mercury / Payoneer assistance");
 }
+
+function translateEnServiceList(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.map((item) => translateEnServiceLabel(String(item))).join(", ");
+  }
+  return translateEnServiceLabel(String(value || "—"));
+}
+
+
+
 
 
 type Lang = "fr" | "en";
@@ -1633,7 +1643,7 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
                 <div key={key} className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-sm font-black text-[#111827]">{key}</p>
-                    <p className="mt-1 text-xs font-bold text-slate-500">{value}</p>
+                    <p className="mt-1 text-xs font-bold text-slate-500">{translateEnServiceList(value)}</p>
                   </div>
                   <p className="text-sm font-black text-[#111827]">{price}</p>
                 </div>
