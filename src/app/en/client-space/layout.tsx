@@ -1,4 +1,4 @@
-export default function FrClientPortalLayout({
+export default function EnClientSpaceLayout({
   children,
 }: {
   children: React.ReactNode;

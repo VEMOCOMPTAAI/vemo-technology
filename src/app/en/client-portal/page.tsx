@@ -15,11 +15,5 @@ export default async function EnClientPortalPage({
   searchParams?: Promise<{ email?: string; tab?: string }>;
 }) {
   const params = searchParams ? await searchParams : {};
-  return (
-    <ClientPortalWorkspace
-      lang="en"
-      email={params.email || ""}
-      tab={normalizeTab(params.tab)}
-    />
-  );
+  return <ClientPortalWorkspace lang="en" email={params.email || ""} tab={normalizeTab(params.tab)} />;
 }

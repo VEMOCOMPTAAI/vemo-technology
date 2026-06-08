@@ -5,29 +5,25 @@
       "file": "pending",
       "currentStep": "file_received"
     },
-    "documents": [],
-    "services": [
+    "documents": [
       {
-        "id": "us_phone",
-        "nameFr": "Numéro téléphone US",
-        "nameEn": "US phone number",
-        "statusFr": "Actif",
-        "statusEn": "Active",
-        "value": "+1 XXX XXX XXXX",
-        "expiresAt": "2026-09-30",
-        "renewalDueAt": "2026-09-15"
+        "id": "doc_llc_formation",
+        "nameFr": "Documents de création LLC",
+        "nameEn": "LLC formation documents",
+        "category": "Company documents",
+        "uploadedAt": "2026-06-08",
+        "url": "#"
       },
       {
-        "id": "registered_agent",
-        "nameFr": "Registered Agent",
-        "nameEn": "Registered Agent",
-        "statusFr": "Inclus",
-        "statusEn": "Included",
-        "value": "Première année incluse",
-        "expiresAt": "2027-06-30",
-        "renewalDueAt": "2027-06-01"
+        "id": "doc_operating_agreement",
+        "nameFr": "Operating Agreement",
+        "nameEn": "Operating Agreement",
+        "category": "Company documents",
+        "uploadedAt": "2026-06-08",
+        "url": "#"
       }
     ],
+    "services": [],
     "messages": []
   }
 }

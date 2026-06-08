@@ -15,11 +15,5 @@ export default async function FrEspaceClientPage({
   searchParams?: Promise<{ email?: string; tab?: string }>;
 }) {
   const params = searchParams ? await searchParams : {};
-  return (
-    <ClientPortalWorkspace
-      lang="fr"
-      email={params.email || ""}
-      tab={normalizeTab(params.tab)}
-    />
-  );
+  return <ClientPortalWorkspace lang="fr" email={params.email || ""} tab={normalizeTab(params.tab)} />;
 }

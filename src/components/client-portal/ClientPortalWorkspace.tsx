@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 type Lang = "fr" | "en";
 type Tab = "overview" | "documents" | "services" | "messages";
 
-type ClientPortalWorkspaceProps = {
+type Props = {
   lang: Lang;
   email?: string;
   tab?: Tab;
@@ -23,6 +23,21 @@ type DocItem = {
   uploaded_at?: string;
 };
 
+type ServiceItem = {
+  id?: string;
+  name?: string;
+  nameFr?: string;
+  nameEn?: string;
+  status?: string;
+  statusFr?: string;
+  statusEn?: string;
+  value?: string;
+  expiresAt?: string;
+  expiration?: string;
+  renewalDueAt?: string;
+  renewal?: string;
+};
+
 type MessageItem = {
   id?: string;
   subject?: string;
@@ -37,29 +52,26 @@ function cleanEmail(email?: string) {
   return email && email.includes("@") ? email : "sheikh.abderrahim1@gmail.com";
 }
 
-function safeDate(value?: string) {
-  if (!value) return "—";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleDateString("fr-FR");
-}
-
-function normalizeTab(tab?: string): Tab {
-  if (tab === "documents" || tab === "services" || tab === "messages") return tab;
+function normalizeTab(value?: string): Tab {
+  if (value === "documents" || value === "services" || value === "messages") return value;
   return "overview";
 }
 
-export default function ClientPortalWorkspace({
-  lang,
-  email,
-  tab = "overview",
-}: ClientPortalWorkspaceProps) {
+function safeDate(value?: string) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("fr-FR");
+}
+
+export default function ClientPortalWorkspace({ lang, email, tab = "overview" }: Props) {
   const isFr = lang === "fr";
   const activeTab = normalizeTab(tab);
   const clientEmail = cleanEmail(email);
 
   const [status, setStatus] = useState<any>(null);
   const [documents, setDocuments] = useState<DocItem[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
@@ -84,37 +96,31 @@ export default function ClientPortalWorkspace({
   const t = isFr
     ? {
         subtitle: "US LLC pour non-résidents",
+        home: "Accueil",
         documents: "Documents",
         services: "Mes services",
         messages: "Messages",
-        logout: "Se déconnecter",
         lang: "EN",
+        logout: "Se déconnecter",
         portal: "Espace client",
         title: "Mon espace client",
         emailLabel: "Email client",
-        overviewKicker: "Suivi",
-        overviewTitle: "État de mon dossier",
+        progress: "Suivi",
+        statusTitle: "État de mon dossier",
         payment: "Paiement",
         file: "Dossier",
         currentStep: "Étape actuelle",
         paymentValue: "En vérification",
         fileValue: "En attente",
         stepValue: "Réception du dossier",
-        documentsTitle: "Mes documents",
-        documentsText: "Les documents ajoutés par l’admin seront disponibles ici.",
+        documentsTitle: "Documents",
         noDocuments: "Aucun document disponible pour le moment.",
         open: "Ouvrir",
         servicesTitle: "Mes services",
-        servicesText: "Les services ajoutés par l’admin seront visibles ici avec expiration et renouvellement.",
         noServices: "Aucun service ajouté pour le moment.",
-        usPhone: "Numéro téléphone US",
-        registeredAgent: "Registered Agent",
-        active: "Actif",
-        included: "Inclus",
         expiration: "Expiration",
         renewal: "Renouvellement",
-        messagesTitle: "Messagerie avec VEMO",
-        messagesText: "Échangez avec l’admin et suivez les réponses liées à votre dossier.",
+        messagesTitle: "Messages",
         reply: "Répondre à VEMO",
         subject: "Objet",
         message: "Votre message...",
@@ -123,37 +129,31 @@ export default function ClientPortalWorkspace({
       }
     : {
         subtitle: "US LLC for non-residents",
+        home: "Home",
         documents: "Documents",
         services: "My services",
         messages: "Messages",
-        logout: "Sign out",
         lang: "FR",
+        logout: "Sign out",
         portal: "Client portal",
         title: "My client space",
         emailLabel: "Client email",
-        overviewKicker: "Progress",
-        overviewTitle: "My file status",
+        progress: "Progress",
+        statusTitle: "My file status",
         payment: "Payment",
         file: "File",
         currentStep: "Current step",
         paymentValue: "Under review",
         fileValue: "Pending",
         stepValue: "File received",
-        documentsTitle: "My documents",
-        documentsText: "Documents uploaded by the admin will be available here.",
+        documentsTitle: "Documents",
         noDocuments: "No document available yet.",
         open: "Open",
         servicesTitle: "My services",
-        servicesText: "Services added by the admin will appear here with expiration and renewal details.",
         noServices: "No service added yet.",
-        usPhone: "US phone number",
-        registeredAgent: "Registered Agent",
-        active: "Active",
-        included: "Included",
         expiration: "Expiration",
         renewal: "Renewal",
-        messagesTitle: "Communication with VEMO",
-        messagesText: "Exchange with the admin and track replies related to your file.",
+        messagesTitle: "Messages",
         reply: "Reply to VEMO",
         subject: "Subject",
         message: "Your message...",
@@ -166,37 +166,29 @@ export default function ClientPortalWorkspace({
 
     async function load() {
       try {
-        const [statusRes, docsRes, messagesRes] = await Promise.all([
+        const [statusRes, docsRes, servicesRes, messagesRes] = await Promise.all([
           fetch(`/api/client-portal/status?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
           fetch(`/api/client-portal/documents?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
+          fetch(`/api/client-portal/services?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
           fetch(`/api/client-portal/messages?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
         ]);
 
         const statusJson = await statusRes.json().catch(() => null);
         const docsJson = await docsRes.json().catch(() => null);
+        const servicesJson = await servicesRes.json().catch(() => null);
         const messagesJson = await messagesRes.json().catch(() => null);
 
         if (cancelled) return;
 
         setStatus(statusJson?.status || statusJson || null);
-        setDocuments(
-          Array.isArray(docsJson?.documents)
-            ? docsJson.documents
-            : Array.isArray(docsJson)
-              ? docsJson
-              : []
-        );
-        setMessages(
-          Array.isArray(messagesJson?.messages)
-            ? messagesJson.messages
-            : Array.isArray(messagesJson)
-              ? messagesJson
-              : []
-        );
+        setDocuments(Array.isArray(docsJson?.documents) ? docsJson.documents : Array.isArray(docsJson) ? docsJson : []);
+        setServices(Array.isArray(servicesJson?.services) ? servicesJson.services : Array.isArray(servicesJson) ? servicesJson : []);
+        setMessages(Array.isArray(messagesJson?.messages) ? messagesJson.messages : Array.isArray(messagesJson) ? messagesJson : []);
       } catch {
         if (!cancelled) {
           setStatus(null);
           setDocuments([]);
+          setServices([]);
           setMessages([]);
         }
       }
@@ -212,82 +204,38 @@ export default function ClientPortalWorkspace({
   async function sendMessage() {
     if (!subject.trim() && !message.trim()) return;
 
+    const localMessage = {
+      id: `local-${Date.now()}`,
+      subject,
+      message,
+      from: "client",
+      createdAt: new Date().toISOString(),
+    };
+
     try {
       await fetch("/api/client-portal/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: clientEmail, subject, message }),
       });
+    } catch {}
 
-      setMessages((old) => [
-        {
-          id: `local-${Date.now()}`,
-          subject,
-          message,
-          from: "client",
-          createdAt: new Date().toISOString(),
-        },
-        ...old,
-      ]);
-
-      setSubject("");
-      setMessage("");
-    } catch {
-      setMessages((old) => [
-        {
-          id: `local-${Date.now()}`,
-          subject,
-          message,
-          from: "client",
-          createdAt: new Date().toISOString(),
-        },
-        ...old,
-      ]);
-      setSubject("");
-      setMessage("");
-    }
+    setMessages((old) => [localMessage, ...old]);
+    setSubject("");
+    setMessage("");
   }
 
   function logout() {
     localStorage.removeItem("vemo_client_email");
+    localStorage.removeItem("vemoClientEmail");
+    localStorage.removeItem("clientEmail");
+    localStorage.removeItem("email");
     window.location.href = isFr ? "/fr" : "/en";
   }
 
-  const paymentLabel =
-    status?.payment_status ||
-    status?.paymentStatus ||
-    status?.payment ||
-    t.paymentValue;
-
-  const fileLabel =
-    status?.dossier_status ||
-    status?.file_status ||
-    status?.fileStatus ||
-    status?.file ||
-    t.fileValue;
-
-  const stepLabel =
-    status?.current_step ||
-    status?.currentStep ||
-    status?.step ||
-    t.stepValue;
-
-  const services = [
-    {
-      name: t.usPhone,
-      status: t.active,
-      value: "+1 XXX XXX XXXX",
-      expiration: "2026-09-30",
-      renewal: "2026-09-15",
-    },
-    {
-      name: t.registeredAgent,
-      status: t.included,
-      value: isFr ? "Première année incluse" : "First year included",
-      expiration: "2027-06-30",
-      renewal: "2027-06-01",
-    },
-  ];
+  const paymentLabel = status?.payment_status || status?.paymentStatus || status?.payment || t.paymentValue;
+  const fileLabel = status?.dossier_status || status?.file_status || status?.fileStatus || status?.file || t.fileValue;
+  const stepLabel = status?.current_step || status?.currentStep || status?.step || t.stepValue;
 
   return (
     <main className="min-h-screen bg-[#F3F7FB] pb-12 text-[#111827]">
@@ -304,6 +252,9 @@ export default function ClientPortalWorkspace({
           </Link>
 
           <nav className="hidden items-center gap-8 text-sm font-black md:flex">
+            <Link href={hrefFor("overview")} className={activeTab === "overview" ? "text-[#F15A24]" : "text-[#111827]"}>
+              {t.home}
+            </Link>
             <Link href={hrefFor("documents")} className={activeTab === "documents" ? "text-[#F15A24]" : "text-[#111827]"}>
               {t.documents}
             </Link>
@@ -347,10 +298,10 @@ export default function ClientPortalWorkspace({
         {activeTab === "overview" && (
           <section className="mt-6 rounded-[28px] bg-white p-8">
             <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">
-              {t.overviewKicker}
+              {t.progress}
             </p>
             <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
-              {t.overviewTitle}
+              {t.statusTitle}
             </h2>
 
             <div className="mt-7 grid gap-4 md:grid-cols-3">
@@ -380,7 +331,6 @@ export default function ClientPortalWorkspace({
                 <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
                   {t.documentsTitle}
                 </h2>
-                <p className="mt-3 text-sm font-bold text-[#64748B]">{t.documentsText}</p>
               </div>
               <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-[#F15A24] px-2 text-xs font-black text-white">
                 {documents.length}
@@ -426,7 +376,6 @@ export default function ClientPortalWorkspace({
                 <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
                   {t.servicesTitle}
                 </h2>
-                <p className="mt-3 text-sm font-bold text-[#64748B]">{t.servicesText}</p>
               </div>
               <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-[#F15A24] px-2 text-xs font-black text-white">
                 {services.length}
@@ -434,38 +383,54 @@ export default function ClientPortalWorkspace({
             </div>
 
             <div className="mt-7 grid gap-4 md:grid-cols-2">
-              {services.map((service) => (
-                <div key={service.name} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-base font-black text-[#123A63]">{service.name}</h3>
-                      <p className="mt-2 text-sm font-bold text-[#64748B]">{service.value}</p>
-                    </div>
-                    <span className="rounded-full bg-white px-3 py-2 text-xs font-black text-[#F15A24]">
-                      {service.status}
-                    </span>
-                  </div>
+              {services.length ? (
+                services.map((service, index) => {
+                  const name = isFr
+                    ? service.nameFr || service.name || service.nameEn || `Service ${index + 1}`
+                    : service.nameEn || service.name || service.nameFr || `Service ${index + 1}`;
 
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-[14px] border border-[#DDE7F2] bg-white p-4">
-                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8AA0BC]">
-                        {t.expiration}
-                      </p>
-                      <p className="mt-2 text-sm font-black text-[#123A63]">
-                        {safeDate(service.expiration)}
-                      </p>
+                  const statusLabel = isFr
+                    ? service.statusFr || service.status || service.statusEn || "—"
+                    : service.statusEn || service.status || service.statusFr || "—";
+
+                  return (
+                    <div key={service.id || index} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-base font-black text-[#123A63]">{name}</h3>
+                          <p className="mt-2 text-sm font-bold text-[#64748B]">{service.value || "—"}</p>
+                        </div>
+                        <span className="rounded-full bg-white px-3 py-2 text-xs font-black text-[#F15A24]">
+                          {statusLabel}
+                        </span>
+                      </div>
+
+                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-[14px] border border-[#DDE7F2] bg-white p-4">
+                          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8AA0BC]">
+                            {t.expiration}
+                          </p>
+                          <p className="mt-2 text-sm font-black text-[#123A63]">
+                            {safeDate(service.expiresAt || service.expiration)}
+                          </p>
+                        </div>
+                        <div className="rounded-[14px] border border-[#DDE7F2] bg-white p-4">
+                          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8AA0BC]">
+                            {t.renewal}
+                          </p>
+                          <p className="mt-2 text-sm font-black text-[#123A63]">
+                            {safeDate(service.renewalDueAt || service.renewal)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="rounded-[14px] border border-[#DDE7F2] bg-white p-4">
-                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8AA0BC]">
-                        {t.renewal}
-                      </p>
-                      <p className="mt-2 text-sm font-black text-[#123A63]">
-                        {safeDate(service.renewal)}
-                      </p>
-                    </div>
-                  </div>
+                  );
+                })
+              ) : (
+                <div className="rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-5 text-sm font-black text-[#64748B]">
+                  {t.noServices}
                 </div>
-              ))}
+              )}
             </div>
           </section>
         )}
@@ -480,7 +445,6 @@ export default function ClientPortalWorkspace({
                 <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
                   {t.messagesTitle}
                 </h2>
-                <p className="mt-3 text-sm font-bold text-[#64748B]">{t.messagesText}</p>
               </div>
               <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-[#F15A24] px-2 text-xs font-black text-white">
                 {messages.length}
