@@ -1,9 +1,10 @@
+import type { ReactNode } from "react";
 import ClientPortalTopMenu from "@/components/client-portal/ClientPortalTopMenu";
 
 export default function EnClientPortalLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <>

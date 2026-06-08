@@ -1,9 +1,10 @@
+import type { ReactNode } from "react";
 import ClientPortalTopMenu from "@/components/client-portal/ClientPortalTopMenu";
 
-export default function FrClientPortalLayout({
+export default function FrEspaceClientLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <>
