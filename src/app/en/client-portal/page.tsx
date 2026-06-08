@@ -1,4 +1,4 @@
-import EnglishClientPortalContent from "./EnglishClientPortalContent";
+import ClientPortalWorkspace from "@/components/client-portal/ClientPortalWorkspace";
 
 export const dynamic = "force-dynamic";
 
@@ -10,5 +10,5 @@ export default async function EnClientPortalPage({
   const params = searchParams ? await searchParams : {};
   const email = params.email || "";
 
-  return <EnglishClientPortalContent email={email} />;
+  return <ClientPortalWorkspace lang="en" email={email} />;
 }

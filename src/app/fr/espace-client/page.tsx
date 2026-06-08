@@ -1,32 +1,14 @@
-import ClientPortalServicesBlock from "@/components/client-portal/ClientPortalServicesBlock";
-import ClientPortalMenu from "@/components/client-portal/ClientPortalMenu";
-import ClientEmailMemory from "@/components/client-portal/ClientEmailMemory";
-import { Suspense } from "react";
-import ClientPortalContent from "./ClientPortalContent";
+import ClientPortalWorkspace from "@/components/client-portal/ClientPortalWorkspace";
 
 export const dynamic = "force-dynamic";
 
-function LoadingClientPortal() {
-  return (
-    <><ClientEmailMemory redirectWhenMissing targetPath="/fr/espace-client" /><main className="min-h-screen bg-[#F5F7FA] px-6 py-12 text-[#111827]">
-      <ClientPortalServicesBlock lang="fr" />
+export default async function FrEspaceClientPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ email?: string }>;
+}) {
+  const params = searchParams ? await searchParams : {};
+  const email = params.email || "";
 
-
-
-
-      <ClientPortalMenu lang="fr" />
-
-      <div className="mx-auto max-w-7xl rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
-        <p className="text-sm font-black text-[#F15A24]">Chargement de l’espace client...</p>
-      </div>
-    </main></>
-  );
-}
-
-export default function ClientPortalPage() {
-  return (
-    <Suspense fallback={<LoadingClientPortal />}>
-      <ClientPortalContent />
-    </Suspense>
-  );
+  return <ClientPortalWorkspace lang="fr" email={email} />;
 }

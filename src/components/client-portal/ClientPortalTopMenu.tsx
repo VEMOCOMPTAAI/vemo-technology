@@ -29,7 +29,7 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
   const copy =
     lang === "fr"
       ? {
-          files: "Mes fichiers",
+          documents: "Documents",
           services: "Mes services",
           messages: "Messages",
           lang: "EN",
@@ -40,7 +40,7 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           subtitle: "US LLC pour non-résidents",
         }
       : {
-          files: "My files",
+          documents: "Documents",
           services: "My services",
           messages: "Messages",
           lang: "FR",
@@ -73,7 +73,7 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-black text-[#111827] md:flex">
-          <a href="#documents" className="hover:text-[#F15A24]">{copy.files}</a>
+          <a href="#documents" className="hover:text-[#F15A24]">{copy.documents}</a>
           <a href="#services" className="hover:text-[#F15A24]">{copy.services}</a>
           <a href="#messages" className="hover:text-[#F15A24]">{copy.messages}</a>
         </nav>

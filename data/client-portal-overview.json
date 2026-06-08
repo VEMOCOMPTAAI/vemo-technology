@@ -1,0 +1,33 @@
+{
+  "sheikh.abderrahim1@gmail.com": {
+    "status": {
+      "payment": "under_review",
+      "file": "pending",
+      "currentStep": "file_received"
+    },
+    "documents": [],
+    "services": [
+      {
+        "id": "us_phone",
+        "nameFr": "Numéro téléphone US",
+        "nameEn": "US phone number",
+        "statusFr": "Actif",
+        "statusEn": "Active",
+        "value": "+1 XXX XXX XXXX",
+        "expiresAt": "2026-09-30",
+        "renewalDueAt": "2026-09-15"
+      },
+      {
+        "id": "registered_agent",
+        "nameFr": "Registered Agent",
+        "nameEn": "Registered Agent",
+        "statusFr": "Inclus",
+        "statusEn": "Included",
+        "value": "Première année incluse",
+        "expiresAt": "2027-06-30",
+        "renewalDueAt": "2027-06-01"
+      }
+    ],
+    "messages": []
+  }
+}
