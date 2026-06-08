@@ -1,3 +1,4 @@
+import ClientPortalServicesBlock from "@/components/client-portal/ClientPortalServicesBlock";
 import ClientPortalMenu from "@/components/client-portal/ClientPortalMenu";
 import ClientEmailMemory from "@/components/client-portal/ClientEmailMemory";
 import { Suspense } from "react";
@@ -8,6 +9,8 @@ export const dynamic = "force-dynamic";
 function LoadingClientPortal() {
   return (
     <><ClientEmailMemory redirectWhenMissing targetPath="/fr/espace-client" /><main className="min-h-screen bg-[#F5F7FA] px-6 py-12 text-[#111827]">
+      <ClientPortalServicesBlock lang="fr" />
+
 
 
 

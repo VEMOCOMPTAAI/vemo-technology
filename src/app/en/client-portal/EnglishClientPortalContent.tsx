@@ -1,5 +1,6 @@
 "use client";
 
+import ClientPortalServicesBlock from "@/components/client-portal/ClientPortalServicesBlock";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -316,7 +317,9 @@ export default function EnglishClientPortalContent() {
                   Documents
                 </p>
                 <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
-                  <span id="documents"></span><span id="documents"></span>Available documents
+                  <span id="documents"></span><span id="documents">
+      <ClientPortalServicesBlock lang="en" />
+</span><span id="documents"></span>Available documents
                 </h2>
               </div>
 
@@ -369,7 +372,7 @@ export default function EnglishClientPortalContent() {
                   Messages
                 </p>
                 <h2 className="mt-2 text-[25px] font-black tracking-[-0.05em]">
-                  <span id="messages"></span><span id="messages"></span>Communication with VEMO
+                  <span id="messages"></span>Communication with VEMO
                 </h2>
               </div>
 
