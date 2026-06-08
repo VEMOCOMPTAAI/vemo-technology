@@ -17,6 +17,17 @@ function getEmail() {
   return window.localStorage.getItem("vemo_client_email") || "";
 }
 
+function makeHref(base: string, email: string, tab?: string) {
+  const params = new URLSearchParams();
+
+  if (email) params.set("email", email);
+  if (tab) params.set("tab", tab);
+
+  const query = params.toString();
+
+  return query ? `${base}?${query}` : base;
+}
+
 export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
   const [email, setEmail] = useState("");
 
@@ -24,7 +35,7 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
     setEmail(getEmail());
   }, []);
 
-  const query = email ? `?email=${encodeURIComponent(email)}` : "";
+  const base = lang === "fr" ? "/fr/espace-client" : "/en/client-portal";
 
   const copy =
     lang === "fr"
@@ -34,10 +45,9 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           messages: "Messages",
           lang: "EN",
           logout: "Se déconnecter",
-          switchHref: `/en/client-portal${query}`,
-          homeHref: `/fr/espace-client${query}`,
+          switchHref: makeHref("/en/client-portal", email),
           logoutHref: "/fr",
-          subtitle: "US LLC pour non-résidents",
+          subtitle: "US LLC pour non-résidents"
         }
       : {
           documents: "Documents",
@@ -45,10 +55,9 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           messages: "Messages",
           lang: "FR",
           logout: "Sign out",
-          switchHref: `/fr/espace-client${query}`,
-          homeHref: `/en/client-portal${query}`,
+          switchHref: makeHref("/fr/espace-client", email),
           logoutHref: "/en",
-          subtitle: "US LLC for non-residents",
+          subtitle: "US LLC for non-residents"
         };
 
   function logout() {
@@ -60,9 +69,9 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
   }
 
   return (
-    <header className="vemo-client-top-nav fixed left-0 right-0 top-0 z-[999] border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
+    <header className="fixed left-0 right-0 top-0 z-[999] border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between px-6">
-        <Link href={copy.homeHref} className="leading-none">
+        <Link href={makeHref(base, email)} className="leading-none">
           <div className="text-[22px] font-black tracking-[-0.04em]">
             <span className="text-[#123A63]">VEMO</span>
             <span className="text-[#F15A24]">TECH</span>
@@ -73,9 +82,15 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-black text-[#111827] md:flex">
-          <a href="#documents" className="hover:text-[#F15A24]">{copy.documents}</a>
-          <a href="#services" className="hover:text-[#F15A24]">{copy.services}</a>
-          <a href="#messages" className="hover:text-[#F15A24]">{copy.messages}</a>
+          <Link href={makeHref(base, email, "documents")} className="hover:text-[#F15A24]">
+            {copy.documents}
+          </Link>
+          <Link href={makeHref(base, email, "services")} className="hover:text-[#F15A24]">
+            {copy.services}
+          </Link>
+          <Link href={makeHref(base, email, "messages")} className="hover:text-[#F15A24]">
+            {copy.messages}
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">

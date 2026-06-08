@@ -2,13 +2,24 @@ import ClientPortalWorkspace from "@/components/client-portal/ClientPortalWorksp
 
 export const dynamic = "force-dynamic";
 
+type Tab = "overview" | "documents" | "services" | "messages";
+
+function normalizeTab(value?: string): Tab {
+  if (value === "documents" || value === "services" || value === "messages") return value;
+  return "overview";
+}
+
 export default async function FrEspaceClientPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ email?: string }>;
+  searchParams?: Promise<{ email?: string; tab?: string }>;
 }) {
   const params = searchParams ? await searchParams : {};
-  const email = params.email || "";
-
-  return <ClientPortalWorkspace lang="fr" email={email} />;
+  return (
+    <ClientPortalWorkspace
+      lang="fr"
+      email={params.email || ""}
+      tab={normalizeTab(params.tab)}
+    />
+  );
 }

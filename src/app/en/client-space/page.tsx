@@ -1,13 +1,25 @@
-import ClientPortalMenu from "@/components/client-portal/ClientPortalMenu";
-import ClientEmailMemory from "@/components/client-portal/ClientEmailMemory";
-import { redirect } from "next/navigation";
+import ClientPortalWorkspace from "@/components/client-portal/ClientPortalWorkspace";
 
-export default async function EnglishClientSpaceAliasPage({
+export const dynamic = "force-dynamic";
+
+type Tab = "overview" | "documents" | "services" | "messages";
+
+function normalizeTab(value?: string): Tab {
+  if (value === "documents" || value === "services" || value === "messages") return value;
+  return "overview";
+}
+
+export default async function EnClientSpacePage({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  searchParams?: Promise<{ email?: string; tab?: string }>;
 }) {
-  const params = await searchParams;
-  const email = Array.isArray(params.email) ? params.email[0] || "" : params.email || "";
-  redirect(`/en/client-portal${email ? `?email=${encodeURIComponent(email)}` : ""}`);
+  const params = searchParams ? await searchParams : {};
+  return (
+    <ClientPortalWorkspace
+      lang="en"
+      email={params.email || ""}
+      tab={normalizeTab(params.tab)}
+    />
+  );
 }
