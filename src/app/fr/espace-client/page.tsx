@@ -16,7 +16,7 @@ function LoadingClientPortal() {
 
       <ClientPortalMenu lang="fr" />
 
-      <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
+      <div className="mx-auto max-w-7xl rounded-[2rem] border border-[#E6EDF5] bg-white p-8">
         <p className="text-sm font-black text-[#F15A24]">Chargement de l’espace client...</p>
       </div>
     </main></>

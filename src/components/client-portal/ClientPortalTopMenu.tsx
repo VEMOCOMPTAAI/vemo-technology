@@ -34,9 +34,10 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           messages: "Messages",
           status: "Statut",
           lang: "EN",
-          refresh: "Actualiser",
+          logout: "Se déconnecter",
           switchHref: `/en/client-portal${query}`,
           homeHref: `/fr/espace-client${query}`,
+          logoutHref: "/fr",
           subtitle: "US LLC pour non-résidents",
         }
       : {
@@ -45,11 +46,20 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           messages: "Messages",
           status: "Status",
           lang: "FR",
-          refresh: "Refresh",
+          logout: "Sign out",
           switchHref: `/fr/espace-client${query}`,
           homeHref: `/en/client-portal${query}`,
+          logoutHref: "/en",
           subtitle: "US LLC for non-residents",
         };
+
+  function logout() {
+    window.localStorage.removeItem("vemo_client_email");
+    window.localStorage.removeItem("vemoClientEmail");
+    window.localStorage.removeItem("clientEmail");
+    window.localStorage.removeItem("email");
+    window.location.href = copy.logoutHref;
+  }
 
   return (
     <header className="vemo-client-top-nav fixed left-0 right-0 top-0 z-[999] border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
@@ -81,10 +91,10 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
 
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={logout}
             className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[#F15A24] px-6 text-sm font-black text-white"
           >
-            {copy.refresh}
+            {copy.logout}
           </button>
         </div>
       </div>
