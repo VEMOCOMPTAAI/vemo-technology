@@ -22,24 +22,6 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
 
   useEffect(() => {
     setEmail(getEmail());
-
-    const hideOldButtons = () => {
-      document.querySelectorAll("a,button").forEach((el) => {
-        const text = (el.textContent || "").trim().toLowerCase();
-        const inHeader = (el as HTMLElement).closest(".vemo-client-top-nav");
-
-        if (!inHeader && ["home", "accueil", "refresh", "actualiser"].includes(text)) {
-          (el as HTMLElement).style.display = "none";
-        }
-      });
-    };
-
-    hideOldButtons();
-
-    const observer = new MutationObserver(hideOldButtons);
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
   }, []);
 
   const query = email ? `?email=${encodeURIComponent(email)}` : "";

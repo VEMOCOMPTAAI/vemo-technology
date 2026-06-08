@@ -220,12 +220,7 @@ export default function EnglishClientPortalContent() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <a
-                href="/en"
-                className="rounded-[14px] border border-[#E6EDF5] bg-white px-4 py-3 text-sm font-black text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
-              >
-                Home
-              </a>
+              
 
               <button
                 type="button"
