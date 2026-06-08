@@ -31,20 +31,14 @@ export default function EnglishClientPortalContent({
           </p>
         </div>
 
-        <section id="status" className="mt-6 rounded-[28px] bg-white p-8">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">
-                Tracking
-              </p>
-              <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
-                My file status
-              </h2>
-            </div>
-
-            <span className="rounded-full bg-[#F15A24] px-4 py-2 text-xs font-black text-white">
-              Live
-            </span>
+        <section className="mt-6 rounded-[28px] bg-white p-8">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">
+              Progress
+            </p>
+            <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
+              My file status
+            </h2>
           </div>
 
           <div className="mt-7 grid gap-4 md:grid-cols-3">
@@ -74,40 +68,6 @@ export default function EnglishClientPortalContent({
                 File received
               </p>
             </div>
-          </div>
-        </section>
-
-        <section id="services" className="mt-6 rounded-[28px] bg-white p-8">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">
-                Services
-              </p>
-              <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
-                My services
-              </h2>
-            </div>
-
-            <span className="rounded-full bg-[#F15A24] px-4 py-2 text-xs font-black text-white">
-              Included in your file
-            </span>
-          </div>
-
-          <div className="mt-7 grid gap-4 md:grid-cols-4">
-            {[
-              ["LLC Formation", "Formation documents and file tracking."],
-              ["EIN", "EIN application follow-up."],
-              ["Banking", "Stripe, Mercury, Wise or Payoneer preparation."],
-              ["Registered Agent", "Included depending on the selected package."],
-            ].map(([title, text]) => (
-              <div key={title} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
-                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-[12px] bg-white text-[#F15A24]">
-                  ✓
-                </div>
-                <h3 className="text-sm font-black text-[#123A63]">{title}</h3>
-                <p className="mt-3 text-xs font-bold leading-5 text-[#64748B]">{text}</p>
-              </div>
-            ))}
           </div>
         </section>
 

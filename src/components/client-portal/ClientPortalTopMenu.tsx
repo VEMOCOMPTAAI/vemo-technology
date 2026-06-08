@@ -32,7 +32,6 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           files: "Mes fichiers",
           services: "Mes services",
           messages: "Messages",
-          status: "Statut",
           lang: "EN",
           logout: "Se déconnecter",
           switchHref: `/en/client-portal${query}`,
@@ -44,7 +43,6 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           files: "My files",
           services: "My services",
           messages: "Messages",
-          status: "Status",
           lang: "FR",
           logout: "Sign out",
           switchHref: `/fr/espace-client${query}`,
@@ -78,7 +76,6 @@ export default function ClientPortalTopMenu({ lang }: { lang: "fr" | "en" }) {
           <a href="#documents" className="hover:text-[#F15A24]">{copy.files}</a>
           <a href="#services" className="hover:text-[#F15A24]">{copy.services}</a>
           <a href="#messages" className="hover:text-[#F15A24]">{copy.messages}</a>
-          <a href="#status" className="hover:text-[#F15A24]">{copy.status}</a>
         </nav>
 
         <div className="flex items-center gap-3">
