@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import VemoGlobalLanguageRouter from "@/components/site/VemoGlobalLanguageRouter";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://vemo-technology.vercel.app";
@@ -70,11 +71,11 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body>
+        <VemoGlobalLanguageRouter />
         {children}
         <Analytics />
       </body>
     </html>
   );
 }
-
 
