@@ -2,10 +2,10 @@ import ClientPortalWorkspace from "@/components/client-portal/ClientPortalWorksp
 
 export const dynamic = "force-dynamic";
 
-type Tab = "overview" | "documents" | "services" | "messages";
+type Tab = "overview" | "documents" | "services" | "messages" | "account";
 
 function normalizeTab(value?: string): Tab {
-  if (value === "documents" || value === "services" || value === "messages") return value;
+  if (value === "documents" || value === "services" || value === "messages" || value === "account") return value;
   return "overview";
 }
 

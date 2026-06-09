@@ -27,11 +27,11 @@ function defaultPortal() {
     status: {
       payment: "under_review",
       file: "pending",
-      currentStep: "file_received",
+      currentStep: "file_received"
     },
     documents: [],
     services: [],
-    messages: [],
+    messages: []
   };
 }
 
@@ -41,12 +41,13 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     email,
-    portal: data[email] || defaultPortal(),
+    portal: data[email] || defaultPortal()
   });
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
+
   const email = String(body.email || "");
   const subject = String(body.subject || "");
   const message = String(body.message || "");
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
     from: "client",
     subject,
     message,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date().toISOString()
   });
 
   data[email] = portal;

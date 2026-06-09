@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Lang = "fr" | "en";
-type Tab = "overview" | "documents" | "services" | "messages";
+type Tab = "overview" | "documents" | "services" | "messages" | "account";
 
 type Props = {
   lang: Lang;
@@ -53,7 +53,7 @@ function cleanEmail(email?: string) {
 }
 
 function normalizeTab(value?: string): Tab {
-  if (value === "documents" || value === "services" || value === "messages") return value;
+  if (value === "documents" || value === "services" || value === "messages" || value === "account") return value;
   return "overview";
 }
 
@@ -73,6 +73,15 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
   const [documents, setDocuments] = useState<DocItem[]>([]);
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [messages, setMessages] = useState<MessageItem[]>([]);
+  const [account, setAccount] = useState<{ name: string; email: string; passwordUpdatedAt?: string | null }>({
+    name: "Client VEMO",
+    email: clientEmail,
+    passwordUpdatedAt: null,
+  });
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [accountMessage, setAccountMessage] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
@@ -96,15 +105,13 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
   const t = isFr
     ? {
         subtitle: "US LLC pour non-résidents",
-        home: "Accueil",
+        home: "Statut",
         documents: "Documents",
         services: "Mes services",
         messages: "Messages",
+        account: "Mon compte",
         lang: "EN",
         logout: "Se déconnecter",
-        portal: "Espace client",
-        title: "Mon espace client",
-        emailLabel: "Email client",
         progress: "Suivi",
         statusTitle: "État de mon dossier",
         payment: "Paiement",
@@ -126,18 +133,40 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
         message: "Votre message...",
         send: "Envoyer",
         noMessages: "Aucun message disponible.",
+        accountTitle: "Mon compte",
+        accountText: "Gérez l’accès à votre espace client.",
+        name: "Nom",
+        email: "Email",
+        readonly: "Non modifiable",
+        password: "Mot de passe",
+        currentPassword: "Mot de passe actuel",
+        newPassword: "Nouveau mot de passe",
+        confirmPassword: "Confirmation du mot de passe",
+        updatePassword: "Mettre à jour le mot de passe",
+        passwordUpdated: "Mot de passe mis à jour.",
+        passwordError: "Vérifiez les informations saisies.",
+        accountTitle: "Mon compte",
+        accountText: "Gérez l’accès à votre espace client.",
+        name: "Nom",
+        email: "Email",
+        readonly: "Non modifiable",
+        password: "Mot de passe",
+        currentPassword: "Mot de passe actuel",
+        newPassword: "Nouveau mot de passe",
+        confirmPassword: "Confirmation du mot de passe",
+        updatePassword: "Mettre à jour le mot de passe",
+        passwordUpdated: "Mot de passe mis à jour.",
+        passwordError: "Vérifiez les informations saisies.",
       }
     : {
         subtitle: "US LLC for non-residents",
-        home: "Home",
+        home: "Status",
         documents: "Documents",
         services: "My services",
         messages: "Messages",
+        account: "My account",
         lang: "FR",
         logout: "Sign out",
-        portal: "Client portal",
-        title: "My client space",
-        emailLabel: "Client email",
         progress: "Progress",
         statusTitle: "My file status",
         payment: "Payment",
@@ -159,6 +188,30 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
         message: "Your message...",
         send: "Send",
         noMessages: "No message available.",
+        accountTitle: "My account",
+        accountText: "Manage access to your client portal.",
+        name: "Name",
+        email: "Email",
+        readonly: "Read only",
+        password: "Password",
+        currentPassword: "Current password",
+        newPassword: "New password",
+        confirmPassword: "Confirm password",
+        updatePassword: "Update password",
+        passwordUpdated: "Password updated.",
+        passwordError: "Please check the information entered.",
+        accountTitle: "My account",
+        accountText: "Manage access to your client portal.",
+        name: "Name",
+        email: "Email",
+        readonly: "Read only",
+        password: "Password",
+        currentPassword: "Current password",
+        newPassword: "New password",
+        confirmPassword: "Confirm password",
+        updatePassword: "Update password",
+        passwordUpdated: "Password updated.",
+        passwordError: "Please check the information entered.",
       };
 
   useEffect(() => {
@@ -166,17 +219,20 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
 
     async function load() {
       try {
-        const [statusRes, docsRes, servicesRes, messagesRes] = await Promise.all([
+        const [statusRes, docsRes, servicesRes, messagesRes, accountRes] = await Promise.all([
           fetch(`/api/client-portal/status?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
           fetch(`/api/client-portal/documents?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
           fetch(`/api/client-portal/services?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
           fetch(`/api/client-portal/messages?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
+          fetch(`/api/client-portal/account?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
+          fetch(`/api/client-portal/account?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
         ]);
 
         const statusJson = await statusRes.json().catch(() => null);
         const docsJson = await docsRes.json().catch(() => null);
         const servicesJson = await servicesRes.json().catch(() => null);
         const messagesJson = await messagesRes.json().catch(() => null);
+        const accountJson = await accountRes.json().catch(() => null);
 
         if (cancelled) return;
 
@@ -184,6 +240,12 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
         setDocuments(Array.isArray(docsJson?.documents) ? docsJson.documents : Array.isArray(docsJson) ? docsJson : []);
         setServices(Array.isArray(servicesJson?.services) ? servicesJson.services : Array.isArray(servicesJson) ? servicesJson : []);
         setMessages(Array.isArray(messagesJson?.messages) ? messagesJson.messages : Array.isArray(messagesJson) ? messagesJson : []);
+        if (accountJson?.account) {
+          setAccount(accountJson.account);
+        }
+        if (accountJson?.account) {
+          setAccount(accountJson.account);
+        }
       } catch {
         if (!cancelled) {
           setStatus(null);
@@ -233,6 +295,46 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
     window.location.href = isFr ? "/fr" : "/en";
   }
 
+  async function updatePassword() {
+    setAccountMessage("");
+
+    if (!currentPassword || !newPassword || !confirmPassword || newPassword.length < 8 || newPassword !== confirmPassword) {
+      setAccountMessage(t.passwordError);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/client-portal/account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: clientEmail,
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.ok) {
+        setAccountMessage(t.passwordError);
+        return;
+      }
+
+      if (json.account) {
+        setAccount(json.account);
+      }
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setAccountMessage(t.passwordUpdated);
+    } catch {
+      setAccountMessage(t.passwordError);
+    }
+  }
+
   const paymentLabel = status?.payment_status || status?.paymentStatus || status?.payment || t.paymentValue;
   const fileLabel = status?.dossier_status || status?.file_status || status?.fileStatus || status?.file || t.fileValue;
   const stepLabel = status?.current_step || status?.currentStep || status?.step || t.stepValue;
@@ -264,6 +366,9 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
             <Link href={hrefFor("messages")} className={activeTab === "messages" ? "text-[#F15A24]" : "text-[#111827]"}>
               {t.messages}
             </Link>
+            <Link href={hrefFor("account")} className={activeTab === "account" ? "text-[#F15A24]" : "text-[#111827]"}>
+              {t.account}
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -278,22 +383,6 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
       </header>
 
       <section className="mx-auto mt-10 max-w-5xl px-6">
-        <div className="rounded-[28px] bg-white p-8">
-          <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F15A24]">
-            {t.portal}
-          </p>
-
-          <h1 className="mt-5 text-4xl font-black tracking-[-0.05em]">
-            {t.title}
-          </h1>
-
-          <div className="mt-7 rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#8AA0BC]">
-              {t.emailLabel}
-            </p>
-            <p className="mt-3 text-sm font-black text-[#123A63]">{clientEmail}</p>
-          </div>
-        </div>
 
         {activeTab === "overview" && (
           <section className="mt-6 rounded-[28px] bg-white p-8">

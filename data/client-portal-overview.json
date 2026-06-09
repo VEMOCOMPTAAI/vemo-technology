@@ -24,6 +24,11 @@
       }
     ],
     "services": [],
-    "messages": []
+    "messages": [],
+    "profile": {
+      "name": "ABDEL CH",
+      "email": "sheikh.abderrahim1@gmail.com",
+      "passwordUpdatedAt": null
+    }
   }
 }
