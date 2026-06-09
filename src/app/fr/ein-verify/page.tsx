@@ -16,7 +16,8 @@ export default async function FrenchEinVerifyPage({
   return (
     <>
       <VemoPublicHeader locale="fr" />
-      <main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
+      <VemoPublicHeader locale="fr" />
+<main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
 <section className="mx-auto max-w-4xl px-6 py-16">
         <div className="rounded-[32px] border border-[#E6EDF5] bg-white p-8 text-center md:p-12">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#F15A24] text-2xl font-black text-white">

@@ -14,7 +14,8 @@ export default function BankingGuidancePage() {
   return (
     <>
       <VemoPublicHeader locale="fr" />
-      <main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
+      <VemoPublicHeader locale="fr" />
+<main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
 <section className="mx-auto max-w-7xl px-6 py-16">
         <p className="text-center text-[11px] font-black uppercase tracking-[0.28em] text-[#F15A24]">
           Banking & payments

@@ -25,7 +25,8 @@ export default function FaqEnPage() {
   return (
     <>
       <VemoPublicHeader locale="en" />
-      <main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
+      <VemoPublicHeader locale="en" />
+<main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
         <section className="mx-auto max-w-4xl px-6 py-12">
           <div className="text-center">
             <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#F15A24]">FAQ</p>

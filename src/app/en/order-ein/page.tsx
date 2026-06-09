@@ -6,7 +6,8 @@ export default function EnglishOrderEinPage() {
   return (
     <>
       <VemoPublicHeader locale="en" />
-      <main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
+      <VemoPublicHeader locale="en" />
+<main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
 <EinOrderFlow locale="en" />
 
       <footer className="border-t border-[#0F3558] bg-[#123A63] text-white">

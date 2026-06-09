@@ -14,7 +14,8 @@ export default function EnglishBankingGuidancePage() {
   return (
     <>
       <VemoPublicHeader locale="en" />
-      <main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
+      <VemoPublicHeader locale="en" />
+<main className="vemo-public-zero-reflets min-h-screen bg-white text-[#111827]">
       <section className="mx-auto max-w-7xl px-6 py-16">
         <Link href="/en" className="text-sm font-black text-[#F15A24]">← Back home</Link>
 
