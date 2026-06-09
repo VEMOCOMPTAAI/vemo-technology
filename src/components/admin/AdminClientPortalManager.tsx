@@ -27,7 +27,6 @@ export default function AdminClientPortalManager({ lang }: Props) {
         search: "Rechercher un dossier...",
         choose: "Choisir un dossier",
         opened: "Dossier ouvert",
-        openClient: "Voir côté client",
         statusTab: "Statut",
         documentsTab: "Documents",
         servicesTab: "Services",
@@ -93,7 +92,6 @@ export default function AdminClientPortalManager({ lang }: Props) {
         search: "Search a file...",
         choose: "Choose a file",
         opened: "Open file",
-        openClient: "View client side",
         statusTab: "Status",
         documentsTab: "Documents",
         servicesTab: "Services",
@@ -184,10 +182,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
     return clients.filter((client) => client.label.toLowerCase().includes(q));
   }, [clients, search]);
 
-  const clientUrl = useMemo(() => {
-    const base = isFr ? "/fr/espace-client" : "/en/client-portal";
-    return `${base}?email=${encodeURIComponent(email)}`;
-  }, [email, isFr]);
+  const langSwitchUrl = isFr ? "/en/admin/client-portal" : "/fr/admin/client-portal";
 
   async function loadClients() {
     const res = await fetch("/api/admin/client-portal/manage", { cache: "no-store" });
@@ -327,12 +322,10 @@ export default function AdminClientPortalManager({ lang }: Props) {
             </div>
 
             <a
-              href={clientUrl}
-              target="_blank"
-              rel="noreferrer"
+              href={langSwitchUrl}
               className="rounded-[14px] border border-[#DDE7F2] bg-white px-5 py-3 text-sm font-black text-[#123A63]"
             >
-              {t.openClient}
+              {isFr ? "EN" : "FR"}
             </a>
           </div>
 
