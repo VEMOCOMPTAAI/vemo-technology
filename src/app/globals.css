@@ -756,3 +756,11 @@ button[data-vemo-upload-button="true"]::after {
 .vemo-doc-action-danger:hover {
   background: #FFF3EF;
 }
+
+/* VEMO final compact document actions */
+.admin-doc-actions a,
+.admin-doc-actions button,
+.admin-doc-actions label {
+  min-width: auto !important;
+}
+

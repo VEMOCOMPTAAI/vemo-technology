@@ -375,7 +375,7 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
             <Link href={switchHref} className="rounded-[14px] border border-[#DDE7F2] bg-white px-5 py-3 text-sm font-black text-[#111827]">
               {t.lang}
             </Link>
-            <button type="button" onClick={logout} className="inline-flex h-10 items-center justify-center rounded-[12px] bg-[#F15A24] px-4 text-xs font-black text-white">
+            <button type="button" onClick={logout} className="inline-flex h-9 items-center justify-center rounded-[10px] bg-[#F15A24] px-4 text-xs font-black text-white">
               {t.logout}
             </button>
           </div>

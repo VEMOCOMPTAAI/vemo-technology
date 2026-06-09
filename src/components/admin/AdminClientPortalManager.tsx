@@ -439,25 +439,25 @@ export default function AdminClientPortalManager({ lang }: Props) {
                           target="_blank"
                           rel="noreferrer"
                           title={isFr ? "Ouvrir" : "Open"}
-                          className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[13px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
+                          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white px-3 text-[11px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
-                          👁
+                          Ouvrir
                         </a>
 
                         <a
                           href={docUrl}
                           download
                           title={isFr ? "Télécharger" : "Download"}
-                          className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[13px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
+                          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white px-3 text-[11px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
-                          ⬇
+                          Télécharger
                         </a>
 
                         <label
                           title={isFr ? "Remplacer" : "Replace"}
-                          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[13px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
+                          className="inline-flex h-9 cursor-pointer items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white px-3 text-[11px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
-                          🔁
+                          Remplacer
                           <input
                             type="file"
                             className="hidden"
@@ -476,9 +476,9 @@ export default function AdminClientPortalManager({ lang }: Props) {
                           type="button"
                           onClick={() => post("deleteDocument", { id: doc.id })}
                           title={isFr ? "Supprimer" : "Delete"}
-                          className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#FBD2C4] bg-white text-[14px] font-black text-[#F15A24] hover:bg-[#FFF3EF]"
+                          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-[#FBD2C4] bg-white px-3 text-[11px] font-black text-[#F15A24] hover:bg-[#FFF3EF]"
                         >
-                          🗑
+                          Supprimer
                         </button>
                       </div>
                     </div>
