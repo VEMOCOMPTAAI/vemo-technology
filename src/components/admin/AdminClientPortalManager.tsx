@@ -318,13 +318,6 @@ export default function AdminClientPortalManager({ lang }: Props) {
               <h1 className="mt-3 text-4xl font-black tracking-[-0.05em]">{t.title}</h1>
               <p className="mt-3 max-w-2xl text-sm font-bold text-[#64748B]">{t.subtitle}</p>
             </div>
-
-            <a
-              href={langSwitchUrl}
-              className="rounded-[14px] border border-[#DDE7F2] bg-white px-5 py-3 text-sm font-black text-[#123A63]"
-            >
-              {isFr ? "EN" : "FR"}
-            </a>
           </div>
 
           <div className="mt-7 grid gap-4 rounded-[22px] border border-[#DDE7F2] bg-[#F8FAFC] p-4 md:grid-cols-[0.9fr_1.4fr]">
