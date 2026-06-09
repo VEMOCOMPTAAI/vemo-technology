@@ -375,7 +375,7 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
             <Link href={switchHref} className="rounded-[14px] border border-[#DDE7F2] bg-white px-5 py-3 text-sm font-black text-[#111827]">
               {t.lang}
             </Link>
-            <button type="button" onClick={logout} className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white">
+            <button type="button" onClick={logout} className="inline-flex h-10 items-center justify-center rounded-[12px] bg-[#F15A24] px-4 text-xs font-black text-white">
               {t.logout}
             </button>
           </div>
@@ -399,7 +399,7 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
                 [t.file, fileLabel],
                 [t.currentStep, stepLabel],
               ].map(([label, value]) => (
-                <div key={label} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
+                <div key={label} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4">
                   <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#8AA0BC]">
                     {label}
                   </p>
@@ -483,7 +483,7 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
                     : service.statusEn || service.status || service.statusFr || "—";
 
                   return (
-                    <div key={service.id || index} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
+                    <div key={service.id || index} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <h3 className="text-base font-black text-[#123A63]">{name}</h3>

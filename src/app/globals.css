@@ -727,3 +727,32 @@ button[data-vemo-upload-button="true"]::after {
 .vemo-client-header + .vemo-client-header {
   display: none !important;
 }
+
+/* VEMO documents/admin actions refinement */
+.vemo-doc-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #DDE7F2;
+  background: #FFFFFF;
+  color: #123A63;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.vemo-doc-action:hover {
+  border-color: #F15A24;
+  color: #F15A24;
+}
+
+.vemo-doc-action-danger {
+  border-color: #FBD2C4;
+  color: #F15A24;
+}
+
+.vemo-doc-action-danger:hover {
+  background: #FFF3EF;
+}

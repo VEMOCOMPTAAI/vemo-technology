@@ -427,7 +427,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
                   const docUrl = doc.url || doc.fileUrl || "#";
 
                   return (
-                    <div key={doc.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-4">
+                    <div key={doc.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] px-4 py-3">
                       <div>
                         <p className="text-sm font-black text-[#123A63]">{doc.name || doc.title || doc.filename}</p>
                         <p className="mt-1 text-xs font-bold text-[#8AA0BC]">{doc.filename || "PDF"}</p>
@@ -439,7 +439,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
                           target="_blank"
                           rel="noreferrer"
                           title={isFr ? "Ouvrir" : "Open"}
-                          className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-lg"
+                          className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[13px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
                           👁
                         </a>
@@ -448,14 +448,14 @@ export default function AdminClientPortalManager({ lang }: Props) {
                           href={docUrl}
                           download
                           title={isFr ? "Télécharger" : "Download"}
-                          className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-lg"
+                          className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[13px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
                           ⬇
                         </a>
 
                         <label
                           title={isFr ? "Remplacer" : "Replace"}
-                          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-lg"
+                          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[13px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
                           🔁
                           <input
@@ -476,7 +476,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
                           type="button"
                           onClick={() => post("deleteDocument", { id: doc.id })}
                           title={isFr ? "Supprimer" : "Delete"}
-                          className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#FBD2C4] bg-white text-lg"
+                          className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#FBD2C4] bg-white text-[14px] font-black text-[#F15A24] hover:bg-[#FFF3EF]"
                         >
                           🗑
                         </button>
