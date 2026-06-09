@@ -341,7 +341,7 @@ export default function ClientPortalWorkspace({ lang, email, tab = "overview" }:
 
   return (
     <main className="min-h-screen bg-[#F3F7FB] pb-12 text-[#111827]">
-      <header className="sticky top-0 z-50 border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
+      <header className="vemo-client-header sticky top-0 z-50 border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between px-6">
           <Link href={hrefFor("overview")} className="leading-none">
             <div className="text-[22px] font-black tracking-[-0.04em]">

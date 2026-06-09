@@ -20,7 +20,7 @@ export default function VemoPublicHeader({ locale }: { locale: Locale }) {
       ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
+    <header className="vemo-public-header sticky top-0 z-50 border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-[84px] max-w-7xl items-center justify-between px-6">
         <Link href={isFr ? "/fr" : "/en"} className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#F15A24] text-sm font-black text-white">

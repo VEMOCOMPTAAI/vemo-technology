@@ -721,3 +721,9 @@ button[data-vemo-upload-button="true"]::after {
 .vemo-client-hide-home a[href="/fr"] {
   display: none !important;
 }
+
+/* VEMO HOTFIX - remove duplicated public/client headers */
+.vemo-public-header + .vemo-public-header,
+.vemo-client-header + .vemo-client-header {
+  display: none !important;
+}
