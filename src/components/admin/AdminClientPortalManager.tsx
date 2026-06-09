@@ -8,7 +8,15 @@ type Props = {
   lang: Lang;
 };
 
-const defaultEmail = "sheikh.abderrahim1@gmail.com";
+type ClientRow = {
+  email: string;
+  label: string;
+  documentsCount?: number;
+  servicesCount?: number;
+  messagesCount?: number;
+};
+
+const DEFAULT_EMAIL = "sheikh.abderrahim1@gmail.com";
 
 export default function AdminClientPortalManager({ lang }: Props) {
   const isFr = lang === "fr";
@@ -16,20 +24,22 @@ export default function AdminClientPortalManager({ lang }: Props) {
   const t = isFr
     ? {
         title: "Gestion espace client",
-        subtitle: "Documents, services, statuts et messages visibles dans l’espace client.",
-        email: "Email client",
-        load: "Charger",
-        status: "Statut dossier",
+        subtitle: "Sélectionnez un dossier client puis gérez uniquement ses éléments visibles dans son espace.",
+        selectClient: "Dossier client",
+        search: "Rechercher par nom LLC...",
+        choose: "Choisir un dossier",
+        openClient: "Ouvrir l’espace client",
+        status: "Statut du dossier",
         payment: "Paiement",
         file: "Dossier",
         step: "Étape actuelle",
         saveStatus: "Enregistrer le statut",
-        documents: "Documents",
+        documents: "Documents du dossier",
         docTitle: "Nom du document",
-        fileInput: "Fichier",
         upload: "Uploader le document",
-        noDocuments: "Aucun document.",
-        services: "Services client",
+        noDocuments: "Aucun document pour ce dossier.",
+        services: "Services du dossier",
+        serviceNote: "Ajoutez uniquement les services réellement inclus pour ce client.",
         nameFr: "Nom FR",
         nameEn: "Nom EN",
         statusFr: "Statut FR",
@@ -38,32 +48,34 @@ export default function AdminClientPortalManager({ lang }: Props) {
         expiration: "Expiration",
         renewal: "Renouvellement",
         addService: "Ajouter le service",
-        noServices: "Aucun service.",
-        messages: "Messages",
+        noServices: "Aucun service pour ce dossier.",
+        messages: "Messages du dossier",
         subject: "Objet",
         message: "Message",
-        send: "Envoyer au client",
-        noMessages: "Aucun message.",
+        send: "Répondre au client",
+        noMessages: "Aucun message pour ce dossier.",
         delete: "Supprimer",
-        openClient: "Ouvrir espace client",
-        saved: "Enregistré."
+        saved: "Enregistré.",
+        loading: "Chargement..."
       }
     : {
         title: "Client portal management",
-        subtitle: "Documents, services, statuses and messages visible in the client portal.",
-        email: "Client email",
-        load: "Load",
+        subtitle: "Select a client file, then manage only the items visible in that client portal.",
+        selectClient: "Client file",
+        search: "Search by LLC name...",
+        choose: "Choose a file",
+        openClient: "Open client portal",
         status: "File status",
         payment: "Payment",
         file: "File",
         step: "Current step",
         saveStatus: "Save status",
-        documents: "Documents",
+        documents: "File documents",
         docTitle: "Document name",
-        fileInput: "File",
         upload: "Upload document",
-        noDocuments: "No document.",
-        services: "Client services",
+        noDocuments: "No document for this file.",
+        services: "File services",
+        serviceNote: "Add only the services actually included for this client.",
         nameFr: "French name",
         nameEn: "English name",
         statusFr: "French status",
@@ -72,20 +84,24 @@ export default function AdminClientPortalManager({ lang }: Props) {
         expiration: "Expiration",
         renewal: "Renewal",
         addService: "Add service",
-        noServices: "No service.",
-        messages: "Messages",
+        noServices: "No service for this file.",
+        messages: "File messages",
         subject: "Subject",
         message: "Message",
-        send: "Send to client",
-        noMessages: "No message.",
+        send: "Reply to client",
+        noMessages: "No message for this file.",
         delete: "Delete",
-        openClient: "Open client portal",
-        saved: "Saved."
+        saved: "Saved.",
+        loading: "Loading..."
       };
 
-  const [email, setEmail] = useState(defaultEmail);
+  const [clients, setClients] = useState<ClientRow[]>([]);
+  const [search, setSearch] = useState("");
+  const [email, setEmail] = useState(DEFAULT_EMAIL);
+  const [selectedLabel, setSelectedLabel] = useState("");
   const [portal, setPortal] = useState<any>(null);
   const [notice, setNotice] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [payment, setPayment] = useState("under_review");
   const [file, setFile] = useState("pending");
@@ -107,25 +123,55 @@ export default function AdminClientPortalManager({ lang }: Props) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
+  const filteredClients = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return clients.filter((client) => client.label.toLowerCase().includes(q));
+  }, [clients, search]);
+
   const clientUrl = useMemo(() => {
     const base = isFr ? "/fr/espace-client" : "/en/client-portal";
     return `${base}?email=${encodeURIComponent(email)}`;
   }, [email, isFr]);
 
-  async function loadClient() {
-    setNotice("");
-
-    const res = await fetch(`/api/admin/client-portal/manage?email=${encodeURIComponent(email)}`, {
-      cache: "no-store"
-    });
-
+  async function loadClients() {
+    const res = await fetch("/api/admin/client-portal/manage", { cache: "no-store" });
     const json = await res.json();
 
-    if (json?.portal) {
-      setPortal(json.portal);
-      setPayment(json.portal.status?.payment || "under_review");
-      setFile(json.portal.status?.file || "pending");
-      setCurrentStep(json.portal.status?.currentStep || "file_received");
+    const rows = Array.isArray(json?.clients) ? json.clients : [];
+    setClients(rows);
+
+    const first = rows.find((item: ClientRow) => item.email === email) || rows[0];
+
+    if (first) {
+      setEmail(first.email);
+      setSelectedLabel(first.label);
+      await loadClient(first.email);
+    } else {
+      await loadClient(email);
+    }
+  }
+
+  async function loadClient(nextEmail = email) {
+    setLoading(true);
+    setNotice("");
+
+    try {
+      const res = await fetch(`/api/admin/client-portal/manage?email=${encodeURIComponent(nextEmail)}`, {
+        cache: "no-store"
+      });
+
+      const json = await res.json();
+
+      if (json?.portal) {
+        setEmail(nextEmail);
+        setSelectedLabel(json.label || "");
+        setPortal(json.portal);
+        setPayment(json.portal.status?.payment || "under_review");
+        setFile(json.portal.status?.file || "pending");
+        setCurrentStep(json.portal.status?.currentStep || "file_received");
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -146,7 +192,9 @@ export default function AdminClientPortalManager({ lang }: Props) {
 
     if (json?.portal) {
       setPortal(json.portal);
+      setSelectedLabel(json.label || selectedLabel);
       setNotice(t.saved);
+      await loadClients();
     }
   }
 
@@ -194,6 +242,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
       setNotice(t.saved);
       setDocTitle("");
       setDocFile(null);
+      await loadClients();
     }
   }
 
@@ -210,7 +259,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
   }
 
   useEffect(() => {
-    loadClient().catch(() => {});
+    loadClients().catch(() => {});
   }, []);
 
   return (
@@ -229,20 +278,48 @@ export default function AdminClientPortalManager({ lang }: Props) {
             </a>
           </div>
 
-          <div className="mt-7 flex flex-col gap-3 rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] p-4 md:flex-row">
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t.email}
-              className="h-12 flex-1 rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-sm font-black outline-none"
-            />
+          <div className="mt-7 rounded-[22px] border border-[#DDE7F2] bg-[#F8FAFC] p-4">
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-[#8AA0BC]">
+              {t.selectClient}
+            </p>
 
-            <button onClick={loadClient} className="rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
-              {t.load}
-            </button>
+            <div className="grid gap-3 md:grid-cols-[1fr_1.4fr]">
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t.search}
+                className="h-12 rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-sm font-black outline-none"
+              />
+
+              <select
+                value={email}
+                onChange={(e) => loadClient(e.target.value)}
+                className="h-12 rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-sm font-black outline-none"
+              >
+                {filteredClients.length ? (
+                  filteredClients.map((client) => (
+                    <option key={client.email} value={client.email}>
+                      {client.label}
+                    </option>
+                  ))
+                ) : (
+                  <option value={email}>{selectedLabel || t.choose}</option>
+                )}
+              </select>
+            </div>
+
+            {selectedLabel ? (
+              <div className="mt-4 rounded-[16px] border border-[#DDE7F2] bg-white p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#8AA0BC]">
+                  Dossier ouvert
+                </p>
+                <p className="mt-2 text-lg font-black text-[#123A63]">{selectedLabel}</p>
+              </div>
+            ) : null}
           </div>
 
           {notice ? <p className="mt-4 rounded-[14px] bg-[#ECFDF3] px-4 py-3 text-sm font-black text-[#087443]">{notice}</p> : null}
+          {loading ? <p className="mt-4 text-sm font-black text-[#64748B]">{t.loading}</p> : null}
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -298,7 +375,13 @@ export default function AdminClientPortalManager({ lang }: Props) {
           </section>
 
           <section className="rounded-[28px] bg-white p-6">
-            <h2 className="text-2xl font-black tracking-[-0.04em]">{t.services}</h2>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-black tracking-[-0.04em]">{t.services}</h2>
+                <p className="mt-2 text-sm font-bold text-[#64748B]">{t.serviceNote}</p>
+              </div>
+              <span className="rounded-full bg-[#F15A24] px-3 py-2 text-xs font-black text-white">{portal?.services?.length || 0}</span>
+            </div>
 
             <div className="mt-5 grid gap-3">
               <input value={service.nameFr} onChange={(e) => setService({ ...service, nameFr: e.target.value })} placeholder={t.nameFr} className="h-12 rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-sm font-black outline-none" />

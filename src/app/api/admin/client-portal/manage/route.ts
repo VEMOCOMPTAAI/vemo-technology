@@ -24,6 +24,7 @@ function defaultPortal(email: string) {
     profile: {
       name: "Client VEMO",
       email,
+      llcName: "Dossier client",
       passwordUpdatedAt: null
     },
     status: {
@@ -37,19 +38,51 @@ function defaultPortal(email: string) {
   };
 }
 
+function dossierName(email: string, portal: any) {
+  return (
+    portal?.profile?.llcName ||
+    portal?.profile?.companyName ||
+    portal?.profile?.company ||
+    portal?.profile?.llc ||
+    portal?.order?.llcName ||
+    portal?.order?.companyName ||
+    portal?.llcName ||
+    portal?.companyName ||
+    portal?.profile?.name ||
+    "Dossier client"
+  );
+}
+
 export async function GET(request: NextRequest) {
   const email = request.nextUrl.searchParams.get("email") || "";
+  const data = await readData();
+
+  if (!email) {
+    const clients = Object.entries(data)
+      .filter(([key]) => key.includes("@"))
+      .map(([clientEmail, portal]: any) => ({
+        email: clientEmail,
+        label: dossierName(clientEmail, portal),
+        status: portal?.status || {},
+        documentsCount: Array.isArray(portal?.documents) ? portal.documents.length : 0,
+        servicesCount: Array.isArray(portal?.services) ? portal.services.length : 0,
+        messagesCount: Array.isArray(portal?.messages) ? portal.messages.length : 0
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    return NextResponse.json({ ok: true, clients });
+  }
 
   if (!email.includes("@")) {
     return NextResponse.json({ ok: false, error: "Email requis" }, { status: 400 });
   }
 
-  const data = await readData();
   const portal = data[email] || defaultPortal(email);
 
   return NextResponse.json({
     ok: true,
     email,
+    label: dossierName(email, portal),
     portal
   });
 }
@@ -120,6 +153,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     ok: true,
+    label: dossierName(email, portal),
     portal
   });
 }
