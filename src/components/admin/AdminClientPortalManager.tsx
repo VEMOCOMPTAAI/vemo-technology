@@ -182,8 +182,6 @@ export default function AdminClientPortalManager({ lang }: Props) {
     return clients.filter((client) => client.label.toLowerCase().includes(q));
   }, [clients, search]);
 
-  const langSwitchUrl = isFr ? "/en/admin/client-portal" : "/fr/admin/client-portal";
-
   async function loadClients() {
     const res = await fetch("/api/admin/client-portal/manage", { cache: "no-store" });
     const json = await res.json();
