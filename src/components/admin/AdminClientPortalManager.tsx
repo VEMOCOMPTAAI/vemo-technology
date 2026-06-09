@@ -305,7 +305,43 @@ export default function AdminClientPortalManager({ lang }: Props) {
     loadClients().catch(() => {});
   }, []);
 
-  const StatPill = ({ value }: { value: string }) => (
+  
+  const IconOpen = () => (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 4h6v6" />
+      <path d="M10 14L20 4" />
+      <path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5" />
+    </svg>
+  );
+
+  const IconDownload = () => (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3v12" />
+      <path d="M7 10l5 5 5-5" />
+      <path d="M5 21h14" />
+    </svg>
+  );
+
+  const IconReplace = () => (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 7v6h-6" />
+      <path d="M3 17v-6h6" />
+      <path d="M7.5 7.5A7 7 0 0 1 19 11" />
+      <path d="M16.5 16.5A7 7 0 0 1 5 13" />
+    </svg>
+  );
+
+  const IconTrash = () => (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 7h16" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M6 7l1 14h10l1-14" />
+      <path d="M9 7V4h6v3" />
+    </svg>
+  );
+
+const StatPill = ({ value }: { value: string }) => (
     <span className="rounded-full bg-[#FFF3EF] px-3 py-2 text-xs font-black text-[#F15A24]">
       {value}
     </span>
@@ -439,7 +475,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
                           target="_blank"
                           rel="noreferrer"
                           title={isFr ? "Ouvrir" : "Open"}
-                          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white px-3 text-[11px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
                           Ouvrir
                         </a>
@@ -448,14 +484,14 @@ export default function AdminClientPortalManager({ lang }: Props) {
                           href={docUrl}
                           download
                           title={isFr ? "Télécharger" : "Download"}
-                          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white px-3 text-[11px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
                           Télécharger
                         </a>
 
                         <label
                           title={isFr ? "Remplacer" : "Replace"}
-                          className="inline-flex h-9 cursor-pointer items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white px-3 text-[11px] font-black text-[#123A63] hover:border-[#F15A24] hover:text-[#F15A24]"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-[#DDE7F2] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
                           Remplacer
                           <input
@@ -476,7 +512,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
                           type="button"
                           onClick={() => post("deleteDocument", { id: doc.id })}
                           title={isFr ? "Supprimer" : "Delete"}
-                          className="inline-flex h-9 items-center justify-center rounded-[10px] border border-[#FBD2C4] bg-white px-3 text-[11px] font-black text-[#F15A24] hover:bg-[#FFF3EF]"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-[#FBD2C4] bg-white text-[#F15A24] transition hover:bg-[#FFF3EF]"
                         >
                           Supprimer
                         </button>
