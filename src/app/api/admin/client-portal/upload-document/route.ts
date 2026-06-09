@@ -25,6 +25,7 @@ function defaultPortal(email: string) {
     profile: {
       name: "Client VEMO",
       email,
+      llcName: "Dossier client",
       passwordUpdatedAt: null
     },
     status: {
@@ -43,14 +44,15 @@ export async function POST(request: NextRequest) {
 
   const email = String(form.get("email") || "");
   const title = String(form.get("title") || "");
+  const documentId = String(form.get("documentId") || "");
   const file = form.get("file");
 
   if (!email.includes("@")) {
-    return NextResponse.json({ ok: false, error: "Email requis" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "EMAIL_REQUIRED" }, { status: 400 });
   }
 
   if (!(file instanceof File)) {
-    return NextResponse.json({ ok: false, error: "Fichier requis" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "FILE_REQUIRED" }, { status: 400 });
   }
 
   await mkdir(UPLOAD_DIR, { recursive: true });
@@ -67,13 +69,31 @@ export async function POST(request: NextRequest) {
   const portal = data[email] || defaultPortal(email);
 
   portal.documents = Array.isArray(portal.documents) ? portal.documents : [];
-  portal.documents.unshift({
-    id: `doc_${Date.now()}`,
+
+  const nextDoc = {
+    id: documentId || `doc_${Date.now()}`,
     name: title || originalName,
+    title: title || originalName,
     filename: originalName,
     url: `/client-documents/${safeName}`,
-    uploadedAt: new Date().toISOString()
-  });
+    fileUrl: `/client-documents/${safeName}`,
+    uploadedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString()
+  };
+
+  if (documentId) {
+    const index = portal.documents.findIndex((item: any) => item.id === documentId);
+    if (index >= 0) {
+      portal.documents[index] = {
+        ...portal.documents[index],
+        ...nextDoc
+      };
+    } else {
+      portal.documents.unshift(nextDoc);
+    }
+  } else {
+    portal.documents.unshift(nextDoc);
+  }
 
   data[email] = portal;
   await writeData(data);

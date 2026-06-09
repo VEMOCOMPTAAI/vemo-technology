@@ -1,40 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { readFile } from "fs/promises";
+import { join } from "path";
 
-export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const DATA_FILE = path.join(process.cwd(), "data", "client-documents.json");
+const DATA_PATH = join(process.cwd(), "data", "client-portal-overview.json");
 
-function cleanEmail(value: any) {
-  return String(value || "").trim().toLowerCase();
-}
-
-async function readDocuments() {
+async function readData(): Promise<Record<string, any>> {
   try {
-    const raw = await fs.readFile(DATA_FILE, "utf8");
-    const parsed = JSON.parse(raw || "[]");
-    return Array.isArray(parsed) ? parsed : [];
+    return JSON.parse(await readFile(DATA_PATH, "utf8"));
   } catch {
-    return [];
+    return {};
   }
 }
 
 export async function GET(request: NextRequest) {
-  const email = cleanEmail(request.nextUrl.searchParams.get("email"));
+  const email = request.nextUrl.searchParams.get("email") || "";
 
-  if (!email) {
-    return NextResponse.json({ ok: true, documents: [] });
+  if (!email.includes("@")) {
+    return NextResponse.json({
+      ok: true,
+      documents: []
+    });
   }
 
-  const documents = await readDocuments();
+  const data = await readData();
+  const portal = data[email] || {};
+  const documents = Array.isArray(portal.documents) ? portal.documents : [];
 
   return NextResponse.json({
     ok: true,
-    documents: documents
-      .filter((doc: any) => cleanEmail(doc.email || doc.client_email) === email)
-      .filter((doc: any) => doc.visible_to_client !== false)
-      .sort((a: any, b: any) => String(b.created_at).localeCompare(String(a.created_at))),
+    documents: documents.map((doc: any) => ({
+      id: doc.id || `doc_${Date.now()}`,
+      name: doc.name || doc.title || doc.filename || "Document",
+      title: doc.name || doc.title || doc.filename || "Document",
+      filename: doc.filename || doc.name || "document.pdf",
+      url: doc.url || doc.fileUrl || "",
+      fileUrl: doc.url || doc.fileUrl || "",
+      uploadedAt: doc.uploadedAt || doc.createdAt || "",
+      createdAt: doc.uploadedAt || doc.createdAt || ""
+    }))
   });
 }

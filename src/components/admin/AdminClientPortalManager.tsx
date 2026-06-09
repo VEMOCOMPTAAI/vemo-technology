@@ -167,6 +167,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
 
   const [docTitle, setDocTitle] = useState("");
   const [docFile, setDocFile] = useState<File | null>(null);
+  const [replaceDocId, setReplaceDocId] = useState("");
 
   const [serviceName, setServiceName] = useState("");
   const [serviceStatus, setServiceStatus] = useState(isFr ? "Actif" : "Active");
@@ -272,6 +273,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
     form.append("email", email);
     form.append("title", docTitle);
     form.append("file", docFile);
+    if (replaceDocId) form.append("documentId", replaceDocId);
 
     const res = await fetch("/api/admin/client-portal/upload-document", {
       method: "POST",
@@ -285,6 +287,7 @@ export default function AdminClientPortalManager({ lang }: Props) {
       setNotice(t.saved);
       setDocTitle("");
       setDocFile(null);
+      setReplaceDocId("");
       await loadClients();
     }
   }
@@ -420,12 +423,67 @@ export default function AdminClientPortalManager({ lang }: Props) {
               </div>
 
               <div className="mt-6 grid gap-3">
-                {portal?.documents?.length ? portal.documents.map((doc: any) => (
-                  <div key={doc.id} className="flex items-center justify-between gap-3 rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-4">
-                    <a href={doc.url} target="_blank" rel="noreferrer" className="text-sm font-black text-[#123A63]">{doc.name || doc.filename}</a>
-                    <button onClick={() => post("deleteDocument", { id: doc.id })} className="text-xs font-black text-[#F15A24]">{t.delete}</button>
-                  </div>
-                )) : (
+                {portal?.documents?.length ? portal.documents.map((doc: any) => {
+                  const docUrl = doc.url || doc.fileUrl || "#";
+
+                  return (
+                    <div key={doc.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-4">
+                      <div>
+                        <p className="text-sm font-black text-[#123A63]">{doc.name || doc.title || doc.filename}</p>
+                        <p className="mt-1 text-xs font-bold text-[#8AA0BC]">{doc.filename || "PDF"}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={docUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          title={isFr ? "Ouvrir" : "Open"}
+                          className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-lg"
+                        >
+                          👁
+                        </a>
+
+                        <a
+                          href={docUrl}
+                          download
+                          title={isFr ? "Télécharger" : "Download"}
+                          className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-lg"
+                        >
+                          ⬇
+                        </a>
+
+                        <label
+                          title={isFr ? "Remplacer" : "Replace"}
+                          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-lg"
+                        >
+                          🔁
+                          <input
+                            type="file"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] || null;
+                              if (!file) return;
+                              setReplaceDocId(doc.id);
+                              setDocTitle(doc.name || doc.title || doc.filename || "");
+                              setDocFile(file);
+                              setTimeout(() => uploadDocument(), 50);
+                            }}
+                          />
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={() => post("deleteDocument", { id: doc.id })}
+                          title={isFr ? "Supprimer" : "Delete"}
+                          className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#FBD2C4] bg-white text-lg"
+                        >
+                          🗑
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }) : (
                   <p className="rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-4 text-sm font-black text-[#64748B]">{t.noDocuments}</p>
                 )}
               </div>
