@@ -1,46 +1,32 @@
-import { NextResponse } from "next/server";
-import { createAdminSessionToken, setAdminCookie } from "@/lib/adminAuth";
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 
-export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
-  try {
-    const { password } = (await request.json()) as { password?: string };
-
-    const expected = process.env.ADMIN_PASSWORD;
-
-    if (!expected) {
-      return NextResponse.json(
-        { error: "ADMIN_PASSWORD manquant dans .env.local." },
-        { status: 500 }
-      );
-    }
-
-    if (!password || password !== expected) {
-      return NextResponse.json(
-        { error: "Mot de passe admin incorrect." },
-        { status: 401 }
-      );
-    }
-
-    const token = createAdminSessionToken();
-
-    const response = NextResponse.json({
-      ok: true,
-    });
-
-    return setAdminCookie(response, token);
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Erreur inconnue.";
-
-    return NextResponse.json(
-      {
-        error: "Connexion admin impossible.",
-        details: message,
-      },
-      { status: 500 }
-    );
-  }
+function adminToken() {
+  const password = process.env.VEMO_ADMIN_PASSWORD || "VemoAdmin@2026";
+  const secret = process.env.VEMO_ADMIN_SECRET || "vemo-admin-local-secret-2026";
+  return crypto.createHash("sha256").update(`${password}:${secret}`).digest("hex");
 }
 
+export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => ({}));
+  const password = String(body.password || "");
+  const expected = process.env.VEMO_ADMIN_PASSWORD || "VemoAdmin@2026";
+
+  if (!password || password !== expected) {
+    return NextResponse.json({ ok: false, error: "INVALID_PASSWORD" }, { status: 401 });
+  }
+
+  const response = NextResponse.json({ ok: true });
+
+  response.cookies.set("vemo_admin_session", adminToken(), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+    path: "/",
+    maxAge: 60 * 60 * 12
+  });
+
+  return response;
+}
