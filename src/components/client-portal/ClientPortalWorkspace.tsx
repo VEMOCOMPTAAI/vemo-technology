@@ -413,7 +413,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
         )}
 
         {activeTab === "documents" && (
-          <section className="rounded-[30px] border border-[#E6EDF7] bg-white p-8">
+          <section className="rounded-[32px] border border-[#E3ECF7] bg-white p-8">
             <div className="flex items-start justify-between gap-5">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">Documents</p>
@@ -422,19 +422,19 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                 </h1>
                 <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[#64748B]">
                   {isFr
-                    ? "Consultez ou téléchargez les documents de votre dossier."
-                    : "View or download the documents in your file."}
+                    ? "Accédez rapidement aux fichiers déposés dans votre dossier."
+                    : "Quickly access the files added to your client file."}
                 </p>
               </div>
 
-              <div className="flex h-10 min-w-10 items-center justify-center rounded-full bg-[#F15A24] px-3 text-sm font-black text-white">
+              <div className="flex h-11 min-w-11 items-center justify-center rounded-[16px] bg-[#FFF1EA] px-4 text-sm font-black text-[#F15A24]">
                 {documents.length}
               </div>
             </div>
 
-            <div className="mt-8 grid gap-3">
+            <div className="mt-8 grid gap-4">
               {loading ? (
-                <p className="rounded-[18px] border border-[#DDE7F2] bg-white px-5 py-5 text-sm font-black text-[#64748B]">...</p>
+                <p className="rounded-[20px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">...</p>
               ) : documents.length ? (
                 documents.map((doc) => {
                   const title = doc.name || doc.title || doc.filename || "Document";
@@ -444,40 +444,44 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                   return (
                     <div
                       key={doc.id || title}
-                      className="flex items-center justify-between gap-4 rounded-[18px] border border-[#E2EAF5] bg-white px-5 py-4 transition hover:border-[#CBD8EA]"
+                      className="relative overflow-hidden rounded-[22px] border border-[#D9E5F2] bg-[#F8FBFF] px-5 py-5 transition hover:border-[#C5D5E9]"
                     >
-                      <div className="min-w-0">
-                        <p className="truncate text-[15px] font-black text-[#123A63]">{title}</p>
-                        <p className="mt-1 truncate text-xs font-bold text-[#8AA0BC]">{filename}</p>
-                      </div>
+                      <div className="absolute left-0 top-0 h-full w-[5px] bg-[#F15A24]" />
 
-                      <div className="flex shrink-0 items-center gap-2">
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noreferrer"
-                          title={isFr ? "Ouvrir" : "Open"}
-                          aria-label={isFr ? "Ouvrir" : "Open"}
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#F15A24] text-white transition hover:bg-[#DB4F1C]"
-                        >
-                          <VemoClientOpenIcon />
-                        </a>
+                      <div className="flex items-center justify-between gap-4 pl-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-[15px] font-black text-[#123A63]">{title}</p>
+                          <p className="mt-1 truncate text-xs font-bold text-[#7F94B1]">{filename}</p>
+                        </div>
 
-                        <a
-                          href={url}
-                          download
-                          title={isFr ? "Télécharger" : "Download"}
-                          aria-label={isFr ? "Télécharger" : "Download"}
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
-                        >
-                          <VemoClientDownloadIcon />
-                        </a>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noreferrer"
+                            title={isFr ? "Ouvrir" : "Open"}
+                            aria-label={isFr ? "Ouvrir" : "Open"}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#F15A24] text-white transition hover:bg-[#DB4F1C]"
+                          >
+                            <VemoClientOpenIcon />
+                          </a>
+
+                          <a
+                            href={url}
+                            download
+                            title={isFr ? "Télécharger" : "Download"}
+                            aria-label={isFr ? "Télécharger" : "Download"}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D6E2F0] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
+                          >
+                            <VemoClientDownloadIcon />
+                          </a>
+                        </div>
                       </div>
                     </div>
                   );
                 })
               ) : (
-                <p className="rounded-[18px] border border-[#DDE7F2] bg-white px-5 py-5 text-sm font-black text-[#64748B]">
+                <p className="rounded-[20px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">
                   {t.noDocs}
                 </p>
               )}
