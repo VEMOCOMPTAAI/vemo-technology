@@ -413,36 +413,38 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
         )}
 
         {activeTab === "documents" && (
-          <section className="overflow-hidden rounded-[32px] border border-[#DDE7F2] bg-[#0F2238] p-0">
-            <div className="flex items-start justify-between gap-5 border-b border-white/10 px-8 py-7">
+          <section className="rounded-[30px] border border-[#DDE7F2] bg-white p-8">
+            <div className="flex items-start justify-between gap-5">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F15A24]">Documents</p>
-                <h1 className="mt-4 text-3xl font-black tracking-[-0.05em] text-white">
+                <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F15A24]">
+                  Documents
+                </p>
+                <h1 className="mt-4 text-3xl font-black tracking-[-0.05em] text-[#111827]">
                   {isFr ? "Mes documents" : "My documents"}
                 </h1>
-                <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[#B8C8DA]">
+                <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[#64748B]">
                   {isFr
-                    ? "Liste des documents disponibles dans votre espace client."
-                    : "List of documents available in your client portal."}
+                    ? "Consultez et téléchargez les fichiers disponibles dans votre dossier."
+                    : "View and download the files available in your client file."}
                 </p>
               </div>
 
-              <div className="flex h-11 min-w-11 items-center justify-center rounded-[16px] bg-[#F15A24] px-4 text-sm font-black text-white">
+              <div className="flex h-11 min-w-11 items-center justify-center rounded-[15px] bg-[#FFF3EF] px-4 text-sm font-black text-[#F15A24]">
                 {documents.length}
               </div>
             </div>
 
-            <div className="bg-white px-6 py-6">
-              <div className="mb-4 grid grid-cols-[1fr_150px] items-center rounded-[16px] bg-[#F5F8FC] px-5 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-[#64748B]">
+            <div className="mt-8 overflow-hidden rounded-[22px] border border-[#DDE7F2]">
+              <div className="grid grid-cols-[1fr_120px] bg-[#F8FAFC] px-5 py-4 text-[10px] font-black uppercase tracking-[0.25em] text-[#8AA0BC]">
                 <span>{isFr ? "Document" : "Document"}</span>
                 <span className="text-right">{isFr ? "Actions" : "Actions"}</span>
               </div>
 
-              <div className="grid gap-3">
-                {loading ? (
-                  <p className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">...</p>
-                ) : documents.length ? (
-                  documents.map((doc) => {
+              {loading ? (
+                <div className="border-t border-[#E6EDF5] px-5 py-5 text-sm font-black text-[#64748B]">...</div>
+              ) : documents.length ? (
+                <div className="divide-y divide-[#E6EDF5]">
+                  {documents.map((doc) => {
                     const title = doc.name || doc.title || doc.filename || "Document";
                     const filename = doc.filename || (isFr ? "Fichier disponible" : "Available file");
                     const url = doc.url || doc.fileUrl || "#";
@@ -454,7 +456,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                     return (
                       <div
                         key={doc.id || title}
-                        className="grid grid-cols-[1fr_150px] items-center gap-4 rounded-[18px] border border-[#DDE7F2] bg-[#FBFDFF] px-5 py-4 transition hover:border-[#BFD0E6]"
+                        className="grid grid-cols-[1fr_120px] items-center gap-4 bg-white px-5 py-4 transition hover:bg-[#FBFDFF]"
                       >
                         <div className="min-w-0">
                           <p className="truncate text-[15px] font-black text-[#123A63]">{title}</p>
@@ -483,13 +485,13 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                         </div>
                       </div>
                     );
-                  })
-                ) : (
-                  <p className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">
-                    {t.noDocs}
-                  </p>
-                )}
-              </div>
+                  })}
+                </div>
+              ) : (
+                <div className="border-t border-[#E6EDF5] px-5 py-5 text-sm font-black text-[#64748B]">
+                  {t.noDocs}
+                </div>
+              )}
             </div>
           </section>
         )}

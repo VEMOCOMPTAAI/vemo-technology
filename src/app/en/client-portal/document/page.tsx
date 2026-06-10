@@ -36,42 +36,43 @@ export default async function EnClientDocumentPreviewPage({
             href={backUrl}
             className="rounded-[14px] border border-[#DDE7F2] bg-white px-5 py-3 text-sm font-black text-[#123A63]"
           >
-            Back to documents
+            Back
           </a>
         </div>
       </header>
 
       <section className="mx-auto max-w-6xl px-6 py-10">
-        <a href={backUrl} className="text-sm font-black text-[#123A63]">
-          ← Back to documents
-        </a>
-
-        <div className="mt-6 flex flex-wrap items-end justify-between gap-5">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F15A24]">
-              Document preview
-            </p>
-            <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-[#111827]">
-              {title}
-            </h1>
-            <p className="mt-2 text-sm font-bold text-[#64748B]">{file}</p>
-          </div>
-
-          <a
-            href={safeUrl}
-            download
-            className="rounded-[14px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white"
-          >
-            Download
+        <div className="rounded-[30px] border border-[#DDE7F2] bg-white p-8">
+          <a href={backUrl} className="text-sm font-black text-[#123A63]">
+            ← Back to documents
           </a>
-        </div>
 
-        <div className="mt-8 rounded-[30px] border border-[#DDE7F2] bg-white p-5">
-          <div className="mb-4 flex items-center justify-center gap-3 rounded-[18px] border border-[#E6EDF5] bg-[#F8FAFC] px-4 py-3 text-sm font-black text-[#123A63]">
-            <span>Secure preview</span>
+          <div className="mt-6 flex flex-wrap items-end justify-between gap-5">
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F15A24]">
+                Document preview
+              </p>
+              <h1 className="mt-3 max-w-4xl truncate text-3xl font-black tracking-[-0.05em] text-[#111827]">
+                {title}
+              </h1>
+              <p className="mt-2 max-w-4xl truncate text-sm font-bold text-[#64748B]">{file}</p>
+            </div>
+
+            <a
+              href={safeUrl}
+              download
+              className="rounded-[14px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white"
+            >
+              Download
+            </a>
           </div>
 
-          <div className="overflow-hidden rounded-[22px] border border-[#DDE7F2] bg-[#F8FAFC]">
+          <div className="mt-8 overflow-hidden rounded-[24px] border border-[#DDE7F2] bg-[#F8FAFC]">
+            <div className="flex items-center justify-between border-b border-[#E6EDF5] bg-[#F8FAFC] px-5 py-4">
+              <p className="text-sm font-black text-[#123A63]">Secure preview</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#8AA0BC]">VEMO</p>
+            </div>
+
             {safeUrl !== "#" ? (
               <iframe src={safeUrl} title={title} className="h-[720px] w-full bg-white" />
             ) : (
