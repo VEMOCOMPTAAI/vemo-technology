@@ -3,6 +3,28 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+function VemoClientOpenIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 4h6v6" />
+      <path d="M10 14L20 4" />
+      <path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5" />
+    </svg>
+  );
+}
+
+function VemoClientDownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3v12" />
+      <path d="M7 10l5 5 5-5" />
+      <path d="M5 21h14" />
+    </svg>
+  );
+}
+
+
+
 type Lang = "fr" | "en";
 type Tab = "status" | "documents" | "services" | "messages" | "account";
 
@@ -391,62 +413,75 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
         )}
 
         {activeTab === "documents" && (
-          <section className="rounded-[28px] bg-white p-8">
-            <div className="flex items-center justify-between gap-4">
+          <section className="rounded-[30px] border border-[#E6EDF7] bg-white p-8">
+            <div className="flex items-start justify-between gap-5">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">Documents</p>
-                <h1 className="mt-4 text-3xl font-black tracking-[-0.05em]">{t.docsTitle}</h1>
+                <h1 className="mt-4 text-3xl font-black tracking-[-0.05em]">
+                  {isFr ? "Mes documents" : "My documents"}
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[#64748B]">
+                  {isFr
+                    ? "Documents disponibles dans votre dossier client."
+                    : "Documents available in your client file."}
+                </p>
               </div>
 
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F15A24] text-sm font-black text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F15A24] text-sm font-black text-white">
                 {documents.length}
               </div>
             </div>
 
             <div className="mt-8 grid gap-3">
               {loading ? (
-                <p className="rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4 text-sm font-black text-[#64748B]">...</p>
+                <p className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">...</p>
               ) : documents.length ? (
                 documents.map((doc) => {
                   const title = doc.name || doc.title || doc.filename || "Document";
-                  const filename = doc.filename || (isFr ? "Document disponible" : "Available document");
+                  const filename = doc.filename || (isFr ? "Fichier disponible" : "Available file");
                   const url = doc.url || doc.fileUrl || "#";
 
                   return (
                     <div
                       key={doc.id || title}
-                      className="flex flex-col gap-4 rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4 md:flex-row md:items-center md:justify-between"
+                      className="flex items-center justify-between gap-4 rounded-[20px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4 transition hover:border-[#C8D7EA]"
                     >
-                      <div>
-                        <p className="text-sm font-black text-[#123A63]">{title}</p>
-                        <p className="mt-1 text-xs font-bold text-[#8AA0BC]">{filename}</p>
+                      <div className="min-w-0">
+                        <div className="mb-2 inline-flex rounded-full border border-[#E6EDF7] bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-[#8AA0BC]">
+                          PDF
+                        </div>
+
+                        <p className="truncate text-sm font-black text-[#123A63]">{title}</p>
+                        <p className="mt-1 truncate text-xs font-bold text-[#8AA0BC]">{filename}</p>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex shrink-0 items-center gap-2">
                         <a
                           href={url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex h-10 items-center gap-2 rounded-[12px] bg-[#F15A24] px-4 text-xs font-black text-white"
+                          title={isFr ? "Ouvrir" : "Open"}
+                          aria-label={isFr ? "Ouvrir" : "Open"}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#F15A24] text-white transition hover:bg-[#DB4F1C]"
                         >
-                          <IconOpen />
-                          {t.open}
+                          <VemoClientOpenIcon />
                         </a>
 
                         <a
                           href={url}
                           download
-                          className="inline-flex h-10 items-center gap-2 rounded-[12px] border border-[#DDE7F2] bg-white px-4 text-xs font-black text-[#123A63]"
+                          title={isFr ? "Télécharger" : "Download"}
+                          aria-label={isFr ? "Télécharger" : "Download"}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
                         >
-                          <IconDownload />
-                          {t.download}
+                          <VemoClientDownloadIcon />
                         </a>
                       </div>
                     </div>
                   );
                 })
               ) : (
-                <p className="rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4 text-sm font-black text-[#64748B]">
+                <p className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">
                   {t.noDocs}
                 </p>
               )}
