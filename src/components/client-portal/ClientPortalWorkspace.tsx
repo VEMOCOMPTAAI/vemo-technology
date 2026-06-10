@@ -334,7 +334,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F6F9FC] text-[#111827]">
+    <main className="vemo-client-clean min-h-screen bg-[#F6F9FC] text-[#111827]">
       <header className="sticky top-0 z-50 border-b border-[#E6EDF5] bg-white">
         <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between px-6">
           <Logo />
@@ -366,7 +366,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
             <button
               type="button"
               onClick={signOut}
-              className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white"
+              className="vemo-client-flat-btn rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white"
             >
               {t.signOut}
             </button>
@@ -469,7 +469,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                           href={url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex h-11 items-center gap-2 rounded-[14px] bg-[#F15A24] px-4 text-xs font-black text-white"
+                          className="vemo-client-flat-btn inline-flex h-11 items-center gap-2 rounded-[14px] bg-[#F15A24] px-4 text-xs font-black text-white"
                         >
                           <IconOpen />
                           {t.open}
@@ -543,7 +543,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                 placeholder={t.yourMessage}
                 className="mt-3 h-32 w-full resize-none rounded-[14px] border border-[#DDE7F2] bg-white px-4 py-4 text-sm font-black outline-none focus:border-[#F15A24]"
               />
-              <button className="mt-3 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
+              <button className="vemo-client-flat-btn mt-3 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
                 {t.send}
               </button>
             </form>
@@ -597,7 +597,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                 />
               </div>
 
-              <button className="mt-4 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
+              <button className="vemo-client-flat-btn mt-4 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
                 {t.updatePassword}
               </button>
             </form>

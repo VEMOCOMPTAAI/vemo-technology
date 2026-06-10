@@ -839,3 +839,45 @@ button[data-vemo-upload-button="true"]::after {
   box-shadow: 0 0 0 1000px #ffffff inset !important;
   -webkit-text-fill-color: #111827 !important;
 }
+
+/* =========================================================
+   VEMO CLIENT — BOUTONS ORANGE PLATS DEFINITIFS
+   Scope: uniquement espace client.
+   ========================================================= */
+
+.vemo-client-clean .vemo-client-flat-btn {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  border: 1px solid #F15A24 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.vemo-client-clean .vemo-client-flat-btn:hover {
+  background: #d94f20 !important;
+  background-color: #d94f20 !important;
+  background-image: none !important;
+  border-color: #d94f20 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.vemo-client-clean button,
+.vemo-client-clean a,
+.vemo-client-clean input,
+.vemo-client-clean textarea {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.vemo-client-clean input:-webkit-autofill,
+.vemo-client-clean input:-webkit-autofill:hover,
+.vemo-client-clean input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #111827 !important;
+}
