@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import AdminSecurePage from "@/components/AdminSecurePage";
 
-export default function Page() {
-  redirect("/fr/admin");
+export default function EnglishAdminPage() {
+  return <AdminSecurePage lang="en" />;
 }

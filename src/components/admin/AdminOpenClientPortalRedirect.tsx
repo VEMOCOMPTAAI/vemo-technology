@@ -5,7 +5,9 @@ import { useEffect } from "react";
 export default function AdminOpenClientPortalRedirect() {
   useEffect(() => {
     function handleClick(event: MouseEvent) {
-      if (window.location.pathname !== "/fr/admin") return;
+      const path = window.location.pathname;
+
+      if (path !== "/fr/admin" && path !== "/en/admin") return;
 
       const target = event.target as HTMLElement | null;
       const button = target?.closest("a,button") as HTMLElement | null;
@@ -17,7 +19,11 @@ export default function AdminOpenClientPortalRedirect() {
       if (text === "ouvrir" || text === "open") {
         event.preventDefault();
         event.stopPropagation();
-        window.location.href = "/fr/admin/client-portal";
+
+        window.location.href =
+          path === "/en/admin"
+            ? "/en/admin/client-portal"
+            : "/fr/admin/client-portal";
       }
     }
 

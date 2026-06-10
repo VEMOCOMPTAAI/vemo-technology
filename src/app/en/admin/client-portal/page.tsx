@@ -1,5 +1,7 @@
-import { redirect } from "next/navigation";
+import AdminClientPortalManager from "@/components/admin/AdminClientPortalManager";
 
-export default function Page() {
-  redirect("/fr/admin/client-portal");
+export const dynamic = "force-dynamic";
+
+export default function EnAdminClientPortalPage() {
+  return <AdminClientPortalManager lang="en" />;
 }
