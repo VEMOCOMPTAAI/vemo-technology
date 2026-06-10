@@ -1,5 +1,5 @@
-import AdminLoginPage from "@/components/AdminLoginPage";
+import { redirect } from "next/navigation";
 
-export default function EnglishAdminLoginPage() {
-  return <AdminLoginPage lang="en" />;
+export default function Page() {
+  redirect("/fr/admin");
 }

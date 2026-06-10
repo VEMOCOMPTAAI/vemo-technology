@@ -1,7 +1,5 @@
-import AdminLoginPage from "@/components/admin/AdminLoginPage";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-export default function EnAdminLoginPage() {
-  return <AdminLoginPage lang="en" />;
+export default function Page() {
+  redirect("/fr/admin");
 }
