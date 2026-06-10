@@ -413,54 +413,59 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
         )}
 
         {activeTab === "documents" && (
-          <section className="rounded-[32px] border border-[#E3ECF7] bg-white p-8">
-            <div className="flex items-start justify-between gap-5">
+          <section className="overflow-hidden rounded-[32px] border border-[#DDE7F2] bg-[#0F2238] p-0">
+            <div className="flex items-start justify-between gap-5 border-b border-white/10 px-8 py-7">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">Documents</p>
-                <h1 className="mt-4 text-3xl font-black tracking-[-0.05em]">
+                <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F15A24]">Documents</p>
+                <h1 className="mt-4 text-3xl font-black tracking-[-0.05em] text-white">
                   {isFr ? "Mes documents" : "My documents"}
                 </h1>
-                <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[#64748B]">
+                <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[#B8C8DA]">
                   {isFr
-                    ? "Accédez rapidement aux fichiers déposés dans votre dossier."
-                    : "Quickly access the files added to your client file."}
+                    ? "Liste des documents disponibles dans votre espace client."
+                    : "List of documents available in your client portal."}
                 </p>
               </div>
 
-              <div className="flex h-11 min-w-11 items-center justify-center rounded-[16px] bg-[#FFF1EA] px-4 text-sm font-black text-[#F15A24]">
+              <div className="flex h-11 min-w-11 items-center justify-center rounded-[16px] bg-[#F15A24] px-4 text-sm font-black text-white">
                 {documents.length}
               </div>
             </div>
 
-            <div className="mt-8 grid gap-4">
-              {loading ? (
-                <p className="rounded-[20px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">...</p>
-              ) : documents.length ? (
-                documents.map((doc) => {
-                  const title = doc.name || doc.title || doc.filename || "Document";
-                  const filename = doc.filename || (isFr ? "Fichier disponible" : "Available file");
-                  const url = doc.url || doc.fileUrl || "#";
+            <div className="bg-white px-6 py-6">
+              <div className="mb-4 grid grid-cols-[1fr_150px] items-center rounded-[16px] bg-[#F5F8FC] px-5 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-[#64748B]">
+                <span>{isFr ? "Document" : "Document"}</span>
+                <span className="text-right">{isFr ? "Actions" : "Actions"}</span>
+              </div>
 
-                  return (
-                    <div
-                      key={doc.id || title}
-                      className="relative overflow-hidden rounded-[22px] border border-[#D9E5F2] bg-[#F8FBFF] px-5 py-5 transition hover:border-[#C5D5E9]"
-                    >
-                      <div className="absolute left-0 top-0 h-full w-[5px] bg-[#F15A24]" />
+              <div className="grid gap-3">
+                {loading ? (
+                  <p className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">...</p>
+                ) : documents.length ? (
+                  documents.map((doc) => {
+                    const title = doc.name || doc.title || doc.filename || "Document";
+                    const filename = doc.filename || (isFr ? "Fichier disponible" : "Available file");
+                    const url = doc.url || doc.fileUrl || "#";
 
-                      <div className="flex items-center justify-between gap-4 pl-3">
+                    const previewUrl = isFr
+                      ? `/fr/espace-client/document?email=${encodeURIComponent(email)}&title=${encodeURIComponent(title)}&file=${encodeURIComponent(filename)}&url=${encodeURIComponent(url)}`
+                      : `/en/client-portal/document?email=${encodeURIComponent(email)}&title=${encodeURIComponent(title)}&file=${encodeURIComponent(filename)}&url=${encodeURIComponent(url)}`;
+
+                    return (
+                      <div
+                        key={doc.id || title}
+                        className="grid grid-cols-[1fr_150px] items-center gap-4 rounded-[18px] border border-[#DDE7F2] bg-[#FBFDFF] px-5 py-4 transition hover:border-[#BFD0E6]"
+                      >
                         <div className="min-w-0">
                           <p className="truncate text-[15px] font-black text-[#123A63]">{title}</p>
-                          <p className="mt-1 truncate text-xs font-bold text-[#7F94B1]">{filename}</p>
+                          <p className="mt-1 truncate text-xs font-bold text-[#8AA0BC]">{filename}</p>
                         </div>
 
-                        <div className="flex shrink-0 items-center gap-2">
+                        <div className="flex justify-end gap-2">
                           <a
-                            href={url}
-                            target="_blank"
-                            rel="noreferrer"
-                            title={isFr ? "Ouvrir" : "Open"}
-                            aria-label={isFr ? "Ouvrir" : "Open"}
+                            href={previewUrl}
+                            title={isFr ? "Visualiser" : "Preview"}
+                            aria-label={isFr ? "Visualiser" : "Preview"}
                             className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#F15A24] text-white transition hover:bg-[#DB4F1C]"
                           >
                             <VemoClientOpenIcon />
@@ -471,20 +476,20 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                             download
                             title={isFr ? "Télécharger" : "Download"}
                             aria-label={isFr ? "Télécharger" : "Download"}
-                            className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D6E2F0] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#DDE7F2] bg-white text-[#123A63] transition hover:border-[#F15A24] hover:text-[#F15A24]"
                           >
                             <VemoClientDownloadIcon />
                           </a>
                         </div>
                       </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="rounded-[20px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">
-                  {t.noDocs}
-                </p>
-              )}
+                    );
+                  })
+                ) : (
+                  <p className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">
+                    {t.noDocs}
+                  </p>
+                )}
+              </div>
             </div>
           </section>
         )}
