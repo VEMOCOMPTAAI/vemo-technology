@@ -881,3 +881,27 @@ button[data-vemo-upload-button="true"]::after {
   box-shadow: 0 0 0 1000px #ffffff inset !important;
   -webkit-text-fill-color: #111827 !important;
 }
+
+/* VEMO final: no gradient buttons in client portal */
+.vemo-client-portal button[type="submit"],
+.vemo-client-portal .vemo-primary-button {
+  background: #F15A24 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.vemo-client-portal button[type="submit"]:hover,
+.vemo-client-portal .vemo-primary-button:hover {
+  background: #DB4F1C !important;
+}
+
+/* Neutralize browser yellow autofill inside VEMO forms */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #123A63 !important;
+  caret-color: #123A63 !important;
+}

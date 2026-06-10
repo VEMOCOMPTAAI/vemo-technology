@@ -335,7 +335,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F3F7FB] text-[#111827]">
+    <main className="vemo-client-portal min-h-screen bg-[#F3F7FB] text-[#111827]">
       <header className="sticky top-0 z-50 border-b border-[#E6EDF5] bg-white">
         <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between px-6">
           <Logo small />
@@ -563,7 +563,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                 placeholder={t.yourMessage}
                 className="mt-3 h-32 w-full resize-none rounded-[14px] border border-[#DDE7F2] bg-white px-4 py-4 text-sm font-black outline-none"
               />
-              <button className="mt-3 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
+              <button className="mt-3 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white transition hover:bg-[#DB4F1C]">
                 {t.send}
               </button>
             </form>
@@ -622,7 +622,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                 />
               </div>
 
-              <button className="mt-4 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
+              <button className="mt-4 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white transition hover:bg-[#DB4F1C]">
                 {t.updatePassword}
               </button>
             </form>
