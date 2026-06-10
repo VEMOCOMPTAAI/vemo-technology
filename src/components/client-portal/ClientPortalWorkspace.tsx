@@ -422,19 +422,19 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                 </h1>
                 <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[#64748B]">
                   {isFr
-                    ? "Documents disponibles dans votre dossier client."
-                    : "Documents available in your client file."}
+                    ? "Consultez ou téléchargez les documents de votre dossier."
+                    : "View or download the documents in your file."}
                 </p>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F15A24] text-sm font-black text-white">
+              <div className="flex h-10 min-w-10 items-center justify-center rounded-full bg-[#F15A24] px-3 text-sm font-black text-white">
                 {documents.length}
               </div>
             </div>
 
             <div className="mt-8 grid gap-3">
               {loading ? (
-                <p className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">...</p>
+                <p className="rounded-[18px] border border-[#DDE7F2] bg-white px-5 py-5 text-sm font-black text-[#64748B]">...</p>
               ) : documents.length ? (
                 documents.map((doc) => {
                   const title = doc.name || doc.title || doc.filename || "Document";
@@ -444,14 +444,10 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                   return (
                     <div
                       key={doc.id || title}
-                      className="flex items-center justify-between gap-4 rounded-[20px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4 transition hover:border-[#C8D7EA]"
+                      className="flex items-center justify-between gap-4 rounded-[18px] border border-[#E2EAF5] bg-white px-5 py-4 transition hover:border-[#CBD8EA]"
                     >
                       <div className="min-w-0">
-                        <div className="mb-2 inline-flex rounded-full border border-[#E6EDF7] bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-[#8AA0BC]">
-                          PDF
-                        </div>
-
-                        <p className="truncate text-sm font-black text-[#123A63]">{title}</p>
+                        <p className="truncate text-[15px] font-black text-[#123A63]">{title}</p>
                         <p className="mt-1 truncate text-xs font-bold text-[#8AA0BC]">{filename}</p>
                       </div>
 
@@ -481,7 +477,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                   );
                 })
               ) : (
-                <p className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-5 text-sm font-black text-[#64748B]">
+                <p className="rounded-[18px] border border-[#DDE7F2] bg-white px-5 py-5 text-sm font-black text-[#64748B]">
                   {t.noDocs}
                 </p>
               )}
