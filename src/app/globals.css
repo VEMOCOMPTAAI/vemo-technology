@@ -905,3 +905,44 @@ select:-webkit-autofill {
   -webkit-text-fill-color: #123A63 !important;
   caret-color: #123A63 !important;
 }
+
+/* === VEMO CLIENT PORTAL FINAL: ZERO GRADIENT === */
+.vemo-client-portal button,
+.vemo-client-portal a {
+  box-shadow: none !important;
+}
+
+.vemo-client-portal button[type="submit"],
+.vemo-client-portal form button,
+.vemo-client-portal .vemo-primary-button {
+  background: #F15A24 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.vemo-client-portal button[type="submit"]:hover,
+.vemo-client-portal form button:hover,
+.vemo-client-portal .vemo-primary-button:hover {
+  background: #DB4F1C !important;
+  background-image: none !important;
+}
+
+/* neutraliser tout style gradient restant dans l'espace client */
+.vemo-client-portal [class*="gradient"],
+.vemo-client-portal [class*="linear-gradient"],
+.vemo-client-portal [class*="from-"],
+.vemo-client-portal [class*="to-"] {
+  background-image: none !important;
+}
+
+/* autofill sans jaune */
+.vemo-client-portal input:-webkit-autofill,
+.vemo-client-portal input:-webkit-autofill:hover,
+.vemo-client-portal input:-webkit-autofill:focus,
+.vemo-client-portal textarea:-webkit-autofill,
+.vemo-client-portal select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #123A63 !important;
+  caret-color: #123A63 !important;
+}

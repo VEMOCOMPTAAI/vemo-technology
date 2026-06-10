@@ -367,7 +367,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
             <button
               type="button"
               onClick={signOut}
-              className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white"
+              className="rounded-[14px] bg-[#F15A24] bg-[#F15A24] px-5 py-3 text-sm font-black text-white transition hover:bg-[#DB4F1C]"
             >
               {t.signOut}
             </button>
@@ -563,7 +563,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                 placeholder={t.yourMessage}
                 className="mt-3 h-32 w-full resize-none rounded-[14px] border border-[#DDE7F2] bg-white px-4 py-4 text-sm font-black outline-none"
               />
-              <button className="mt-3 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white transition hover:bg-[#DB4F1C]">
+              <button className="mt-3 rounded-[14px] bg-[#F15A24] bg-[#F15A24] px-6 py-3 text-sm font-black text-white transition hover:bg-[#DB4F1C] transition hover:bg-[#DB4F1C]">
                 {t.send}
               </button>
             </form>
@@ -622,7 +622,7 @@ export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
                 />
               </div>
 
-              <button className="mt-4 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white transition hover:bg-[#DB4F1C]">
+              <button className="mt-4 rounded-[14px] bg-[#F15A24] bg-[#F15A24] px-6 py-3 text-sm font-black text-white transition hover:bg-[#DB4F1C] transition hover:bg-[#DB4F1C]">
                 {t.updatePassword}
               </button>
             </form>
