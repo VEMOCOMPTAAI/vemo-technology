@@ -1,51 +1,27 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-
-
-function ClientDocIconOpen() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 4h6v6" />
-      <path d="M10 14L20 4" />
-      <path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5" />
-    </svg>
-  );
-}
-
-function ClientDocIconDownload() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3v12" />
-      <path d="M7 10l5 5 5-5" />
-      <path d="M5 21h14" />
-    </svg>
-  );
-}
-
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type Lang = "fr" | "en";
-type Tab = "overview" | "documents" | "services" | "messages" | "account";
+type Tab = "status" | "documents" | "services" | "messages" | "account";
 
 type Props = {
-  lang: Lang;
-  email?: string;
-  tab?: Tab;
+  lang?: Lang;
 };
 
-type DocItem = {
+type ClientDocument = {
   id?: string;
   name?: string;
-  filename?: string;
   title?: string;
+  filename?: string;
   url?: string;
-  file_url?: string;
-  created_at?: string;
-  uploaded_at?: string;
+  fileUrl?: string;
+  uploadedAt?: string;
+  createdAt?: string;
 };
 
-type ServiceItem = {
+type ClientService = {
   id?: string;
   name?: string;
   nameFr?: string;
@@ -53,510 +29,498 @@ type ServiceItem = {
   status?: string;
   statusFr?: string;
   statusEn?: string;
+  detail?: string;
   value?: string;
   expiresAt?: string;
-  expiration?: string;
-  renewalDueAt?: string;
-  renewal?: string;
+  renewalAt?: string;
 };
 
-type MessageItem = {
+type ClientMessage = {
   id?: string;
+  from?: "admin" | "client";
   subject?: string;
   message?: string;
   body?: string;
-  from?: string;
-  created_at?: string;
   createdAt?: string;
 };
 
-function cleanEmail(email?: string) {
-  return email && email.includes("@") ? email : "sheikh.abderrahim1@gmail.com";
+type ClientStatus = {
+  payment?: string;
+  file?: string;
+  currentStep?: string;
+};
+
+type Account = {
+  name?: string;
+  email?: string;
+};
+
+function Logo({ admin = false }: { admin?: boolean }) {
+  return (
+    <div className="leading-none">
+      <div className="text-[22px] font-black tracking-[-0.04em]">
+        <span className="text-[#123A63]">VEMO</span>
+        <span className="text-[#F15A24]">TECH</span>
+      </div>
+      <div className="mt-1 text-[9px] font-black uppercase tracking-[0.36em] text-[#64748B]">
+        {admin ? "ADMIN" : "US LLC POUR NON-RÉSIDENTS"}
+      </div>
+    </div>
+  );
 }
 
-function normalizeTab(value?: string): Tab {
-  if (value === "documents" || value === "services" || value === "messages" || value === "account") return value;
-  return "overview";
-}
-
-function safeDate(value?: string) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("fr-FR");
-}
-
-export default function ClientPortalWorkspace({ lang, email, tab = "overview" }: Props) {
-  const isFr = lang === "fr";
-  const activeTab = normalizeTab(tab);
-  const clientEmail = cleanEmail(email);
-
-  const [status, setStatus] = useState<any>(null);
-  const [documents, setDocuments] = useState<DocItem[]>([]);
-  const [services, setServices] = useState<ServiceItem[]>([]);
-  const [messages, setMessages] = useState<MessageItem[]>([]);
-  const [account, setAccount] = useState<{ name: string; email: string; passwordUpdatedAt?: string | null }>({
-    name: "Client VEMO",
-    email: clientEmail,
-    passwordUpdatedAt: null,
-  });
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [accountMessage, setAccountMessage] = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-
-  const basePath = isFr ? "/fr/espace-client" : "/en/client-portal";
-  const oppositePath = isFr ? "/en/client-portal" : "/fr/espace-client";
-
-  const hrefFor = (nextTab?: Tab) => {
-    const params = new URLSearchParams();
-    params.set("email", clientEmail);
-    if (nextTab && nextTab !== "overview") params.set("tab", nextTab);
-    return `${basePath}?${params.toString()}`;
-  };
-
-  const switchHref = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set("email", clientEmail);
-    if (activeTab !== "overview") params.set("tab", activeTab);
-    return `${oppositePath}?${params.toString()}`;
-  }, [activeTab, clientEmail, oppositePath]);
-
-  const t = isFr
-    ? {
-        subtitle: "US LLC pour non-résidents",
-        home: "Statut",
-        documents: "Documents",
-        services: "Mes services",
-        messages: "Messages",
-        account: "Mon compte",
-        lang: "EN",
-        logout: "Se déconnecter",
-        progress: "Suivi",
-        statusTitle: "État de mon dossier",
-        payment: "Paiement",
-        file: "Dossier",
-        currentStep: "Étape actuelle",
-        paymentValue: "En vérification",
-        fileValue: "En attente",
-        stepValue: "Réception du dossier",
-        documentsTitle: "Documents",
-        noDocuments: "Aucun document disponible pour le moment.",
-        open: "Ouvrir",
-        servicesTitle: "Mes services",
-        noServices: "Aucun service ajouté pour le moment.",
-        expiration: "Expiration",
-        renewal: "Renouvellement",
-        messagesTitle: "Messages",
-        reply: "Répondre à VEMO",
-        subject: "Objet",
-        message: "Votre message...",
-        send: "Envoyer",
-        noMessages: "Aucun message disponible.",
-        accountTitle: "Mon compte",
-        accountText: "Gérez l’accès à votre espace client.",
-        name: "Nom",
-        email: "Email",
-        readonly: "Non modifiable",
-        password: "Mot de passe",
-        currentPassword: "Mot de passe actuel",
-        newPassword: "Nouveau mot de passe",
-        confirmPassword: "Confirmation du mot de passe",
-        updatePassword: "Mettre à jour le mot de passe",
-        passwordUpdated: "Mot de passe mis à jour.",
-        passwordError: "Vérifiez les informations saisies.",
-        accountTitle: "Mon compte",
-        accountText: "Gérez l’accès à votre espace client.",
-        name: "Nom",
-        email: "Email",
-        readonly: "Non modifiable",
-        password: "Mot de passe",
-        currentPassword: "Mot de passe actuel",
-        newPassword: "Nouveau mot de passe",
-        confirmPassword: "Confirmation du mot de passe",
-        updatePassword: "Mettre à jour le mot de passe",
-        passwordUpdated: "Mot de passe mis à jour.",
-        passwordError: "Vérifiez les informations saisies.",
-      }
-    : {
-        subtitle: "US LLC for non-residents",
-        home: "Status",
-        documents: "Documents",
-        services: "My services",
-        messages: "Messages",
-        account: "My account",
-        lang: "FR",
-        logout: "Sign out",
-        progress: "Progress",
-        statusTitle: "My file status",
-        payment: "Payment",
-        file: "File",
-        currentStep: "Current step",
-        paymentValue: "Under review",
-        fileValue: "Pending",
-        stepValue: "File received",
-        documentsTitle: "Documents",
-        noDocuments: "No document available yet.",
-        open: "Open",
-        servicesTitle: "My services",
-        noServices: "No service added yet.",
-        expiration: "Expiration",
-        renewal: "Renewal",
-        messagesTitle: "Messages",
-        reply: "Reply to VEMO",
-        subject: "Subject",
-        message: "Your message...",
-        send: "Send",
-        noMessages: "No message available.",
-        accountTitle: "My account",
-        accountText: "Manage access to your client portal.",
-        name: "Name",
-        email: "Email",
-        readonly: "Read only",
-        password: "Password",
-        currentPassword: "Current password",
-        newPassword: "New password",
-        confirmPassword: "Confirm password",
-        updatePassword: "Update password",
-        passwordUpdated: "Password updated.",
-        passwordError: "Please check the information entered.",
-        accountTitle: "My account",
-        accountText: "Manage access to your client portal.",
-        name: "Name",
-        email: "Email",
-        readonly: "Read only",
-        password: "Password",
-        currentPassword: "Current password",
-        newPassword: "New password",
-        confirmPassword: "Confirm password",
-        updatePassword: "Update password",
-        passwordUpdated: "Password updated.",
-        passwordError: "Please check the information entered.",
-      };
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const [statusRes, docsRes, servicesRes, messagesRes, accountRes] = await Promise.all([
-          fetch(`/api/client-portal/status?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
-          fetch(`/api/client-portal/documents?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
-          fetch(`/api/client-portal/services?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
-          fetch(`/api/client-portal/messages?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
-          fetch(`/api/client-portal/account?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
-          fetch(`/api/client-portal/account?email=${encodeURIComponent(clientEmail)}`, { cache: "no-store" }),
-        ]);
-
-        const statusJson = await statusRes.json().catch(() => null);
-        const docsJson = await docsRes.json().catch(() => null);
-        const servicesJson = await servicesRes.json().catch(() => null);
-        const messagesJson = await messagesRes.json().catch(() => null);
-        const accountJson = await accountRes.json().catch(() => null);
-
-        if (cancelled) return;
-
-        setStatus(statusJson?.status || statusJson || null);
-        setDocuments(Array.isArray(docsJson?.documents) ? docsJson.documents : Array.isArray(docsJson) ? docsJson : []);
-        setServices(Array.isArray(servicesJson?.services) ? servicesJson.services : Array.isArray(servicesJson) ? servicesJson : []);
-        setMessages(Array.isArray(messagesJson?.messages) ? messagesJson.messages : Array.isArray(messagesJson) ? messagesJson : []);
-        if (accountJson?.account) {
-          setAccount(accountJson.account);
-        }
-        if (accountJson?.account) {
-          setAccount(accountJson.account);
-        }
-      } catch {
-        if (!cancelled) {
-          setStatus(null);
-          setDocuments([]);
-          setServices([]);
-          setMessages([]);
-        }
-      }
-    }
-
-    load();
-
-    
-  const IconOpen = () => (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+function IconOpen() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 4h6v6" />
       <path d="M10 14L20 4" />
       <path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5" />
     </svg>
   );
+}
 
-  const IconDownload = () => (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+function IconDownload() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 3v12" />
       <path d="M7 10l5 5 5-5" />
       <path d="M5 21h14" />
     </svg>
   );
+}
 
-return () => {
-      cancelled = true;
-    };
-  }, [clientEmail]);
+function IconFile() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M8 13h8" />
+      <path d="M8 17h5" />
+    </svg>
+  );
+}
 
-  async function sendMessage() {
-    if (!subject.trim() && !message.trim()) return;
+function FieldBox({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[18px] border border-[#E6EDF5] bg-white px-5 py-4">
+      <p className="text-[10px] font-black uppercase tracking-[0.32em] text-[#8AA0BC]">{label}</p>
+      <p className="mt-3 text-sm font-black text-[#123A63]">{value || "—"}</p>
+    </div>
+  );
+}
 
-    const localMessage = {
-      id: `local-${Date.now()}`,
-      subject,
-      message,
-      from: "client",
-      createdAt: new Date().toISOString(),
-    };
+function EmptyBox({ text }: { text: string }) {
+  return (
+    <div className="rounded-[18px] border border-dashed border-[#DDE7F2] bg-white px-5 py-6 text-sm font-black text-[#64748B]">
+      {text}
+    </div>
+  );
+}
 
-    try {
-      await fetch("/api/client-portal/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: clientEmail, subject, message }),
-      });
-    } catch {}
+export default function ClientPortalWorkspace({ lang = "fr" }: Props) {
+  const isFr = lang === "fr";
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-    setMessages((old) => [localMessage, ...old]);
-    setSubject("");
-    setMessage("");
+  const email = searchParams.get("email") || "";
+  const initialTab = (searchParams.get("tab") || "status") as Tab;
+
+  const [activeTab, setActiveTab] = useState<Tab>(
+    ["status", "documents", "services", "messages", "account"].includes(initialTab) ? initialTab : "status"
+  );
+
+  const [loading, setLoading] = useState(true);
+  const [documents, setDocuments] = useState<ClientDocument[]>([]);
+  const [services, setServices] = useState<ClientService[]>([]);
+  const [messages, setMessages] = useState<ClientMessage[]>([]);
+  const [status, setStatus] = useState<ClientStatus>({});
+  const [account, setAccount] = useState<Account>({ email });
+
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [notice, setNotice] = useState("");
+
+  const t = useMemo(() => {
+    return isFr
+      ? {
+          status: "Statut",
+          documents: "Documents",
+          services: "Mes services",
+          messages: "Messages",
+          account: "Mon compte",
+          signOut: "Se déconnecter",
+          titleStatus: "État de mon dossier",
+          subtitle: "Espace client sécurisé",
+          payment: "Paiement",
+          file: "Dossier",
+          currentStep: "Étape actuelle",
+          docsTitle: "Documents",
+          docsSubtitle: "Tous les fichiers ajoutés par VEMO sont disponibles ici.",
+          noDocs: "Aucun document disponible pour le moment.",
+          open: "Ouvrir",
+          download: "Télécharger",
+          servicesTitle: "Mes services",
+          servicesSubtitle: "Suivi des services actifs, renouvellements et échéances.",
+          noServices: "Aucun service ajouté pour le moment.",
+          expiration: "Expiration",
+          renewal: "Renouvellement",
+          messagesTitle: "Messagerie avec VEMO",
+          messagesSubtitle: "Échangez avec l’équipe VEMO depuis votre espace sécurisé.",
+          noMessages: "Aucun message disponible.",
+          reply: "Répondre à VEMO",
+          subject: "Objet",
+          yourMessage: "Votre message...",
+          send: "Envoyer",
+          accountTitle: "Mon compte",
+          accountSubtitle: "Vos informations de compte sont sécurisées.",
+          fullName: "Nom complet",
+          email: "Email",
+          readOnly: "Non modifiable",
+          password: "Mot de passe",
+          currentPassword: "Mot de passe actuel",
+          newPassword: "Nouveau mot de passe",
+          confirmPassword: "Confirmation du mot de passe",
+          updatePassword: "Mettre à jour le mot de passe",
+          saved: "Message envoyé.",
+          passwordSaved: "Mot de passe mis à jour.",
+          passwordError: "Les mots de passe ne correspondent pas.",
+          langSwitch: "EN",
+        }
+      : {
+          status: "Status",
+          documents: "Documents",
+          services: "My services",
+          messages: "Messages",
+          account: "My account",
+          signOut: "Sign out",
+          titleStatus: "My file status",
+          subtitle: "Secure client portal",
+          payment: "Payment",
+          file: "File",
+          currentStep: "Current step",
+          docsTitle: "Documents",
+          docsSubtitle: "All files added by VEMO are available here.",
+          noDocs: "No document available yet.",
+          open: "Open",
+          download: "Download",
+          servicesTitle: "My services",
+          servicesSubtitle: "Track active services, renewals and deadlines.",
+          noServices: "No service added yet.",
+          expiration: "Expiration",
+          renewal: "Renewal",
+          messagesTitle: "Communication with VEMO",
+          messagesSubtitle: "Message the VEMO team from your secure portal.",
+          noMessages: "No message available yet.",
+          reply: "Reply to VEMO",
+          subject: "Subject",
+          yourMessage: "Write your message...",
+          send: "Send",
+          accountTitle: "My account",
+          accountSubtitle: "Your account information is secure.",
+          fullName: "Full name",
+          email: "Email",
+          readOnly: "Read only",
+          password: "Password",
+          currentPassword: "Current password",
+          newPassword: "New password",
+          confirmPassword: "Confirm password",
+          updatePassword: "Update password",
+          saved: "Message sent.",
+          passwordSaved: "Password updated.",
+          passwordError: "Passwords do not match.",
+          langSwitch: "FR",
+        };
+  }, [isFr]);
+
+  function setTab(tab: Tab) {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.replace(`${pathname}?${params.toString()}`);
   }
 
-  function logout() {
-    localStorage.removeItem("vemo_client_email");
-    localStorage.removeItem("vemoClientEmail");
-    localStorage.removeItem("clientEmail");
-    localStorage.removeItem("email");
-    window.location.href = isFr ? "/fr" : "/en";
+  function switchLang() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", activeTab);
+    router.push(isFr ? `/en/client-portal?${params.toString()}` : `/fr/espace-client?${params.toString()}`);
   }
 
-  async function updatePassword() {
-    setAccountMessage("");
+  function signOut() {
+    router.push(isFr ? "/fr" : "/en");
+  }
 
-    if (!currentPassword || !newPassword || !confirmPassword || newPassword.length < 8 || newPassword !== confirmPassword) {
-      setAccountMessage(t.passwordError);
+  async function loadAll() {
+    if (!email) {
+      setLoading(false);
       return;
     }
 
-    try {
-      const res = await fetch("/api/client-portal/account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: clientEmail,
-          currentPassword,
-          newPassword,
-          confirmPassword,
-        }),
-      });
+    setLoading(true);
+    const qs = `?email=${encodeURIComponent(email)}`;
 
-      const json = await res.json();
+    const [docsRes, servicesRes, statusRes, messagesRes, accountRes] = await Promise.all([
+      fetch(`/api/client-portal/documents${qs}`, { cache: "no-store" }).catch(() => null),
+      fetch(`/api/client-portal/services${qs}`, { cache: "no-store" }).catch(() => null),
+      fetch(`/api/client-portal/status${qs}`, { cache: "no-store" }).catch(() => null),
+      fetch(`/api/client-portal/messages${qs}`, { cache: "no-store" }).catch(() => null),
+      fetch(`/api/client-portal/account${qs}`, { cache: "no-store" }).catch(() => null),
+    ]);
 
-      if (!res.ok || !json.ok) {
-        setAccountMessage(t.passwordError);
-        return;
-      }
+    const docsJson = await docsRes?.json().catch(() => null);
+    const servicesJson = await servicesRes?.json().catch(() => null);
+    const statusJson = await statusRes?.json().catch(() => null);
+    const messagesJson = await messagesRes?.json().catch(() => null);
+    const accountJson = await accountRes?.json().catch(() => null);
 
-      if (json.account) {
-        setAccount(json.account);
-      }
+    setDocuments(Array.isArray(docsJson?.documents) ? docsJson.documents : []);
+    setServices(Array.isArray(servicesJson?.services) ? servicesJson.services : []);
+    setStatus(statusJson?.status || statusJson || {});
+    setMessages(Array.isArray(messagesJson?.messages) ? messagesJson.messages : []);
+    setAccount(accountJson?.account || accountJson?.profile || { email });
 
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setAccountMessage(t.passwordUpdated);
-    } catch {
-      setAccountMessage(t.passwordError);
-    }
+    setLoading(false);
   }
 
-  const paymentLabel = status?.payment_status || status?.paymentStatus || status?.payment || t.paymentValue;
-  const fileLabel = status?.dossier_status || status?.file_status || status?.fileStatus || status?.file || t.fileValue;
-  const stepLabel = status?.current_step || status?.currentStep || status?.step || t.stepValue;
+  useEffect(() => {
+    loadAll();
+  }, [email]);
+
+  async function sendMessage(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !message.trim()) return;
+
+    await fetch(`/api/client-portal/messages?email=${encodeURIComponent(email)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ subject, message, from: "client" }),
+    }).catch(() => null);
+
+    setSubject("");
+    setMessage("");
+    setNotice(t.saved);
+    await loadAll();
+  }
+
+  async function updatePassword(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (newPassword !== confirmPassword) {
+      setNotice(t.passwordError);
+      return;
+    }
+
+    await fetch(`/api/client-portal/account?email=${encodeURIComponent(email)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ oldPassword, newPassword }),
+    }).catch(() => null);
+
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setNotice(t.passwordSaved);
+  }
+
+  const menu: { key: Tab; label: string }[] = [
+    { key: "status", label: t.status },
+    { key: "documents", label: t.documents },
+    { key: "services", label: t.services },
+    { key: "messages", label: t.messages },
+    { key: "account", label: t.account },
+  ];
 
   return (
-    <main className="min-h-screen bg-[#F3F7FB] pb-12 text-[#111827]">
-      <header className="vemo-client-header sticky top-0 z-50 border-b border-[#E6EDF5] bg-white/95 backdrop-blur">
+    <main className="min-h-screen bg-[#F6F9FC] text-[#111827]">
+      <header className="sticky top-0 z-50 border-b border-[#E6EDF5] bg-white">
         <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between px-6">
-          <Link href={hrefFor("overview")} className="leading-none">
-            <div className="text-[22px] font-black tracking-[-0.04em]">
-              <span className="text-[#123A63]">VEMO</span>
-              <span className="text-[#F15A24]">TECH</span>
-            </div>
-            <div className="mt-1 text-[9px] font-black uppercase tracking-[0.38em] text-[#64748B]">
-              {t.subtitle}
-            </div>
-          </Link>
+          <Logo />
 
-          <nav className="hidden items-center gap-8 text-sm font-black md:flex">
-            <Link href={hrefFor("overview")} className={activeTab === "overview" ? "text-[#F15A24]" : "text-[#111827]"}>
-              {t.home}
-            </Link>
-            <Link href={hrefFor("documents")} className={activeTab === "documents" ? "text-[#F15A24]" : "text-[#111827]"}>
-              {t.documents}
-            </Link>
-            <Link href={hrefFor("services")} className={activeTab === "services" ? "text-[#F15A24]" : "text-[#111827]"}>
-              {t.services}
-            </Link>
-            <Link href={hrefFor("messages")} className={activeTab === "messages" ? "text-[#F15A24]" : "text-[#111827]"}>
-              {t.messages}
-            </Link>
-            <Link href={hrefFor("account")} className={activeTab === "account" ? "text-[#F15A24]" : "text-[#111827]"}>
-              {t.account}
-            </Link>
+          <nav className="hidden items-center gap-2 md:flex">
+            {menu.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setTab(item.key)}
+                className={`rounded-[14px] px-4 py-3 text-sm font-black transition ${
+                  activeTab === item.key ? "bg-[#FFF3EF] text-[#F15A24]" : "text-[#111827] hover:bg-[#F8FAFC]"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link href={switchHref} className="rounded-[14px] border border-[#DDE7F2] bg-white px-5 py-3 text-sm font-black text-[#111827]">
-              {t.lang}
-            </Link>
-            <button type="button" onClick={logout} className="inline-flex h-9 items-center justify-center rounded-[10px] bg-[#F15A24] px-4 text-xs font-black text-white">
-              {t.logout}
+            <button
+              type="button"
+              onClick={switchLang}
+              className="rounded-[14px] border border-[#DDE7F2] bg-white px-5 py-3 text-sm font-black text-[#123A63]"
+            >
+              {t.langSwitch}
             </button>
+
+            <button
+              type="button"
+              onClick={signOut}
+              className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white"
+            >
+              {t.signOut}
+            </button>
+          </div>
+        </div>
+
+        <div className="border-t border-[#EEF3F8] bg-white px-4 py-3 md:hidden">
+          <div className="flex gap-2 overflow-x-auto">
+            {menu.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setTab(item.key)}
+                className={`shrink-0 rounded-[12px] px-4 py-2 text-xs font-black ${
+                  activeTab === item.key ? "bg-[#F15A24] text-white" : "border border-[#DDE7F2] bg-white text-[#123A63]"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
         </div>
       </header>
 
-      <section className="mx-auto mt-10 max-w-5xl px-6">
+      <section className="mx-auto max-w-6xl px-6 py-10">
+        <div className="mb-7 rounded-[28px] border border-[#E6EDF5] bg-white px-7 py-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F15A24]">{t.subtitle}</p>
+          <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h1 className="text-3xl font-black tracking-[-0.05em] text-[#111827]">
+                {activeTab === "status" && t.titleStatus}
+                {activeTab === "documents" && t.docsTitle}
+                {activeTab === "services" && t.servicesTitle}
+                {activeTab === "messages" && t.messagesTitle}
+                {activeTab === "account" && t.accountTitle}
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm font-bold leading-6 text-[#64748B]">
+                {activeTab === "status" && t.subtitle}
+                {activeTab === "documents" && t.docsSubtitle}
+                {activeTab === "services" && t.servicesSubtitle}
+                {activeTab === "messages" && t.messagesSubtitle}
+                {activeTab === "account" && t.accountSubtitle}
+              </p>
+            </div>
 
-        {activeTab === "overview" && (
-          <section className="mt-6 rounded-[28px] bg-white p-8">
-            <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">
-              {t.progress}
-            </p>
-            <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
-              {t.statusTitle}
-            </h2>
+            <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-[#F15A24] text-sm font-black text-white">
+              {activeTab === "documents" && documents.length}
+              {activeTab === "services" && services.length}
+              {activeTab === "messages" && messages.length}
+              {activeTab === "status" && "✓"}
+              {activeTab === "account" && "•"}
+            </div>
+          </div>
+        </div>
 
-            <div className="mt-7 grid gap-4 md:grid-cols-3">
-              {[
-                [t.payment, paymentLabel],
-                [t.file, fileLabel],
-                [t.currentStep, stepLabel],
-              ].map(([label, value]) => (
-                <div key={label} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#8AA0BC]">
-                    {label}
-                  </p>
-                  <p className="mt-4 text-sm font-black text-[#123A63]">{value}</p>
-                </div>
-              ))}
+        {notice ? (
+          <div className="mb-5 rounded-[16px] border border-[#BFE8D3] bg-[#ECFDF5] px-5 py-4 text-sm font-black text-[#047857]">
+            {notice}
+          </div>
+        ) : null}
+
+        {activeTab === "status" && (
+          <section className="rounded-[28px] border border-[#E6EDF5] bg-white p-7">
+            <div className="grid gap-4 md:grid-cols-3">
+              <FieldBox label={t.payment} value={status.payment || (isFr ? "En vérification" : "Under review")} />
+              <FieldBox label={t.file} value={status.file || (isFr ? "En attente" : "Pending")} />
+              <FieldBox label={t.currentStep} value={status.currentStep || (isFr ? "Réception du dossier" : "File received")} />
             </div>
           </section>
         )}
 
         {activeTab === "documents" && (
-          <section className="mt-6 rounded-[28px] bg-white p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">
-                  {t.documents}
-                </p>
-                <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
-                  {t.documentsTitle}
-                </h2>
-              </div>
-              <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-[#F15A24] px-2 text-xs font-black text-white">
-                {documents.length}
-              </span>
-            </div>
-
-            <div className="mt-7 grid gap-3">
-              {documents.length ? (
-                documents.map((doc, index) => {
-                  const name = doc.name || doc.title || doc.filename || `Document ${index + 1}`;
-                  const url = doc.url || doc.file_url || "#";
+          <section className="rounded-[28px] border border-[#E6EDF5] bg-white p-7">
+            <div className="grid gap-4">
+              {loading ? (
+                <EmptyBox text="..." />
+              ) : documents.length ? (
+                documents.map((doc) => {
+                  const title = doc.name || doc.title || doc.filename || "Document";
+                  const filename = doc.filename || title;
+                  const url = doc.url || doc.fileUrl || "#";
 
                   return (
-                    <div key={doc.id || index} className="flex items-center justify-between rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
-                      <div>
-                        <p className="text-sm font-black text-[#123A63]">{name}</p>
-                        <p className="mt-1 text-xs font-bold text-[#64748B]">
-                          {safeDate(doc.uploaded_at || doc.created_at)}
-                        </p>
+                    <div
+                      key={doc.id || title}
+                      className="group flex flex-col gap-4 rounded-[20px] border border-[#DDE7F2] bg-white px-5 py-5 transition hover:border-[#F15A24] md:flex-row md:items-center md:justify-between"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-[#FFF3EF] text-[#F15A24]">
+                          <IconFile />
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-[#123A63]">{title}</p>
+                          <p className="mt-1 text-xs font-bold text-[#8AA0BC]">{filename}</p>
+                        </div>
                       </div>
-                      <a href={url} target="_blank" rel="noreferrer" className="rounded-[12px] bg-[#F15A24] px-4 py-3 text-xs font-black text-white">
-                        {t.open}
-                      </a>
+
+                      <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex h-11 items-center gap-2 rounded-[14px] bg-[#F15A24] px-4 text-xs font-black text-white"
+                        >
+                          <IconOpen />
+                          {t.open}
+                        </a>
+
+                        <a
+                          href={url}
+                          download={filename}
+                          className="inline-flex h-11 items-center gap-2 rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-xs font-black text-[#123A63]"
+                        >
+                          <IconDownload />
+                          {t.download}
+                        </a>
+                      </div>
                     </div>
                   );
                 })
               ) : (
-                <div className="rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-5 text-sm font-black text-[#64748B]">
-                  {t.noDocuments}
-                </div>
+                <EmptyBox text={t.noDocs} />
               )}
             </div>
           </section>
         )}
 
         {activeTab === "services" && (
-          <section className="mt-6 rounded-[28px] bg-white p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">
-                  {t.services}
-                </p>
-                <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
-                  {t.servicesTitle}
-                </h2>
-              </div>
-              <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-[#F15A24] px-2 text-xs font-black text-white">
-                {services.length}
-              </span>
-            </div>
-
-            <div className="mt-7 grid gap-4 md:grid-cols-2">
+          <section className="rounded-[28px] border border-[#E6EDF5] bg-white p-7">
+            <div className="grid gap-4 md:grid-cols-2">
               {services.length ? (
-                services.map((service, index) => {
-                  const name = isFr
-                    ? service.nameFr || service.name || service.nameEn || `Service ${index + 1}`
-                    : service.nameEn || service.name || service.nameFr || `Service ${index + 1}`;
-
-                  const statusLabel = isFr
-                    ? service.statusFr || service.status || service.statusEn || "—"
-                    : service.statusEn || service.status || service.statusFr || "—";
-
-                  return (
-                    <div key={service.id || index} className="rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] px-5 py-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h3 className="text-base font-black text-[#123A63]">{name}</h3>
-                          <p className="mt-2 text-sm font-bold text-[#64748B]">{service.value || "—"}</p>
-                        </div>
-                        <span className="rounded-full bg-white px-3 py-2 text-xs font-black text-[#F15A24]">
-                          {statusLabel}
-                        </span>
+                services.map((service) => (
+                  <div key={service.id || service.name} className="rounded-[22px] border border-[#DDE7F2] bg-white p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h2 className="text-lg font-black text-[#123A63]">
+                          {isFr ? service.nameFr || service.name : service.nameEn || service.name}
+                        </h2>
+                        <p className="mt-2 text-sm font-bold text-[#64748B]">{service.detail || service.value || ""}</p>
                       </div>
-
-                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                        <div className="rounded-[14px] border border-[#DDE7F2] bg-white p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8AA0BC]">
-                            {t.expiration}
-                          </p>
-                          <p className="mt-2 text-sm font-black text-[#123A63]">
-                            {safeDate(service.expiresAt || service.expiration)}
-                          </p>
-                        </div>
-                        <div className="rounded-[14px] border border-[#DDE7F2] bg-white p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8AA0BC]">
-                            {t.renewal}
-                          </p>
-                          <p className="mt-2 text-sm font-black text-[#123A63]">
-                            {safeDate(service.renewalDueAt || service.renewal)}
-                          </p>
-                        </div>
-                      </div>
+                      <span className="rounded-full bg-[#FFF3EF] px-3 py-2 text-[11px] font-black text-[#F15A24]">
+                        {isFr ? service.statusFr || service.status || "Actif" : service.statusEn || service.status || "Active"}
+                      </span>
                     </div>
-                  );
-                })
+
+                    <div className="mt-5 grid gap-3 md:grid-cols-2">
+                      <FieldBox label={t.expiration} value={service.expiresAt || "—"} />
+                      <FieldBox label={t.renewal} value={service.renewalAt || "—"} />
+                    </div>
+                  </div>
+                ))
               ) : (
-                <div className="rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-5 text-sm font-black text-[#64748B]">
-                  {t.noServices}
+                <div className="md:col-span-2">
+                  <EmptyBox text={t.noServices} />
                 </div>
               )}
             </div>
@@ -564,59 +528,79 @@ return () => {
         )}
 
         {activeTab === "messages" && (
-          <section className="mt-6 rounded-[28px] bg-white p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#8AA0BC]">
-                  {t.messages}
-                </p>
-                <h2 className="mt-4 text-2xl font-black tracking-[-0.04em]">
-                  {t.messagesTitle}
-                </h2>
-              </div>
-              <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-[#F15A24] px-2 text-xs font-black text-white">
-                {messages.length}
-              </span>
-            </div>
-
-            <div className="mt-7 rounded-[18px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
+          <section className="rounded-[28px] border border-[#E6EDF5] bg-white p-7">
+            <form onSubmit={sendMessage} className="rounded-[22px] border border-[#DDE7F2] bg-white p-5">
               <p className="text-sm font-black text-[#123A63]">{t.reply}</p>
               <input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder={t.subject}
-                className="mt-4 h-12 w-full rounded-[14px] border border-[#E5D8CF] bg-white px-4 text-sm font-bold outline-none"
+                className="mt-4 h-12 w-full rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-sm font-black outline-none focus:border-[#F15A24]"
               />
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={t.message}
-                className="mt-3 h-28 w-full resize-none rounded-[14px] border border-[#E5D8CF] bg-white px-4 py-4 text-sm font-bold outline-none"
+                placeholder={t.yourMessage}
+                className="mt-3 h-32 w-full resize-none rounded-[14px] border border-[#DDE7F2] bg-white px-4 py-4 text-sm font-black outline-none focus:border-[#F15A24]"
               />
-              <button type="button" onClick={sendMessage} className="mt-4 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
+              <button className="mt-3 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
                 {t.send}
               </button>
-            </div>
+            </form>
 
-            <div className="mt-5 grid gap-3">
+            <div className="mt-6 grid gap-3">
               {messages.length ? (
-                messages.map((msg, index) => (
-                  <div key={msg.id || index} className="rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
-                    <div className="flex items-center justify-between gap-4">
-                      <p className="text-sm font-black text-[#123A63]">{msg.subject || "Message"}</p>
-                      <p className="text-xs font-bold text-[#64748B]">{safeDate(msg.createdAt || msg.created_at)}</p>
-                    </div>
-                    <p className="mt-3 text-sm font-bold leading-6 text-[#64748B]">
-                      {msg.message || msg.body}
-                    </p>
+                messages.map((msg) => (
+                  <div key={msg.id || msg.createdAt} className="rounded-[18px] border border-[#DDE7F2] bg-white p-5">
+                    <p className="text-sm font-black text-[#123A63]">{msg.subject || "Message"}</p>
+                    <p className="mt-2 text-sm font-bold leading-6 text-[#64748B]">{msg.message || msg.body}</p>
                   </div>
                 ))
               ) : (
-                <div className="rounded-[16px] border border-[#DDE7F2] bg-[#F8FAFC] p-5 text-sm font-black text-[#64748B]">
-                  {t.noMessages}
-                </div>
+                <EmptyBox text={t.noMessages} />
               )}
             </div>
+          </section>
+        )}
+
+        {activeTab === "account" && (
+          <section className="rounded-[28px] border border-[#E6EDF5] bg-white p-7">
+            <div className="grid gap-4 md:grid-cols-2">
+              <FieldBox label={`${t.fullName} — ${t.readOnly}`} value={account.name || ""} />
+              <FieldBox label={`${t.email} — ${t.readOnly}`} value={account.email || email} />
+            </div>
+
+            <form onSubmit={updatePassword} className="mt-7 rounded-[22px] border border-[#DDE7F2] bg-white p-5">
+              <p className="text-sm font-black text-[#123A63]">{t.password}</p>
+
+              <div className="mt-4 grid gap-3">
+                <input
+                  type="password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  placeholder={t.currentPassword}
+                  className="h-12 rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-sm font-black outline-none focus:border-[#F15A24]"
+                />
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder={t.newPassword}
+                  className="h-12 rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-sm font-black outline-none focus:border-[#F15A24]"
+                />
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={t.confirmPassword}
+                  className="h-12 rounded-[14px] border border-[#DDE7F2] bg-white px-4 text-sm font-black outline-none focus:border-[#F15A24]"
+                />
+              </div>
+
+              <button className="mt-4 rounded-[14px] bg-[#F15A24] px-6 py-3 text-sm font-black text-white">
+                {t.updatePassword}
+              </button>
+            </form>
           </section>
         )}
       </section>
