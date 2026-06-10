@@ -764,3 +764,78 @@ button[data-vemo-upload-button="true"]::after {
   min-width: auto !important;
 }
 
+
+/* =========================================================
+   VEMO CLIENT PORTAL — STYLE OPTIMISÉ, SCOPÉ UNIQUEMENT
+   ========================================================= */
+
+.vemo-client-portal {
+  background: #F7FAFD !important;
+}
+
+.vemo-client-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #E6EDF5 !important;
+  box-shadow: none !important;
+}
+
+.vemo-client-main-card {
+  border: 1px solid #E6EDF5 !important;
+  box-shadow: none !important;
+}
+
+.vemo-client-doc-card {
+  background: #ffffff !important;
+  border: 1px solid #DDE7F2 !important;
+  transition: border-color 160ms ease, transform 160ms ease;
+  box-shadow: none !important;
+}
+
+.vemo-client-doc-card:hover {
+  border-color: #F15A24 !important;
+  transform: translateY(-1px);
+}
+
+.vemo-client-doc-open {
+  background: #F15A24 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid #F15A24 !important;
+  box-shadow: none !important;
+}
+
+.vemo-client-doc-open:hover {
+  background: #d94f20 !important;
+  border-color: #d94f20 !important;
+}
+
+.vemo-client-doc-download {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #123A63 !important;
+  border: 1px solid #DDE7F2 !important;
+  box-shadow: none !important;
+}
+
+.vemo-client-doc-download:hover {
+  border-color: #F15A24 !important;
+  color: #F15A24 !important;
+}
+
+.vemo-client-portal button,
+.vemo-client-portal a,
+.vemo-client-portal input,
+.vemo-client-portal textarea,
+.vemo-client-portal select {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.vemo-client-portal input:-webkit-autofill,
+.vemo-client-portal input:-webkit-autofill:hover,
+.vemo-client-portal input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #111827 !important;
+}
