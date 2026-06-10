@@ -4,27 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 const ADMIN_PASSWORD = "123456";
+const STORAGE_KEY = "vemo_admin_authenticated";
 
-const STORAGE_KEYS = [
-  "vemo_admin_authenticated",
-  "vemo_admin_auth",
-  "admin_authenticated",
-  "adminAuth",
-];
-
-const COOKIE_KEYS = [
-  "vemo_admin_authenticated",
-  "vemo_admin_auth",
-  "vemo_admin_access",
-  "admin_authenticated",
-  "adminAuth",
-  "isAdmin",
-];
-
-function Logo() {
+function AdminLogo() {
   return (
     <div>
-      <div className="text-[24px] font-black trac      <div className="text-[24px] font-black trac      <">VEMO</span>
+      <div className="text-[24px] font-black tracking-[-0.04em]">
+        <span className="text-[#123A63]">VEMO</span>
         <span className="text-[#F15A24]">TECH</span>
       </div>
       <div className="mt-1 text-[9px] font-black uppercase tracking-[0.38em] text-[#64748B]">
@@ -32,26 +18,6 @@ function Logo() {
       </div>
     </div>
   );
-}
-
-function setAdminSession() {
-  STORAGE_KEYS.forEach((key) => window.localStorage.setItem(key, "yes"));
-  COOKIE_KEYS.forEach((key) => {
-    document.cookie = `${key}=yes; path=/; max-age=86400; SameSite=Lax`;
-  });
-}
-
-function clearAdminSession() {
-  STORAGE_KEYS.forEach((key) => window.localStorage.removeItem(key));
-  COOKIE_KEYS.forEach((key) => {
-    document.cookie = `${key}=; Max-Age=0; path=/`;
-  });
-}
-
-function hasAdminSession() {
-  const localOk = STORAGE_KEYS.some((key) => window.localStorage.getItem(key) === "yes");
-  const cookieOk = COOKIE_KEYS.some((key) => document.cookie.includes(`${key}=yes`));
-  return localOk || cookieOk;
 }
 
 export default function AdminPasswordGate({
@@ -71,27 +37,30 @@ export default function AdminPasswordGate({
   const t = useMemo(() => {
     return isFr
       ? {
+          lang: "EN",
           secure: "ADMIN SÉCURISÉ",
           title: "Connexion administrateur",
           subtitle: "Entrez le mot de passe admin pour accéder à l’espace de gestion.",
           placeholder: "Mot de passe admin",
           button: "Se connecter",
           error: "Mot de passe incorrect.",
-          lang: "EN",
         }
       : {
+          lang: "FR",
           secure: "SECURE ADMIN",
           title: "Admin login",
           subtitle: "Enter the admin password to access the management area.",
           placeholder: "Admin password",
           button: "Sign in",
           error: "Incorrect password.",
-          lang: "FR",
         };
   }, [isFr]);
 
   useEffect(() => {
-    const ok = hasAdminSession();
+    const ok =
+      window.localStorage.getItem(STORAGE_KEY) === "yes" ||
+      document.cookie.includes("vemo_admin_authenticated=yes");
+
     setAuthenticated(ok);
     setReady(true);
   }, []);
@@ -99,46 +68,29 @@ export default function AdminPasswordGate({
   useEffect(() => {
     if (!authenticated) return;
 
-    function handleClick(event: MouseEvent) {
+    function onClick(event: MouseEvent) {
       const target = event.target as HTMLElement | null;
       const button = target?.closest("button,a") as HTMLElement | null;
+
       if (!button) return;
 
       const text = (button.textContent || "").trim().toLowerCase();
 
-      if (
-        text === "se déconnecter" ||
-        text === "sign out" ||
-        text === "déconnexion" ||
-        text === "logout"
-      ) {
+      if (text === "se déconnecter" || text === "sign out" || text === "logout") {
         event.preventDefault();
         event.stopPropagation();
-        clearAdminSession();
+
+        window.localStorage.removeItem(STORAGE_KEY);
+        document.cookie = "vemo_admin_authenticated=; Max-Age=0; path=/";
+
         setAuthenticated(false);
         router.push(isFr ? "/fr/admin" : "/en/admin");
       }
     }
 
-    document.addEventListener("click", handleClick, true);
-    return () => document.removeEventListener("click", handleClick, true);
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
   }, [authenticated, isFr, router]);
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (password.trim() !== ADMIN_PASSWORD) {
-      setError(t.error);
-      return;
-    }
-
-    setAdminSession();
-    setAuthenticated(true);
-    setError("");
-    setPassword("");
-
-    router.refresh();
-  }
 
   function switchLang() {
     if (pathname.startsWith("/fr/admin/client-portal")) {
@@ -154,6 +106,22 @@ export default function AdminPasswordGate({
     router.push(isFr ? "/en/admin" : "/fr/admin");
   }
 
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (password.trim() !== ADMIN_PASSWORD) {
+      setError(t.error);
+      return;
+    }
+
+    window.localStorage.setItem(STORAGE_KEY, "yes");
+    document.cookie = "vemo_admin_authenticated=yes; path=/; max-age=86400; SameSite=Lax";
+
+    setAuthenticated(true);
+    setPassword("");
+    setError("");
+  }
+
   if (!ready) {
     return <main className="min-h-screen bg-[#F3F7FB]" />;
   }
@@ -163,7 +131,8 @@ export default function AdminPasswordGate({
       <main className="min-h-screen bg-[#F3F7FB] text-[#111827]">
         <header className="border-b border-[#E6EDF5] bg-white">
           <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between px-6">
-            <Logo />
+            <AdminLogo />
+
             <button
               type="button"
               onClick={switchLang}
@@ -179,7 +148,7 @@ export default function AdminPasswordGate({
             onSubmit={submit}
             className="w-full max-w-xl rounded-[32px] border border-[#DDE7F2] bg-white p-10"
           >
-            <Logo />
+            <AdminLogo />
 
             <p className="mt-10 text-[10px] font-black uppercase tracking-[0.45em] text-[#F15A24]">
               {t.secure}
@@ -197,8 +166,8 @@ export default function AdminPasswordGate({
               type="password"
               autoFocus
               value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
+              onChange={(event) => {
+                setPassword(event.target.value);
                 setError("");
               }}
               placeholder={t.placeholder}
