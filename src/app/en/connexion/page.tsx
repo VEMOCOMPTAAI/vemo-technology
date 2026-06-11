@@ -54,7 +54,7 @@ export default function EnglishLoginPage() {
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
           <a href="/en" className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#F15A24] to-[#0f2a4f] text-xl font-black text-white">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br  to-[#0f2a4f] text-xl font-black text-white">
               V
             </div>
 

@@ -331,7 +331,7 @@ export default function VemoAdminDashboardClean() {
 
             <button
               onClick={load}
-              className="inline-flex items-center gap-2 rounded-[18px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
+              className="inline-flex items-center gap-2 rounded-[18px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white -[0_14px_28px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
             >
               <ActionIcon type="refresh" />
               {t.refresh}
@@ -341,7 +341,7 @@ export default function VemoAdminDashboardClean() {
       </header>
 
       <section className="mx-auto max-w-7xl px-6 py-8">
-        <div className="rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_24px_70px_rgba(18,58,99,0.08)]">
+        <div className="rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 -[0_24px_70px_rgba(18,58,99,0.08)]">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F15A24]">
             {t.secure}
           </p>
@@ -378,25 +378,25 @@ export default function VemoAdminDashboardClean() {
         )}
 
         <div className="mt-6 grid gap-4 md:grid-cols-4">
-          <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,0.045)]">
+          <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 -[0_12px_28px_rgba(18,58,99,0.045)]">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">{t.clients}</p>
             <p className="mt-2 text-3xl font-black">{visibleClients.length}</p>
           </div>
-          <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,0.045)]">
+          <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 -[0_12px_28px_rgba(18,58,99,0.045)]">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">{t.paid}</p>
             <p className="mt-2 text-3xl font-black">{paidCount}</p>
           </div>
-          <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,0.045)]">
+          <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 -[0_12px_28px_rgba(18,58,99,0.045)]">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">{t.pending}</p>
             <p className="mt-2 text-3xl font-black">{pendingCount}</p>
           </div>
-          <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_12px_28px_rgba(18,58,99,0.045)]">
+          <div className="rounded-[1.6rem] border border-[#E8E2DC] bg-white p-5 -[0_12px_28px_rgba(18,58,99,0.045)]">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F15A24]">{t.shown}</p>
             <p className="mt-2 text-3xl font-black">{tableRows.length}</p>
           </div>
         </div>
 
-        <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-5 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+        <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-5 -[0_18px_45px_rgba(18,58,99,0.06)]">
           <div className="grid gap-4 xl:grid-cols-[1fr_1fr_170px]">
             <div>
               <label className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
@@ -432,7 +432,7 @@ export default function VemoAdminDashboardClean() {
               <button
                 onClick={() => openClient()}
                 disabled={selectedIndex === "all"}
-                className="inline-flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] bg-[#F15A24] px-5 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+                className="inline-flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] bg-[#F15A24] px-5 text-sm font-black text-white -[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:-none"
               >
                 <ActionIcon type="open" />
                 {t.openFolder}
@@ -441,7 +441,7 @@ export default function VemoAdminDashboardClean() {
           </div>
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-[2rem] border border-[#E8E2DC] bg-white shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+        <div className="mt-6 overflow-hidden rounded-[2rem] border border-[#E8E2DC] bg-white -[0_18px_45px_rgba(18,58,99,0.06)]">
           <div className="grid grid-cols-[130px_minmax(180px,1.1fr)_150px_135px_135px_155px_155px_95px] bg-[#FBFCFD] px-5 py-4 text-[10px] font-black uppercase tracking-[0.11em] text-slate-500">
             <div>{t.no}</div>
             <div>{t.llc}</div>
@@ -484,7 +484,7 @@ export default function VemoAdminDashboardClean() {
                   <div className="text-right">
                     <button
                       onClick={() => openClient(client)}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] bg-[#F15A24] text-white shadow-[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] bg-[#F15A24] text-white -[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
                       title={t.manage}
                     >
                       <ActionIcon type="open" />

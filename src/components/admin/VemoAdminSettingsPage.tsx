@@ -171,7 +171,7 @@ export default function VemoAdminSettingsPage() {
             <button
               onClick={save}
               disabled={saving}
-              className="rounded-[18px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B] disabled:opacity-60"
+              className="rounded-[18px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white -[0_14px_28px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B] disabled:opacity-60"
             >
               {saving ? "Sauvegarde..." : "Sauvegarder"}
             </button>
@@ -180,7 +180,7 @@ export default function VemoAdminSettingsPage() {
       </header>
 
       <section className="mx-auto max-w-7xl px-6 py-8">
-        <div className="rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_24px_70px_rgba(18,58,99,0.08)]">
+        <div className="rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 -[0_24px_70px_rgba(18,58,99,0.08)]">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F15A24]">
             Configuration commerciale
           </p>
@@ -218,7 +218,7 @@ export default function VemoAdminSettingsPage() {
           </div>
         )}
 
-        <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+        <div className="mt-6 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 -[0_18px_45px_rgba(18,58,99,0.06)]">
           <div className="grid gap-4 md:grid-cols-[220px_1fr_180px] md:items-end">
             <label>
               <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-[#F15A24]">
@@ -266,7 +266,7 @@ export default function VemoAdminSettingsPage() {
             pricing.packs.map((pack, index) => (
               <div
                 key={pack.id || index}
-                className="rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_16px_38px_rgba(18,58,99,0.055)]"
+                className="rounded-[2rem] border border-[#E8E2DC] bg-white p-6 -[0_16px_38px_rgba(18,58,99,0.055)]"
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
@@ -439,7 +439,7 @@ export default function VemoAdminSettingsPage() {
           <button
             onClick={save}
             disabled={saving}
-            className="rounded-[20px] bg-[#F15A24] px-8 py-4 text-sm font-black text-white shadow-[0_18px_40px_rgba(241,90,36,.24)] transition hover:bg-[#D94A1B] disabled:opacity-60"
+            className="rounded-[20px] bg-[#F15A24] px-8 py-4 text-sm font-black text-white -[0_18px_40px_rgba(241,90,36,.24)] transition hover:bg-[#D94A1B] disabled:opacity-60"
           >
             {saving ? "Sauvegarde..." : "Sauvegarder les paramètres"}
           </button>

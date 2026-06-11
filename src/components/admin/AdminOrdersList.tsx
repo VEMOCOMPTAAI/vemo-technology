@@ -167,21 +167,21 @@ export default function AdminOrdersList() {
 
       <section className="mx-auto max-w-[1440px] px-10 py-10">
         <div className="grid gap-5 md:grid-cols-3">
-          <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+          <div className="rounded-[2rem] bg-white p-6 ">
             <p className="text-sm font-black uppercase tracking-wide text-slate-500">
               Dossiers
             </p>
             <p className="mt-2 text-4xl font-black">{orders.length}</p>
           </div>
 
-          <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+          <div className="rounded-[2rem] bg-white p-6 ">
             <p className="text-sm font-black uppercase tracking-wide text-slate-500">
               Payés
             </p>
             <p className="mt-2 text-4xl font-black text-green-700">{paidCount}</p>
           </div>
 
-          <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+          <div className="rounded-[2rem] bg-white p-6 ">
             <p className="text-sm font-black uppercase tracking-wide text-slate-500">
               Chiffre d'affaires
             </p>
@@ -191,7 +191,7 @@ export default function AdminOrdersList() {
           </div>
         </div>
 
-        <div className="mt-8 rounded-[2rem] bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-[2rem] bg-white p-6 ">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-3xl font-black">Dossiers LLC</h1>

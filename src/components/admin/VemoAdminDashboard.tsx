@@ -380,7 +380,7 @@ export default function VemoAdminDashboard() {
   if (authState === "loading") {
     return (
       <main className="min-h-screen bg-[#F7FAFC] p-6">
-        <div className="mx-auto mt-20 max-w-xl rounded-[2rem] border border-[#E8E2DC] bg-white p-8 text-center shadow-[0_22px_60px_rgba(18,58,99,0.08)]">
+        <div className="mx-auto mt-20 max-w-xl rounded-[2rem] border border-[#E8E2DC] bg-white p-8 text-center -[0_22px_60px_rgba(18,58,99,0.08)]">
           <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
             Vemo Admin
           </p>
@@ -395,7 +395,7 @@ export default function VemoAdminDashboard() {
   if (authState === "denied") {
     return (
       <main className="min-h-screen bg-[#F7FAFC] p-6">
-        <div className="mx-auto mt-20 max-w-xl rounded-[2rem] border border-[#F5D6C9] bg-white p-8 text-center shadow-[0_22px_60px_rgba(18,58,99,0.08)]">
+        <div className="mx-auto mt-20 max-w-xl rounded-[2rem] border border-[#F5D6C9] bg-white p-8 text-center -[0_22px_60px_rgba(18,58,99,0.08)]">
           <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
             Vemo Admin
           </p>
@@ -404,7 +404,7 @@ export default function VemoAdminDashboard() {
           </h1>
           <a
             href="/fr/admin/connexion"
-            className="mt-7 inline-flex rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
+            className="mt-7 inline-flex rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white -[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
           >
             Connexion admin
           </a>
@@ -431,7 +431,7 @@ export default function VemoAdminDashboard() {
                 onClick={() => setTab(key as AdminTab)}
                 className={`w-full rounded-[18px] px-5 py-4 text-left text-sm font-black transition ${
                   tab === key
-                    ? "bg-[#F15A24] text-white shadow-[0_16px_34px_rgba(241,90,36,.22)]"
+                    ? "bg-[#F15A24] text-white -[0_16px_34px_rgba(241,90,36,.22)]"
                     : "bg-white text-slate-600 hover:bg-white hover:text-[#F15A24]"
                 }`}
               >
@@ -449,7 +449,7 @@ export default function VemoAdminDashboard() {
         </aside>
 
         <section className="p-6 lg:p-10">
-          <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_22px_60px_rgba(18,58,99,0.08)]">
+          <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-8 -[0_22px_60px_rgba(18,58,99,0.08)]">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F15A24]">
@@ -467,7 +467,7 @@ export default function VemoAdminDashboard() {
 
               <button
                 onClick={loadDashboard}
-                className="rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
+                className="rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white -[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
               >
                 Actualiser
               </button>
@@ -483,7 +483,7 @@ export default function VemoAdminDashboard() {
           {tab === "home" && (
             <>
               <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-6 py-3 shadow-[0_10px_24px_rgba(18,58,99,0.04)]">
+                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-6 py-3 -[0_10px_24px_rgba(18,58,99,0.04)]">
                   <p className="whitespace-nowrap text-[10px] font-black uppercase tracking-[0.12em] text-[#F15A24]">
                     Clients
                   </p>
@@ -492,7 +492,7 @@ export default function VemoAdminDashboard() {
                   </p>
                 </div>
 
-                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-6 py-3 shadow-[0_10px_24px_rgba(18,58,99,0.04)]">
+                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-6 py-3 -[0_10px_24px_rgba(18,58,99,0.04)]">
                   <p className="whitespace-nowrap text-[10px] font-black uppercase tracking-[0.12em] text-[#F15A24]">
                     Comptes clients
                   </p>
@@ -501,7 +501,7 @@ export default function VemoAdminDashboard() {
                   </p>
                 </div>
 
-                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-6 py-3 shadow-[0_10px_24px_rgba(18,58,99,0.04)]">
+                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-6 py-3 -[0_10px_24px_rgba(18,58,99,0.04)]">
                   <p className="whitespace-nowrap text-[10px] font-black uppercase tracking-[0.12em] text-[#F15A24]">
                     Documents
                   </p>
@@ -510,7 +510,7 @@ export default function VemoAdminDashboard() {
                   </p>
                 </div>
 
-                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-6 py-3 shadow-[0_10px_24px_rgba(18,58,99,0.04)]">
+                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-6 py-3 -[0_10px_24px_rgba(18,58,99,0.04)]">
                   <p className="whitespace-nowrap text-[10px] font-black uppercase tracking-[0.12em] text-[#F15A24]">
                     Messages
                   </p>
@@ -519,7 +519,7 @@ export default function VemoAdminDashboard() {
                   </p>
                 </div>
 
-                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-5 py-3 shadow-[0_10px_24px_rgba(18,58,99,0.04)]">
+                <div className="h-[86px] rounded-[1.25rem] border border-[#E8E2DC] bg-white px-5 py-3 -[0_10px_24px_rgba(18,58,99,0.04)]">
                   <p className="whitespace-nowrap text-[9px] font-black uppercase tracking-[0.08em] text-[#F15A24]">
                     Paiements en attente
                   </p>
@@ -529,7 +529,7 @@ export default function VemoAdminDashboard() {
                 </div>
               </div>
 
-              <div className="mt-8 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+              <div className="mt-8 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 -[0_18px_45px_rgba(18,58,99,0.06)]">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
@@ -642,7 +642,7 @@ export default function VemoAdminDashboard() {
                             <div className="text-right">
                               <a
                                 href={`/fr/admin/client?email=${encodeURIComponent(client.email)}`}
-                                className="inline-flex rounded-[14px] bg-[#F15A24] px-4 py-3 text-xs font-black text-white shadow-[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
+                                className="inline-flex rounded-[14px] bg-[#F15A24] px-4 py-3 text-xs font-black text-white -[0_10px_22px_rgba(241,90,36,.18)] transition hover:bg-[#D94A1B]"
                               >
                                 Gérer →
                               </a>
@@ -660,7 +660,7 @@ export default function VemoAdminDashboard() {
           {tab === "documents" && (
             <div className="mt-8">
               {!selectedClient ? (
-                <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+                <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-8 -[0_18px_45px_rgba(18,58,99,0.06)]">
                   <EmptyState
                     title="Aucun client sélectionné"
                     text="Retournez à Pilotage et cliquez sur Gérer pour ouvrir le dossier d’un client."
@@ -668,14 +668,14 @@ export default function VemoAdminDashboard() {
 
                   <button
                     onClick={() => setTab("home")}
-                    className="mt-6 rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
+                    className="mt-6 rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white -[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B]"
                   >
                     Retour au pilotage →
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-7 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+                  <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-7 -[0_18px_45px_rgba(18,58,99,0.06)]">
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
@@ -705,7 +705,7 @@ export default function VemoAdminDashboard() {
                   </div>
 
                   <div className="mt-6 grid gap-6 xl:grid-cols-[420px_1fr]">
-                    <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+                    <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-6 -[0_18px_45px_rgba(18,58,99,0.06)]">
                       <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
                         Ajouter / replace
                       </p>
@@ -766,14 +766,14 @@ export default function VemoAdminDashboard() {
 
                         <button
                           disabled={uploading}
-                          className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:opacity-60"
+                          className="w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white -[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:opacity-60"
                         >
                           {uploading ? "Upload..." : "Ajouter / replace →"}
                         </button>
                       </form>
                     </div>
 
-                    <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+                    <div className="rounded-[2rem] border border-[#E8E2DC] bg-white p-6 -[0_18px_45px_rgba(18,58,99,0.06)]">
                       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                         <div>
                           <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#F15A24]">
@@ -799,7 +799,7 @@ export default function VemoAdminDashboard() {
                           selectedDocs.map((doc) => (
                             <div
                               key={doc.id}
-                              className="rounded-[1.5rem] border border-[#E8E2DC] bg-white p-5 transition hover:border-[#F15A24]/30 hover:shadow-[0_14px_35px_rgba(18,58,99,0.06)]"
+                              className="rounded-[1.5rem] border border-[#E8E2DC] bg-white p-5 transition hover:border-[#F15A24]/30 hover:-[0_14px_35px_rgba(18,58,99,0.06)]"
                             >
                               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                                 <div>
@@ -852,7 +852,7 @@ export default function VemoAdminDashboard() {
           )}
 
           {tab === "payments" && (
-            <div className="mt-8 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+            <div className="mt-8 rounded-[2rem] border border-[#E8E2DC] bg-white p-6 -[0_18px_45px_rgba(18,58,99,0.06)]">
               <h2 className="text-2xl font-black text-[#111827]">Paiement du client</h2>
 
               {!selectedClient ? (
@@ -879,7 +879,7 @@ export default function VemoAdminDashboard() {
 
           {tab === "messages" && (
             <div className="mt-8 grid gap-6 xl:grid-cols-[420px_1fr]">
-              <div className="rounded-[1.5rem] border border-[#E8E2DC] bg-white px-6 py-4 shadow-[0_14px_34px_rgba(18,58,99,0.05)]">
+              <div className="rounded-[1.5rem] border border-[#E8E2DC] bg-white px-6 py-4 -[0_14px_34px_rgba(18,58,99,0.05)]">
                 <h2 className="text-2xl font-black text-[#111827]">Envoyer un message</h2>
 
                 {!selectedClient ? (
@@ -899,14 +899,14 @@ export default function VemoAdminDashboard() {
                       className="mt-5 min-h-[170px] w-full rounded-[18px] border border-[#E8E2DC] bg-white px-5 py-4 text-sm font-bold outline-none focus:border-[#F15A24] focus:ring-4 focus:ring-[#F15A24]/10"
                     />
 
-                    <button onClick={sendMessage} disabled={!messageText.trim()} className="mt-4 w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:opacity-60">
+                    <button onClick={sendMessage} disabled={!messageText.trim()} className="mt-4 w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white -[0_16px_34px_rgba(241,90,36,.22)] transition hover:bg-[#D94A1B] disabled:opacity-60">
                       Envoyer →
                     </button>
                   </>
                 )}
               </div>
 
-              <div className="rounded-[1.5rem] border border-[#E8E2DC] bg-white px-6 py-4 shadow-[0_14px_34px_rgba(18,58,99,0.05)]">
+              <div className="rounded-[1.5rem] border border-[#E8E2DC] bg-white px-6 py-4 -[0_14px_34px_rgba(18,58,99,0.05)]">
                 <h2 className="text-2xl font-black text-[#111827]">Conversation</h2>
 
                 <div className="mt-5 grid gap-4">

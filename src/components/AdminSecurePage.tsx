@@ -149,7 +149,7 @@ export default function AdminSecurePage({ lang }: { lang: Lang }) {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f4f7fa] px-6 text-slate-950">
-        <div className="w-full max-w-xl rounded-[2rem] border border-slate-100 bg-white p-10 text-center shadow-xl shadow-slate-200/70">
+        <div className="w-full max-w-xl rounded-[2rem] border border-slate-100 bg-white p-10 text-center  -slate-200/70">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-xl font-black text-[#F15A24]">
             V
           </div>
@@ -167,7 +167,7 @@ export default function AdminSecurePage({ lang }: { lang: Lang }) {
   if (!authorized) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f4f7fa] px-6 text-slate-950">
-        <div className="w-full max-w-xl rounded-[2rem] border border-red-100 bg-white p-10 text-center shadow-xl shadow-slate-200/70">
+        <div className="w-full max-w-xl rounded-[2rem] border border-red-100 bg-white p-10 text-center  -slate-200/70">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-xl font-black text-red-600">
             !
           </div>
@@ -187,7 +187,7 @@ export default function AdminSecurePage({ lang }: { lang: Lang }) {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <a
               href={`/${lang}/admin/connexion`}
-              className="rounded-2xl bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-lg shadow-orange-900/20"
+              className="rounded-2xl bg-[#F15A24] px-6 py-4 text-sm font-black text-white  -orange-900/20"
             >
               {t.login}
             </a>

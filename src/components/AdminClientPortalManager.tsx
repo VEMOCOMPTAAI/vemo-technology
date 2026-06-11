@@ -433,7 +433,7 @@ export default function AdminClientPortalManager() {
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F15A24] text-xl font-black text-white shadow-lg shadow-orange-900/20">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F15A24] text-xl font-black text-white  -orange-900/20">
               V
             </span>
             <span>
@@ -450,7 +450,7 @@ export default function AdminClientPortalManager() {
             <button
               type="button"
               onClick={loadClients}
-              className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black shadow-sm transition hover:border-[#F15A24] hover:text-[#F15A24]"
+              className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black  transition hover:border-[#F15A24] hover:text-[#F15A24]"
             >
               Actualiser
             </button>
@@ -458,7 +458,7 @@ export default function AdminClientPortalManager() {
             <button
               type="button"
               onClick={logoutAdmin}
-              className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm transition hover:border-[#F15A24] hover:text-[#F15A24]"
+              className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-950  transition hover:border-[#F15A24] hover:text-[#F15A24]"
             >
               Déconnexion
             </button>
@@ -467,7 +467,7 @@ export default function AdminClientPortalManager() {
       </header>
 
       <section className="mx-auto max-w-7xl px-6 py-10">
-        <section className="mb-8 rounded-[2rem] border border-slate-100 bg-white p-7 shadow-xl shadow-slate-200/70">
+        <section className="mb-8 rounded-[2rem] border border-slate-100 bg-white p-7  -slate-200/70">
           <div className="grid gap-6 lg:grid-cols-[1fr_420px] lg:items-end">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.22em] text-[#F15A24]">
@@ -501,20 +501,20 @@ export default function AdminClientPortalManager() {
         </section>
 
         {loading && (
-          <div className="rounded-[2rem] border border-slate-100 bg-white p-8 text-sm font-black text-slate-500 shadow-xl shadow-slate-200/70">
+          <div className="rounded-[2rem] border border-slate-100 bg-white p-8 text-sm font-black text-slate-500  -slate-200/70">
             Chargement des clients...
           </div>
         )}
 
         {!loading && clients.length === 0 && (
-          <div className="rounded-[2rem] border border-slate-100 bg-white p-8 text-sm font-black text-slate-500 shadow-xl shadow-slate-200/70">
+          <div className="rounded-[2rem] border border-slate-100 bg-white p-8 text-sm font-black text-slate-500  -slate-200/70">
             Aucun client trouvé. Crée d’abord un compte client ou finalise un paiement.
           </div>
         )}
 
         {!loading && selectedClient && (
           <div className="space-y-8">
-            <section className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-xl shadow-slate-200/70">
+            <section className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white  -slate-200/70">
               <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
                 <div className="p-8">
                   <p className="text-sm font-black uppercase tracking-[0.22em] text-[#F15A24]">
@@ -535,7 +535,7 @@ export default function AdminClientPortalManager() {
 
             <section className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
               <div className="space-y-8">
-                <section className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-xl shadow-slate-200/70">
+                <section className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white  -slate-200/70">
                   <div className="bg-[#F15A24] hover:bg-[#D94A1B] p-7 text-white">
                     <p className="text-xs font-black uppercase tracking-[0.2em] text-white/70">
                       Document studio
@@ -611,14 +611,14 @@ export default function AdminClientPortalManager() {
                     <button
                       type="submit"
                       disabled={savingDoc}
-                      className="w-fit rounded-2xl bg-[#F15A24] px-7 py-4 text-sm font-black text-white shadow-lg shadow-orange-900/20 transition hover:bg-[#D94A1B] disabled:opacity-60"
+                      className="w-fit rounded-2xl bg-[#F15A24] px-7 py-4 text-sm font-black text-white  -orange-900/20 transition hover:bg-[#D94A1B] disabled:opacity-60"
                     >
                       {savingDoc ? "Publication..." : "Publier"}
                     </button>
                   </form>
                 </section>
 
-                <section className="rounded-[2rem] border border-slate-100 bg-white p-7 shadow-xl shadow-slate-200/70">
+                <section className="rounded-[2rem] border border-slate-100 bg-white p-7  -slate-200/70">
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F15A24]">
@@ -706,7 +706,7 @@ export default function AdminClientPortalManager() {
               </div>
 
               <div className="space-y-8">
-                <section className="rounded-[2rem] border border-slate-100 bg-white p-7 shadow-xl shadow-slate-200/70">
+                <section className="rounded-[2rem] border border-slate-100 bg-white p-7  -slate-200/70">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F15A24]">
                       Message rapide
@@ -734,14 +734,14 @@ export default function AdminClientPortalManager() {
                     <button
                       type="submit"
                       disabled={sendingMessage}
-                      className="w-fit rounded-2xl bg-[#F15A24] px-7 py-4 text-sm font-black text-white shadow-lg shadow-orange-900/20 transition hover:bg-[#D94A1B] disabled:opacity-60"
+                      className="w-fit rounded-2xl bg-[#F15A24] px-7 py-4 text-sm font-black text-white  -orange-900/20 transition hover:bg-[#D94A1B] disabled:opacity-60"
                     >
                       {sendingMessage ? "Envoi..." : "Envoyer"}
                     </button>
                   </form>
                 </section>
 
-                <section className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-xl shadow-slate-200/70">
+                <section className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white  -slate-200/70">
                   <div className="bg-[#F15A24] hover:bg-[#D94A1B] p-7 text-white">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -776,7 +776,7 @@ export default function AdminClientPortalManager() {
                         >
                           <div
                             className={cn(
-                              "max-w-[90%] rounded-[1.5rem] p-5 shadow-sm",
+                              "max-w-[90%] rounded-[1.5rem] p-5 ",
                               isClient
                                 ? "rounded-tl-md border border-slate-100 bg-white text-slate-950"
                                 : "rounded-tr-md bg-[#F15A24] text-white"
@@ -879,7 +879,7 @@ export default function AdminClientPortalManager() {
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+    <div className="rounded-3xl bg-white p-5  ring-1 ring-slate-100">
       <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F15A24]">
         {label}
       </p>

@@ -333,7 +333,7 @@ export default function AdminOrderDetail() {
 
       <section className="mx-auto max-w-[1440px] px-10 py-10">
         {loading && (
-          <div className="rounded-[2rem] bg-white p-8 text-center font-black shadow-sm">
+          <div className="rounded-[2rem] bg-white p-8 text-center font-black ">
             Chargement du dossier...
           </div>
         )}
@@ -352,7 +352,7 @@ export default function AdminOrderDetail() {
 
         {order && (
           <div className="grid gap-8 lg:grid-cols-[1fr_0.42fr]">
-            <div className="rounded-[2rem] bg-white p-8 shadow-sm">
+            <div className="rounded-[2rem] bg-white p-8 ">
               <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 md:flex-row md:items-start md:justify-between">
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.2em] text-[#9F1239]">
@@ -429,7 +429,7 @@ export default function AdminOrderDetail() {
                 <button
                   onClick={saveAdminTracking}
                   disabled={saving}
-                  className="mt-5 rounded-2xl bg-[#9F1239] px-6 py-4 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-5 rounded-2xl bg-[#9F1239] px-6 py-4 font-black text-white  disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {saving ? "Sauvegarde..." : "Sauvegarder le suivi admin"}
                 </button>
@@ -518,7 +518,7 @@ export default function AdminOrderDetail() {
                     WebkitAppearance: "none",
                     appearance: "none",
                   }}
-                  className="vemo-uploader-orange rounded-[16px] px-5 py-4 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.20)] transition hover:opacity-90 disabled:opacity-60"
+                  className="vemo-uploader-orange rounded-[16px] px-5 py-4 text-sm font-black text-white -[0_14px_28px_rgba(241,90,36,.20)] transition hover:opacity-90 disabled:opacity-60"
                 >
                   {uploading ? "Upload..." : replaceDocumentId ? "Remplacer" : "Uploader"}
                 </button>
@@ -691,7 +691,7 @@ export default function AdminOrderDetail() {
               </div>
             </div>
 
-            <aside className="rounded-[2rem] bg-white p-8 shadow-sm">
+            <aside className="rounded-[2rem] bg-white p-8 ">
               <h2 className="text-2xl font-black">Résumé paiement</h2>
 
               <div className="mt-6 space-y-5">

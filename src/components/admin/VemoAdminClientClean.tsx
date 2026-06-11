@@ -490,7 +490,7 @@ export default function VemoAdminClientClean() {
       </header>
 
       <section className="mx-auto max-w-7xl px-6 py-8">
-        <div className="rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 shadow-[0_24px_70px_rgba(18,58,99,0.08)]">
+        <div className="rounded-[2.5rem] border border-[#E8E2DC] bg-white p-8 -[0_24px_70px_rgba(18,58,99,0.08)]">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F15A24]">
@@ -545,7 +545,7 @@ export default function VemoAdminClientClean() {
         )}
 
         <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[2.2rem] border border-[#E8E2DC] bg-white p-7 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+          <div className="rounded-[2.2rem] border border-[#E8E2DC] bg-white p-7 -[0_18px_45px_rgba(18,58,99,0.06)]">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-[#F15A24]">Documents</p>
             <h2 className="mt-2 text-3xl font-black tracking-[-0.06em]">Documents du dossier</h2>
 
@@ -588,7 +588,7 @@ export default function VemoAdminClientClean() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="rounded-[16px] bg-[#F15A24] px-5 py-4 text-sm font-black text-white shadow-[0_14px_28px_rgba(241,90,36,.20)] transition hover:bg-[#D94A1B] disabled:opacity-60"
+                  className="rounded-[16px] bg-[#F15A24] px-5 py-4 text-sm font-black text-white -[0_14px_28px_rgba(241,90,36,.20)] transition hover:bg-[#D94A1B] disabled:opacity-60"
                 >
                   {busy ? "Traitement..." : replaceId ? "Remplacer" : "Uploader"}
                 </button>
@@ -618,7 +618,7 @@ export default function VemoAdminClientClean() {
                           target="_blank"
                           title="Ouvrir"
                           aria-label="Ouvrir"
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#E8E2DC] bg-white text-[#123A63] shadow-sm transition hover:border-[#F15A24]/30 hover:bg-[#FFF7F2] hover:text-[#F15A24]"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#E8E2DC] bg-white text-[#123A63]  transition hover:border-[#F15A24]/30 hover:bg-[#FFF7F2] hover:text-[#F15A24]"
                         >
                           <ActionIcon type="open" />
                         </a>
@@ -627,7 +627,7 @@ export default function VemoAdminClientClean() {
                           onClick={() => setReplaceId(doc.id || "")}
                           title="Remplacer"
                           aria-label="Remplacer"
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#E8E2DC] bg-white text-[#123A63] shadow-sm transition hover:border-[#F15A24]/30 hover:bg-[#FFF7F2] hover:text-[#F15A24]"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-[#E8E2DC] bg-white text-[#123A63]  transition hover:border-[#F15A24]/30 hover:bg-[#FFF7F2] hover:text-[#F15A24]"
                         >
                           <ActionIcon type="replace" />
                         </button>
@@ -636,7 +636,7 @@ export default function VemoAdminClientClean() {
                           onClick={() => deleteDoc(doc.id)}
                           title="Supprimer"
                           aria-label="Supprimer"
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-red-100 bg-red-50 text-red-700 shadow-sm transition hover:border-red-200 hover:bg-red-100"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[13px] border border-red-100 bg-red-50 text-red-700  transition hover:border-red-200 hover:bg-red-100"
                         >
                           <ActionIcon type="delete" />
                         </button>
@@ -649,7 +649,7 @@ export default function VemoAdminClientClean() {
           </div>
 
           <div className="space-y-6">
-            <div className="rounded-[2.2rem] border border-[#E8E2DC] bg-white p-7 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+            <div className="rounded-[2.2rem] border border-[#E8E2DC] bg-white p-7 -[0_18px_45px_rgba(18,58,99,0.06)]">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#F15A24]">Statuts</p>
               <h2 className="mt-2 text-2xl font-black">Pilotage du dossier</h2>
 
@@ -704,7 +704,7 @@ export default function VemoAdminClientClean() {
               </div>
             </div>
 
-            <div className="rounded-[2.2rem] border border-[#E8E2DC] bg-white p-7 shadow-[0_18px_45px_rgba(18,58,99,0.06)]">
+            <div className="rounded-[2.2rem] border border-[#E8E2DC] bg-white p-7 -[0_18px_45px_rgba(18,58,99,0.06)]">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#F15A24]">Messages</p>
               <h2 className="mt-2 text-2xl font-black">Conversation client</h2>
 
@@ -735,7 +735,7 @@ export default function VemoAdminClientClean() {
               <button
                 onClick={sendMessage}
                 disabled={busy}
-                className="mt-4 w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(241,90,36,.22)] hover:bg-[#D94A1B] disabled:opacity-60"
+                className="mt-4 w-full rounded-[18px] bg-[#F15A24] px-6 py-4 text-sm font-black text-white -[0_16px_34px_rgba(241,90,36,.22)] hover:bg-[#D94A1B] disabled:opacity-60"
               >
                 Envoyer →
               </button>

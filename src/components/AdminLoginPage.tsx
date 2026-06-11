@@ -101,7 +101,7 @@ export default function AdminLoginPage({ lang }: { lang: Lang }) {
       <SiteHeader lang={lang} />
 
       <section className="mx-auto flex min-h-[620px] max-w-5xl items-center justify-center px-6 py-16">
-        <div className="w-full max-w-xl rounded-[2rem] border border-slate-100 bg-white p-8 shadow-xl shadow-slate-200/70 md:p-10">
+        <div className="w-full max-w-xl rounded-[2rem] border border-slate-100 bg-white p-8  -slate-200/70 md:p-10">
           <div className="mb-8">
             <p className="text-sm font-black uppercase tracking-[0.22em] text-[#F15A24]">
               {t.eyebrow}
@@ -154,7 +154,7 @@ export default function AdminLoginPage({ lang }: { lang: Lang }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-2xl bg-[#0f2a4f] px-6 py-4 text-sm font-black text-white shadow-lg shadow-slate-900/20 transition hover:bg-[#0b1f3d] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-2xl bg-[#0f2a4f] px-6 py-4 text-sm font-black text-white  -slate-900/20 transition hover:bg-[#0b1f3d] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? t.loading : t.submit}
             </button>
