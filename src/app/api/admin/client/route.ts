@@ -288,7 +288,9 @@ export async function POST(request: Request) {
           .eq("document_key", doc.document_key)
           .maybeSingle();
 
-        if (!existingDoc?.id) {
+        const existingDocSafe = existingDoc as { id?: string } | null;
+
+    if (!existingDocSafe?.id) {
           await supabase.from("client_documents").insert({
             order_id: orderId,
             client_email: email,
