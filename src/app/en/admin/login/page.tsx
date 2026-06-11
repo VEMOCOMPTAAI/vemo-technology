@@ -1,5 +1,5 @@
-import SimpleAdminLogin from "@/components/admin/SimpleAdminLogin";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <SimpleAdminLogin lang="en" />;
+  redirect("/en/admin/connexion");
 }
