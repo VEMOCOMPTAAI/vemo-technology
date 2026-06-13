@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.redirect(new URL("/en/admin/client-portal", request.url));
   response.cookies.set("vemo_admin_access", "true", {
     path: "/",
-    maxAge: 60 * 60 * 24,
+    maxAge: 86400,
     sameSite: "lax",
   });
 
