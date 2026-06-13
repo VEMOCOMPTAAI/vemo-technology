@@ -946,3 +946,17 @@ select:-webkit-autofill {
   -webkit-text-fill-color: #123A63 !important;
   caret-color: #123A63 !important;
 }
+
+/* ADMIN LOGIN FINAL — aucun dégradé, aucun shadow */
+.vemo-admin-login-button,
+.vemo-admin-login-button:hover,
+.vemo-admin-login-button:focus,
+.vemo-admin-login-button:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  color: #ffffff !important;
+  border: none !important;
+}
