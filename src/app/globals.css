@@ -960,3 +960,17 @@ select:-webkit-autofill {
   color: #ffffff !important;
   border: none !important;
 }
+
+/* ADMIN LOGIN FINAL — aucun dégradé, aucun shadow */
+.vemo-admin-login-button,
+.vemo-admin-login-button:hover,
+.vemo-admin-login-button:focus,
+.vemo-admin-login-button:active {
+  background: #F15A24 !important;
+  background-color: #F15A24 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  color: #ffffff !important;
+  border: none !important;
+}
