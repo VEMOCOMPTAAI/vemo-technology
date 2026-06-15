@@ -1,10 +1,10 @@
 const packs = [
   ["New Mexico Starter", "129 USD", "LLC New Mexico + documents de création."],
   ["New Mexico Standard", "149 USD", "LLC New Mexico + EIN + accompagnement bancaire."],
-  ["New Mexico Premium", "199 USD", "LLC New Mexico + EIN + suivi complet + support prioritaire."],
+  ["New Mexico Premium", "199 USD", "LLC New Mexico + EIN + suivi complet."],
   ["Wyoming Starter", "149 USD", "LLC Wyoming + documents de création."],
   ["Wyoming Standard", "179 USD", "LLC Wyoming + EIN + accompagnement bancaire."],
-  ["Wyoming Premium", "229 USD", "LLC Wyoming + EIN + suivi complet + support prioritaire."],
+  ["Wyoming Premium", "229 USD", "LLC Wyoming + EIN + suivi complet."],
 ];
 
 export default function Page() {

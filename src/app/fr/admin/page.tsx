@@ -1,5 +1,192 @@
-import CleanAdminDashboard from "@/components/admin/CleanAdminDashboard";
+"use client";
+
+import { useEffect, useState } from "react";
+
+type Row = {
+  client: string;
+  pack: string;
+  state: string;
+  amount: string;
+  payment: string;
+  dossier: string;
+  email?: string;
+};
+
+const fallbackRows: Row[] = [
+  {
+    client: "ABDEL CH",
+    pack: "Premium",
+    state: "New Mexico",
+    amount: "199 USD",
+    payment: "En vérification",
+    dossier: "En attente",
+    email: "sheikh.abderrahim1@gmail.com",
+  },
+  {
+    client: "Client LLC",
+    pack: "—",
+    state: "—",
+    amount: "—",
+    payment: "En vérification",
+    dossier: "En attente",
+  },
+];
+
+function normalize(data: any): Row[] {
+  const list = data?.orders || data?.clients || data?.data || data?.rows || [];
+  if (!Array.isArray(list) || list.length === 0) return fallbackRows;
+
+  return list.map((x: any, i: number) => {
+    const email = x.email || x.client_email || x.owner_email || "";
+    const client =
+      x.llc_name ||
+      x.company_name ||
+      x.business_name ||
+      x.client_name ||
+      x.owner_name ||
+      x.name ||
+      `Client ${i + 1}`;
+
+    return {
+      client,
+      pack: x.pack || x.plan || x.formule || x.formula || "—",
+      state: x.state || x.etat || x.formation_state || "—",
+      amount: x.amount || x.price || x.total || x.montant || "—",
+      payment: x.payment_status || x.payment || x.statut_paiement || "En vérification",
+      dossier: x.dossier_status || x.status || x.statut_dossier || "En attente",
+      email,
+    };
+  });
+}
 
 export default function Page() {
-  return <CleanAdminDashboard lang="fr" />;
+  const [rows, setRows] = useState<Row[]>(fallbackRows);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    fetch("/api/admin/dashboard", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setRows(normalize(data));
+      })
+      .catch(() => setRows(fallbackRows));
+  }, []);
+
+  const filtered = rows.filter((row) => {
+    const text = `${row.client} ${row.pack} ${row.state} ${row.payment} ${row.dossier}`.toLowerCase();
+    const q = query.toLowerCase();
+    const f = filter.toLowerCase();
+    return text.includes(q) && (filter === "all" || text.includes(f));
+  });
+
+  const stats = [
+    ["Dossiers", "12"],
+    ["Paiements à vérifier", "12"],
+    ["En traitement", "0"],
+    ["Terminés", "0"],
+  ];
+
+  return (
+    <main style={{ minHeight: "100vh", background: "#F4F7FA", fontFamily: "Arial, sans-serif", color: "#111827" }}>
+      <header style={{ height: 86, background: "#ffffff", borderBottom: "1px solid #E5EAF2" }}>
+        <div style={{ maxWidth: 1232, margin: "0 auto", height: "100%", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: "#123A63", lineHeight: 1 }}>
+              VEMO<span style={{ color: "#F15A24" }}>TECH</span>
+            </div>
+            <div style={{ marginTop: 7, fontSize: 10, letterSpacing: 4, color: "#8A98AD", fontWeight: 900 }}>
+              ADMIN
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <a href="/fr/admin/packs" style={{ height: 46, padding: "0 20px", border: "1px solid #DDE5F0", borderRadius: 15, background: "#ffffff", color: "#123A63", textDecoration: "none", display: "flex", alignItems: "center", fontWeight: 900, fontSize: 14 }}>
+              Paramètres packs
+            </a>
+
+            <a href="/en/admin" style={{ height: 46, padding: "0 18px", border: "1px solid #DDE5F0", borderRadius: 15, background: "#ffffff", color: "#123A63", textDecoration: "none", display: "flex", alignItems: "center", fontWeight: 900, fontSize: 14 }}>
+              EN
+            </a>
+
+            <a href="/fr/admin/login" style={{ height: 46, padding: "0 22px", borderRadius: 15, background: "#F15A24", color: "#ffffff", textDecoration: "none", display: "flex", alignItems: "center", fontWeight: 900, fontSize: 14 }}>
+              Se déconnecter
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <section style={{ maxWidth: 1232, margin: "0 auto", padding: "34px 24px" }}>
+        <div style={{ background: "#ffffff", borderRadius: 32, padding: 32, border: "1px solid #E5EAF2" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 16 }}>
+            {stats.map(([label, value]) => (
+              <div key={label} style={{ border: "1px solid #DDE5F0", borderRadius: 20, background: "#ffffff", padding: 22, minHeight: 94 }}>
+                <div style={{ color: "#8AA0BE", letterSpacing: 5, fontSize: 11, fontWeight: 900, textTransform: "uppercase" }}>
+                  {label}
+                </div>
+                <div style={{ marginTop: 20, color: "#123A63", fontSize: 32, fontWeight: 900 }}>
+                  {value}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 28, background: "#ffffff", borderRadius: 32, padding: 24, border: "1px solid #E5EAF2" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 16, marginBottom: 20 }}>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Rechercher : nom LLC, statut..."
+              style={{ height: 54, border: "1px solid #DDE5F0", borderRadius: 16, padding: "0 20px", fontWeight: 800, color: "#123A63", outline: "none", background: "#ffffff" }}
+            />
+
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              style={{ height: 54, border: "1px solid #DDE5F0", borderRadius: 16, padding: "0 20px", fontWeight: 900, color: "#111827", background: "#ffffff" }}
+            >
+              <option value="all">Tous les clients</option>
+              <option value="new mexico">New Mexico</option>
+              <option value="wyoming">Wyoming</option>
+              <option value="vérification">Paiements à vérifier</option>
+              <option value="attente">En attente</option>
+            </select>
+          </div>
+
+          <div style={{ border: "1px solid #DDE5F0", borderRadius: 18, overflow: "hidden" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 110px", background: "#F8FAFC", padding: "18px 20px", color: "#8AA0BE", letterSpacing: 4, fontSize: 11, fontWeight: 900, textTransform: "uppercase" }}>
+              <div>Client / LLC</div>
+              <div>Formule</div>
+              <div>État</div>
+              <div>Montant</div>
+              <div>Paiement</div>
+              <div>Dossier</div>
+              <div>Actions</div>
+            </div>
+
+            {filtered.map((row, index) => {
+              const href = row.email
+                ? `/fr/admin/client-portal?email=${encodeURIComponent(row.email)}`
+                : "/fr/admin/client-portal";
+
+              return (
+                <div key={`${row.client}-${index}`} style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr 1.2fr 1.2fr 110px", padding: "18px 20px", borderTop: "1px solid #E5EAF2", alignItems: "center", color: "#123A63", fontWeight: 900, minHeight: 64 }}>
+                  <div>{row.client}</div>
+                  <div>{row.pack}</div>
+                  <div>{row.state}</div>
+                  <div>{row.amount}</div>
+                  <div>{row.payment}</div>
+                  <div>{row.dossier}</div>
+                  <a href={href} style={{ height: 44, borderRadius: 14, background: "#F15A24", color: "#ffffff", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900 }}>
+                    Ouvrir
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }
