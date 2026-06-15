@@ -1,98 +1,49 @@
-import Link from "next/link";
-
-const clients = [
-  { name: "ABDEL CH", pack: "Premium", state: "New Mexico", amount: "199 USD", payment: "Under review", file: "Pending" },
-  { name: "Client LLC", pack: "—", state: "—", amount: "—", payment: "Under review", file: "Pending" },
-  { name: "Client LLC", pack: "—", state: "—", amount: "—", payment: "Under review", file: "Pending" },
-];
-
-export default function EnAdminPage() {
+export default function Page() {
   return (
-    <main className="min-h-screen bg-[#F3F7FB] text-[#111827]">
-      <section className="mx-auto max-w-7xl px-6 py-8">
-        <div className="rounded-[32px] bg-white p-8">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <div className="text-[28px] font-black tracking-[-0.04em]">
-                <span className="text-[#123A63]">VEMO</span>
-                <span className="text-[#F15A24]">TECH</span>
-              </div>
-              <p className="mt-2 text-[10px] font-black uppercase tracking-[0.45em] text-[#64748B]">ADMIN</p>
+    <main style={{ minHeight: "100vh", background: "#F4F7FA", fontFamily: "Arial, sans-serif", color: "#111827" }}>
+      <header style={{ height: 86, background: "#ffffff", borderBottom: "1px solid #E5EAF2" }}>
+        <div style={{ maxWidth: 1232, margin: "0 auto", height: "100%", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: "#123A63", lineHeight: 1 }}>
+              VEMO<span style={{ color: "#F15A24" }}>TECH</span>
             </div>
-
-            <div className="flex gap-3">
-              <Link
-                href="/en/admin/packs"
-                className="rounded-[14px] border border-[#DDE7F2] bg-white px-5 py-3 text-sm font-black text-[#111827]"
-              >
-                Pack settings
-              </Link>
-              <Link
-                href="/en/admin/client-portal"
-                className="rounded-[14px] bg-[#F15A24] px-5 py-3 text-sm font-black text-white"
-              >
-                Client portal
-              </Link>
+            <div style={{ marginTop: 7, fontSize: 10, letterSpacing: 4, color: "#8A98AD", fontWeight: 900 }}>
+              ADMIN
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-4">
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <a href="/en/admin/packs" style={{ height: 46, padding: "0 20px", border: "1px solid #DDE5F0", borderRadius: 15, background: "#ffffff", color: "#123A63", textDecoration: "none", display: "flex", alignItems: "center", fontWeight: 900, fontSize: 14 }}>
+              Pack settings
+            </a>
+            <a href="/fr/admin" style={{ height: 46, padding: "0 18px", border: "1px solid #DDE5F0", borderRadius: 15, background: "#ffffff", color: "#123A63", textDecoration: "none", display: "flex", alignItems: "center", fontWeight: 900, fontSize: 14 }}>
+              FR
+            </a>
+            <a href="/en/admin/login" style={{ height: 46, padding: "0 22px", borderRadius: 15, background: "#F15A24", color: "#ffffff", textDecoration: "none", display: "flex", alignItems: "center", fontWeight: 900, fontSize: 14 }}>
+              Sign out
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <section style={{ maxWidth: 1232, margin: "0 auto", padding: "34px 24px" }}>
+        <div style={{ background: "#ffffff", borderRadius: 32, padding: 32, border: "1px solid #E5EAF2" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 16 }}>
             {[
               ["Files", "12"],
-              ["Payments to review", "12"],
+              ["Payments to verify", "12"],
               ["In progress", "0"],
               ["Completed", "0"],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-[20px] border border-[#DDE7F2] bg-[#F8FAFC] p-5">
-                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#8AA0BC]">{label}</p>
-                <p className="mt-5 text-3xl font-black text-[#123A63]">{value}</p>
+              <div key={label} style={{ border: "1px solid #DDE5F0", borderRadius: 20, background: "#ffffff", padding: 22, minHeight: 94 }}>
+                <div style={{ color: "#8AA0BE", letterSpacing: 5, fontSize: 11, fontWeight: 900, textTransform: "uppercase" }}>
+                  {label}
+                </div>
+                <div style={{ marginTop: 20, color: "#123A63", fontSize: 32, fontWeight: 900 }}>
+                  {value}
+                </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        <div className="mt-7 rounded-[32px] bg-white p-6">
-          <div className="mb-5 grid gap-4 md:grid-cols-[1fr_380px]">
-            <input
-              placeholder="Search: LLC name, status..."
-              className="h-14 rounded-[16px] border border-[#DDE7F2] bg-white px-5 text-sm font-black outline-none"
-            />
-            <select className="h-14 rounded-[16px] border border-[#DDE7F2] bg-white px-5 text-sm font-black outline-none">
-              <option>All clients</option>
-            </select>
-          </div>
-
-          <div className="overflow-hidden rounded-[22px] border border-[#DDE7F2]">
-            <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr_1.2fr_150px] bg-[#F8FAFC] px-5 py-4 text-[10px] font-black uppercase tracking-[0.25em] text-[#8AA0BC]">
-              <span>Client / LLC</span>
-              <span>Package</span>
-              <span>State</span>
-              <span>Amount</span>
-              <span>Payment</span>
-              <span>File</span>
-              <span className="text-right">Actions</span>
-            </div>
-
-            <div className="divide-y divide-[#E6EDF5]">
-              {clients.map((client, index) => (
-                <div key={index} className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr_1.2fr_150px] items-center px-5 py-4 text-sm font-black text-[#123A63]">
-                  <span>{client.name}</span>
-                  <span>{client.pack}</span>
-                  <span>{client.state}</span>
-                  <span>{client.amount}</span>
-                  <span>{client.payment}</span>
-                  <span>{client.file}</span>
-                  <div className="text-right">
-                    <Link
-                      href="/en/admin/client-portal"
-                      className="inline-flex h-11 items-center justify-center rounded-[14px] bg-[#F15A24] px-7 text-sm font-black text-white"
-                    >
-                      Open
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
