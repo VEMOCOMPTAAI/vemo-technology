@@ -69,9 +69,8 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
       isFr
         ? {
             title: "Paramètres packs",
-            subtitle: "Modifiez les packs, les prix et les lignes pour New Mexico et Wyoming.",
+            subtitle: "Modifiez les noms, les prix et les lignes de chaque pack.",
             back: "Retour admin",
-            state: "État",
             packName: "Nom du pack",
             price: "Prix USD",
             lines: "Lignes du pack",
@@ -83,9 +82,8 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
           }
         : {
             title: "Pack settings",
-            subtitle: "Edit plans, prices and lines for New Mexico and Wyoming.",
+            subtitle: "Edit each pack name, price and lines.",
             back: "Back to admin",
-            state: "State",
             packName: "Pack name",
             price: "USD price",
             lines: "Pack lines",
@@ -103,19 +101,21 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length) setPacks(parsed);
+        if (Array.isArray(parsed) && parsed.length) {
+          setPacks(parsed);
+        }
       }
     } catch {}
   }, []);
 
-  function updatePack(id: string, field: keyof Pack, value: string) {
+  function updatePack(id: string, field: "name" | "price" | "lines", value: string) {
     setSaved(false);
     setPacks((current) =>
       current.map((pack) =>
         pack.id === id
           ? {
               ...pack,
-              [field]: field === "state" ? (value as Pack["state"]) : value,
+              [field]: value,
             }
           : pack
       )
@@ -175,8 +175,8 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
         </div>
 
         {(["New Mexico", "Wyoming"] as const).map((stateName) => (
-          <div key={stateName} style={{ marginTop: 28 }}>
-            <h2 style={{ margin: "0 0 14px", color: "#123A63", fontSize: 22, fontWeight: 900 }}>
+          <div key={stateName} style={{ marginTop: 32 }}>
+            <h2 style={{ margin: "0 0 14px", color: "#123A63", fontSize: 24, fontWeight: 900 }}>
               {stateName}
             </h2>
 
@@ -192,30 +192,9 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
                   }}
                 >
                   <label style={{ display: "block", color: "#8AA0BE", letterSpacing: 3, fontSize: 11, fontWeight: 900, textTransform: "uppercase", marginBottom: 8 }}>
-                    {t.state}
-                  </label>
-                  <select
-                    value={pack.state}
-                    onChange={(e) => updatePack(pack.id, "state", e.target.value)}
-                    style={{
-                      width: "100%",
-                      height: 46,
-                      border: "1px solid #DDE5F0",
-                      borderRadius: 14,
-                      padding: "0 12px",
-                      background: "#ffffff",
-                      color: "#123A63",
-                      fontWeight: 900,
-                      boxSizing: "border-box",
-                    }}
-                  >
-                    <option value="New Mexico">New Mexico</option>
-                    <option value="Wyoming">Wyoming</option>
-                  </select>
-
-                  <label style={{ display: "block", color: "#8AA0BE", letterSpacing: 3, fontSize: 11, fontWeight: 900, textTransform: "uppercase", marginTop: 16, marginBottom: 8 }}>
                     {t.packName}
                   </label>
+
                   <input
                     value={pack.name}
                     onChange={(e) => updatePack(pack.id, "name", e.target.value)}
@@ -228,12 +207,14 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
                       color: "#123A63",
                       fontWeight: 900,
                       boxSizing: "border-box",
+                      background: "#ffffff",
                     }}
                   />
 
                   <label style={{ display: "block", color: "#8AA0BE", letterSpacing: 3, fontSize: 11, fontWeight: 900, textTransform: "uppercase", marginTop: 16, marginBottom: 8 }}>
                     {t.price}
                   </label>
+
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 70px", gap: 10 }}>
                     <input
                       value={pack.price}
@@ -248,9 +229,23 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
                         fontWeight: 900,
                         fontSize: 20,
                         boxSizing: "border-box",
+                        background: "#ffffff",
                       }}
                     />
-                    <div style={{ height: 46, border: "1px solid #DDE5F0", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", color: "#123A63", fontWeight: 900 }}>
+
+                    <div
+                      style={{
+                        height: 46,
+                        border: "1px solid #DDE5F0",
+                        borderRadius: 14,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#123A63",
+                        fontWeight: 900,
+                        background: "#ffffff",
+                      }}
+                    >
                       {t.usd}
                     </div>
                   </div>
@@ -258,10 +253,11 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
                   <label style={{ display: "block", color: "#8AA0BE", letterSpacing: 3, fontSize: 11, fontWeight: 900, textTransform: "uppercase", marginTop: 16, marginBottom: 8 }}>
                     {t.lines}
                   </label>
+
                   <textarea
                     value={pack.lines}
                     onChange={(e) => updatePack(pack.id, "lines", e.target.value)}
-                    rows={6}
+                    rows={7}
                     style={{
                       width: "100%",
                       border: "1px solid #DDE5F0",
@@ -272,8 +268,10 @@ export default function EditablePacksSettings({ lang }: { lang: Lang }) {
                       lineHeight: 1.5,
                       resize: "vertical",
                       boxSizing: "border-box",
+                      background: "#ffffff",
                     }}
                   />
+
                   <p style={{ margin: "8px 0 0", color: "#8A98AD", fontSize: 12, fontWeight: 700 }}>
                     {t.linesHint}
                   </p>
