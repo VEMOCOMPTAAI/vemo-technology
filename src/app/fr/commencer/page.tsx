@@ -1,7 +1,5 @@
-import VemoStartFlowPage from "@/components/start/VemoStartFlowPage";
+import StartLLCFlow from "@/components/llc/StartLLCFlow";
 
-export const dynamic = "force-dynamic";
-
-export default function CommencerPage() {
-  return <VemoStartFlowPage lang="fr" />;
+export default function Page() {
+  return <StartLLCFlow lang="fr" />;
 }
