@@ -1013,3 +1013,41 @@ select:-webkit-autofill {
   }
 }
 /* === VEMO RESTORED 10 STEP MOBILE ONLY END === */
+
+/* === VEMO RESTORED 10 STEP MOBILE ONLY START === */
+/* Mobile uniquement pour l'ancien tunnel 10 étapes. Desktop non touché. */
+
+@media (max-width: 768px) {
+  .vemo-mobile-stepper {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    max-width: 340px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .vemo-mobile-stepper::-webkit-scrollbar {
+    height: 0 !important;
+  }
+
+  .vemo-mobile-stepper-item {
+    flex: 0 0 64px !important;
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    min-height: 52px !important;
+    padding: 7px !important;
+  }
+
+  .vemo-mobile-stepper-item * {
+    font-size: 8.5px !important;
+    line-height: 1.1 !important;
+  }
+}
+/* === VEMO RESTORED 10 STEP MOBILE ONLY END === */
