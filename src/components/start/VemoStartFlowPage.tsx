@@ -63,7 +63,6 @@ const FORMULA_PREVIEW: Record<
   },
 };
 
-
 const activitySectors = [
   "E-commerce",
   "Services digitaux",
@@ -577,8 +576,6 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       });
   }
 
-
-
   // RUNTIME_EDITABLE_PACKS_PATCH
   const [runtimePacks, setRuntimePacks] = useState<any[]>([]);
   const [runtimeRenewal, setRuntimeRenewal] = useState<Record<string, number>>({
@@ -762,8 +759,6 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       prev.filter((service) => visibleSelectableServices([service]).length > 0)
     );
   }, [services.join("|")]);
-
-
 
   useEffect(() => {
     if (memberRole === "Membre et Manager") {

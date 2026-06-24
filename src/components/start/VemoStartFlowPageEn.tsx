@@ -6,7 +6,6 @@ import { loadStripe } from "@stripe/stripe-js";
 import { VEMO_COUNTRIES, flagFromIso, type VemoCountry } from "@/lib/vemoCountries";
 import { VEMO_LLC_PACKS, getVemoLlcPackFeatures, getVemoLlcPackPrice } from "@/lib/vemoLlcPacks";
 
-
 function translateEnServiceLabel(value: string) {
   const label = String(value || "");
 
@@ -34,15 +33,6 @@ function translateEnServiceList(value: unknown) {
 
   return translateEnServiceLabel(String(value || "—"));
 }
-
-
-
-
-
-
-
-
-
 
 type Lang = "fr" | "en";
 type PlanId = "" | "starter" | "standard" | "premium";
@@ -100,7 +90,6 @@ const FORMULA_PREVIEW: Record<
     ],
   },
 };
-
 
 const activitySectors = [
   "E-commerce",
@@ -615,8 +604,6 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       });
   }
 
-
-
   // RUNTIME_EDITABLE_PACKS_PATCH
   const [runtimePacks, setRuntimePacks] = useState<any[]>([]);
   const [runtimeRenewal, setRuntimeRenewal] = useState<Record<string, number>>({
@@ -800,8 +787,6 @@ export default function VemoStartFlowPage({ lang = "fr" }: { lang?: Lang }) {
       prev.filter((service) => visibleSelectableServices([service]).length > 0)
     );
   }, [services.join("|")]);
-
-
 
   useEffect(() => {
     if (memberRole === "Member et Manager") {

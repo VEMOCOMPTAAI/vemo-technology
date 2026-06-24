@@ -1,5 +1,11 @@
-import StartLLCFlow from "@/components/llc/StartLLCFlow";
+import EnglishDomTranslator from "@/components/start/EnglishDomTranslator";
+import VemoStartFlowPage from "@/components/start/VemoStartFlowPageEn";
 
-export default function Page() {
-  return <StartLLCFlow lang="en" />;
+export default function EnStartPage() {
+  return (
+    <>
+      <EnglishDomTranslator />
+      <VemoStartFlowPage lang="en" />
+    </>
+  );
 }
