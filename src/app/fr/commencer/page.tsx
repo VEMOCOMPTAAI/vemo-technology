@@ -1,7 +1,5 @@
-import VemoStartFlowPage from "@/components/start/VemoStartFlowPage";
+import VemoStartFlowClean from "@/components/start/VemoStartFlowClean";
 
-export const dynamic = "force-dynamic";
-
-export default function CommencerPage() {
-  return <VemoStartFlowPage lang="fr" />;
+export default function Page() {
+  return <VemoStartFlowClean language="fr" />;
 }

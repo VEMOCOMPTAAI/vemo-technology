@@ -1,11 +1,5 @@
-import EnglishDomTranslator from "@/components/start/EnglishDomTranslator";
-import VemoStartFlowPage from "@/components/start/VemoStartFlowPageEn";
+import VemoStartFlowClean from "@/components/start/VemoStartFlowClean";
 
-export default function EnStartPage() {
-  return (
-    <>
-      <EnglishDomTranslator />
-      <VemoStartFlowPage lang="en" />
-    </>
-  );
+export default function Page() {
+  return <VemoStartFlowClean language="en" />;
 }
