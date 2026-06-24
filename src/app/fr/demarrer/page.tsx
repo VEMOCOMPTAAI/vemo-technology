@@ -1,5 +1,5 @@
-import VemoStartFlowClean from "@/components/start/VemoStartFlowClean";
+import VemoPremiumStartFlow from "@/components/start/VemoPremiumStartFlow";
 
 export default function Page() {
-  return <VemoStartFlowClean language="fr" />;
+  return <VemoPremiumStartFlow lang="fr" />;
 }

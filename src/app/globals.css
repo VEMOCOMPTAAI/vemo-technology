@@ -1630,3 +1630,579 @@ select:-webkit-autofill {
   }
 }
 /* === VEMO MOBILE ONLY TUNNEL FINAL END === */
+
+
+/* === VEMO PREMIUM FLOW START === */
+.vemo-flow {
+  background: #F4F7FA;
+  color: #101828;
+  padding: 34px 24px 56px;
+  min-height: calc(100vh - 82px);
+}
+
+.vemo-flow *,
+.vemo-flow *::before,
+.vemo-flow *::after {
+  box-sizing: border-box;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.vemo-flow-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.vemo-flow-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.vemo-flow-head span,
+.vemo-flow-kicker {
+  color: #F15A24;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.vemo-flow-head h1 {
+  margin: 10px 0 10px;
+  font-size: 42px;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.vemo-flow-head p {
+  margin: 0;
+  max-width: 660px;
+  color: #5F728E;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.vemo-flow-total {
+  background: #ffffff;
+  border: 1px solid #DDE7F2;
+  border-radius: 20px;
+  padding: 16px 20px;
+  min-width: 160px;
+}
+
+.vemo-flow-total small {
+  display: block;
+  color: #8DA0B8;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.vemo-flow-total strong {
+  color: #F15A24;
+  font-size: 24px;
+}
+
+.vemo-flow-stepper {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #DDE7F2;
+  border-radius: 24px;
+  padding: 12px;
+  margin-bottom: 26px;
+}
+
+.vemo-flow-stepper button {
+  background: #ffffff;
+  border: 1px solid #DDE7F2;
+  border-radius: 16px;
+  min-height: 68px;
+  padding: 10px;
+  text-align: left;
+  color: #6A7D99;
+  cursor: pointer;
+}
+
+.vemo-flow-stepper strong {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #EEF4FA;
+  color: #123A63;
+  font-size: 11px;
+  margin-bottom: 7px;
+}
+
+.vemo-flow-stepper span {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.vemo-flow-stepper button.active {
+  border-color: #F15A24;
+  color: #F15A24;
+}
+
+.vemo-flow-stepper button.active strong,
+.vemo-flow-stepper button.done strong {
+  background: #F15A24;
+  color: #ffffff;
+}
+
+.vemo-flow-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 26px;
+  align-items: start;
+}
+
+.vemo-flow-card,
+.vemo-flow-side {
+  background: #ffffff;
+  border: 1px solid #DDE7F2;
+  border-radius: 28px;
+  padding: 30px;
+}
+
+.vemo-flow-card h2 {
+  margin: 8px 0 22px;
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.vemo-flow-subtitle {
+  margin: 24px 0 12px;
+  color: #123A63;
+  font-size: 18px;
+}
+
+.vemo-flow-two,
+.vemo-flow-three {
+  display: grid;
+  gap: 14px;
+}
+
+.vemo-flow-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vemo-flow-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.vemo-flow-choice,
+.vemo-flow-pack,
+.vemo-flow-service {
+  background: #ffffff;
+  border: 1px solid #DDE7F2;
+  border-radius: 20px;
+  padding: 18px;
+  text-align: left;
+  cursor: pointer;
+  color: #123A63;
+}
+
+.vemo-flow-choice.active,
+.vemo-flow-pack.active,
+.vemo-flow-service.active {
+  border-color: #F15A24;
+}
+
+.vemo-flow-choice span,
+.vemo-flow-pack span,
+.vemo-flow-service span {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.vemo-flow-choice small,
+.vemo-flow-pack small {
+  color: #5F728E;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.vemo-flow-pack strong {
+  display: block;
+  color: #F15A24;
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.vemo-flow-field {
+  display: grid;
+  gap: 7px;
+}
+
+.vemo-flow-field span,
+.vemo-flow-country > span {
+  color: #123A63;
+  font-size: 12.5px;
+  font-weight: 900;
+}
+
+.vemo-flow-field input,
+.vemo-flow-field select,
+.vemo-flow-field textarea {
+  width: 100%;
+  border: 1px solid #DDE7F2;
+  border-radius: 15px;
+  background: #ffffff;
+  color: #101828;
+  font-size: 14px;
+  padding: 0 14px;
+  outline: none;
+}
+
+.vemo-flow-field input,
+.vemo-flow-field select {
+  height: 46px;
+}
+
+.vemo-flow-field textarea {
+  min-height: 104px;
+  padding-top: 12px;
+  resize: vertical;
+}
+
+.vemo-flow-field em,
+.vemo-flow-country em,
+.vemo-flow-error {
+  color: #F15A24;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.vemo-flow-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: #123A63;
+  font-weight: 800;
+}
+
+.vemo-flow-country {
+  position: relative;
+  display: grid;
+  gap: 7px;
+}
+
+.vemo-flow-country > button {
+  height: 46px;
+  border: 1px solid #DDE7F2;
+  border-radius: 15px;
+  background: #ffffff;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #123A63;
+  cursor: pointer;
+}
+
+.vemo-flow-country > button b {
+  font-size: 18px;
+}
+
+.vemo-flow-country > button strong {
+  font-size: 13px;
+  font-weight: 900;
+  flex: 1;
+  text-align: left;
+}
+
+.vemo-flow-country > button small {
+  color: #5F728E;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.vemo-flow-country-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #DDE7F2;
+  border-radius: 18px;
+  padding: 10px;
+}
+
+.vemo-flow-country-menu input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid #DDE7F2;
+  border-radius: 12px;
+  padding: 0 10px;
+  margin-bottom: 8px;
+}
+
+.vemo-flow-country-menu > div {
+  max-height: 220px;
+  overflow: auto;
+  display: grid;
+  gap: 6px;
+}
+
+.vemo-flow-country-menu button {
+  border: 0;
+  background: #ffffff;
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 9px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.vemo-flow-country-menu button:hover {
+  background: #F4F7FA;
+}
+
+.vemo-flow-members,
+.vemo-flow-services {
+  display: grid;
+  gap: 12px;
+}
+
+.vemo-flow-member {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 120px;
+  gap: 12px;
+  border: 1px solid #DDE7F2;
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.vemo-flow-light {
+  margin-top: 14px;
+  height: 42px;
+  border: 1px solid #DDE7F2;
+  background: #ffffff;
+  color: #123A63;
+  border-radius: 14px;
+  padding: 0 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.vemo-flow-service {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+
+.vemo-flow-service strong {
+  color: #F15A24;
+  font-size: 13px;
+}
+
+.vemo-flow-actions {
+  border-top: 1px solid #DDE7F2;
+  margin-top: 26px;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.vemo-flow-back,
+.vemo-flow-next {
+  height: 44px;
+  border-radius: 14px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.vemo-flow-back {
+  background: #ffffff;
+  border: 1px solid #DDE7F2;
+  color: #123A63;
+}
+
+.vemo-flow-next {
+  background: #F15A24;
+  border: 1px solid #F15A24;
+  color: #ffffff;
+}
+
+.vemo-flow-summary h3 {
+  margin: 0 0 18px;
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+
+.vemo-flow-row {
+  border-bottom: 1px solid #EEF4FA;
+  padding: 13px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vemo-flow-row span {
+  color: #101828;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.vemo-flow-row strong {
+  color: #5F728E;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.vemo-flow-total-card {
+  margin-top: 18px;
+  border: 1px solid #F15A24;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-weight: 900;
+}
+
+.vemo-flow-total-card strong {
+  color: #F15A24;
+}
+
+.vemo-flow-summary-mobile {
+  display: none;
+}
+
+.vemo-flow-upload {
+  margin-top: 16px;
+  border: 1px solid #DDE7F2;
+  border-radius: 18px;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .vemo-flow {
+    padding: 20px 14px 38px;
+  }
+
+  .vemo-flow-inner {
+    max-width: 360px;
+  }
+
+  .vemo-flow-head {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .vemo-flow-head h1 {
+    font-size: 30px;
+  }
+
+  .vemo-flow-head p {
+    font-size: 13px;
+  }
+
+  .vemo-flow-total {
+    display: none;
+  }
+
+  .vemo-flow-stepper {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 22px;
+    margin-bottom: 18px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .vemo-flow-stepper::-webkit-scrollbar {
+    height: 0;
+  }
+
+  .vemo-flow-stepper button {
+    flex: 0 0 84px;
+    min-width: 84px;
+    min-height: 58px;
+    border-radius: 14px;
+    padding: 8px;
+  }
+
+  .vemo-flow-stepper span {
+    font-size: 10px;
+    line-height: 1.1;
+  }
+
+  .vemo-flow-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vemo-flow-card {
+    border-radius: 24px;
+    padding: 20px;
+  }
+
+  .vemo-flow-side {
+    display: none;
+  }
+
+  .vemo-flow-summary-mobile {
+    display: block;
+    margin-bottom: 18px;
+  }
+
+  .vemo-flow-card h2 {
+    font-size: 25px;
+    margin-bottom: 18px;
+  }
+
+  .vemo-flow-two,
+  .vemo-flow-three,
+  .vemo-flow-member {
+    grid-template-columns: 1fr;
+  }
+
+  .vemo-flow-choice,
+  .vemo-flow-pack,
+  .vemo-flow-service {
+    padding: 15px;
+    border-radius: 17px;
+  }
+
+  .vemo-flow-choice span,
+  .vemo-flow-pack span,
+  .vemo-flow-service span {
+    font-size: 16px;
+  }
+
+  .vemo-flow-actions {
+    position: sticky;
+    bottom: 0;
+    background: #ffffff;
+    padding-top: 14px;
+  }
+}
+/* === VEMO PREMIUM FLOW END === */
