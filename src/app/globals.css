@@ -976,10 +976,137 @@ select:-webkit-autofill {
 }
 
 
-/* === VEMO RESTORED 10 STEP MOBILE ONLY START === */
-/* Mobile uniquement pour l'ancien tunnel 10 étapes. Desktop non touché. */
+/* === VEMO CLEAN 10 STEP TUNNEL START === */
+/*
+  Tunnel LLC 10 étapes :
+  - pas de gradient
+  - pas de shadow
+  - pas de glow
+  - desktop : layout conservé
+  - mobile : uniquement optimisation responsive
+*/
 
+html,
+body,
+main {
+  background: #F4F7FA !important;
+}
+
+header {
+  background: #ffffff !important;
+}
+
+/* Nettoyage visuel uniquement sur les pages tunnel */
+body:has(.vemo-mobile-stepper) main *,
+body:has(.vemo-mobile-stepper) main *::before,
+body:has(.vemo-mobile-stepper) main *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body:has(.vemo-mobile-stepper) main [style*="linear-gradient"],
+body:has(.vemo-mobile-stepper) main [style*="radial-gradient"] {
+  background-image: none !important;
+}
+
+body:has(.vemo-mobile-stepper) main section,
+body:has(.vemo-mobile-stepper) main > div {
+  background-image: none !important;
+}
+
+/* Mobile uniquement */
 @media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: hidden !important;
+  }
+
+  main {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  header nav,
+  header ul {
+    display: none !important;
+  }
+
+  header > div {
+    min-height: 72px !important;
+    padding: 12px 14px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  header a[href="/fr"],
+  header a[href="/en"],
+  header a[href="/"] {
+    max-width: calc(100vw - 145px) !important;
+    overflow: hidden !important;
+  }
+
+  header [style*="letter-spacing"],
+  header [style*="letterSpacing"] {
+    font-size: 7px !important;
+    letter-spacing: 2px !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+  }
+
+  header a,
+  header button {
+    min-height: 38px !important;
+    padding: 9px 12px !important;
+    border-radius: 13px !important;
+    font-size: 12px !important;
+  }
+
+  body:has(.vemo-mobile-stepper) main section {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  body:has(.vemo-mobile-stepper) main section > div,
+  body:has(.vemo-mobile-stepper) main article,
+  body:has(.vemo-mobile-stepper) main aside,
+  body:has(.vemo-mobile-stepper) main form {
+    max-width: 340px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  body:has(.vemo-mobile-stepper) main h1 {
+    font-size: 26px !important;
+    line-height: 1.05 !important;
+  }
+
+  body:has(.vemo-mobile-stepper) main h2 {
+    font-size: 21px !important;
+    line-height: 1.08 !important;
+  }
+
+  body:has(.vemo-mobile-stepper) main p,
+  body:has(.vemo-mobile-stepper) main li {
+    font-size: 12.5px !important;
+    line-height: 1.42 !important;
+  }
+
+  body:has(.vemo-mobile-stepper) main [style*="padding: 64"],
+  body:has(.vemo-mobile-stepper) main [style*="padding: 56"],
+  body:has(.vemo-mobile-stepper) main [style*="padding: 48"],
+  body:has(.vemo-mobile-stepper) main [style*="padding: 44"],
+  body:has(.vemo-mobile-stepper) main [style*="padding: 40"],
+  body:has(.vemo-mobile-stepper) main [style*="padding: 36"],
+  body:has(.vemo-mobile-stepper) main [style*="padding: 32"],
+  body:has(.vemo-mobile-stepper) main [style*="padding: 28"],
+  body:has(.vemo-mobile-stepper) main [style*="padding: 24"] {
+    padding: 16px !important;
+  }
+
   .vemo-mobile-stepper {
     display: flex !important;
     flex-direction: row !important;
@@ -1011,43 +1138,12 @@ select:-webkit-autofill {
     font-size: 8.5px !important;
     line-height: 1.1 !important;
   }
-}
-/* === VEMO RESTORED 10 STEP MOBILE ONLY END === */
 
-/* === VEMO RESTORED 10 STEP MOBILE ONLY START === */
-/* Mobile uniquement pour l'ancien tunnel 10 étapes. Desktop non touché. */
-
-@media (max-width: 768px) {
-  .vemo-mobile-stepper {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    gap: 8px !important;
-    padding: 10px !important;
-    max-width: 340px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  .vemo-mobile-stepper::-webkit-scrollbar {
-    height: 0 !important;
-  }
-
-  .vemo-mobile-stepper-item {
-    flex: 0 0 64px !important;
-    width: 64px !important;
-    min-width: 64px !important;
-    max-width: 64px !important;
-    min-height: 52px !important;
-    padding: 7px !important;
-  }
-
-  .vemo-mobile-stepper-item * {
-    font-size: 8.5px !important;
-    line-height: 1.1 !important;
+  body:has(.vemo-mobile-stepper) main aside,
+  body:has(.vemo-mobile-stepper) main [style*="position: sticky"],
+  body:has(.vemo-mobile-stepper) main [style*="sticky"] {
+    position: static !important;
+    top: auto !important;
   }
 }
-/* === VEMO RESTORED 10 STEP MOBILE ONLY END === */
+/* === VEMO CLEAN 10 STEP TUNNEL END === */
