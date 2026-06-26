@@ -1632,11 +1632,12 @@ select:-webkit-autofill {
 /* === VEMO MOBILE ONLY TUNNEL FINAL END === */
 
 
+
 /* === VEMO PREMIUM FLOW START === */
 .vemo-flow {
   background: #F4F7FA;
   color: #101828;
-  padding: 34px 24px 56px;
+  padding: 30px 24px 48px;
   min-height: calc(100vh - 82px);
 }
 
@@ -1658,7 +1659,7 @@ select:-webkit-autofill {
   justify-content: space-between;
   gap: 24px;
   align-items: flex-end;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .vemo-flow-head span,
@@ -1671,8 +1672,8 @@ select:-webkit-autofill {
 }
 
 .vemo-flow-head h1 {
-  margin: 10px 0 10px;
-  font-size: 42px;
+  margin: 8px 0 8px;
+  font-size: 40px;
   line-height: 1.02;
   letter-spacing: -0.04em;
 }
@@ -1690,7 +1691,7 @@ select:-webkit-autofill {
   background: #ffffff;
   border: 1px solid #DDE7F2;
   border-radius: 20px;
-  padding: 16px 20px;
+  padding: 15px 20px;
   min-width: 160px;
 }
 
@@ -1781,13 +1782,13 @@ select:-webkit-autofill {
 }
 
 .vemo-flow-subtitle {
-  margin: 24px 0 12px;
+  margin: 22px 0 12px;
   color: #123A63;
   font-size: 18px;
 }
 
 .vemo-flow-two,
-.vemo-flow-three {
+.vemo-flow-pack-row {
   display: grid;
   gap: 14px;
 }
@@ -1796,7 +1797,7 @@ select:-webkit-autofill {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.vemo-flow-three {
+.vemo-flow-pack-row {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -1842,7 +1843,8 @@ select:-webkit-autofill {
   margin-bottom: 10px;
 }
 
-.vemo-flow-field {
+.vemo-flow-field,
+.vemo-flow-country {
   display: grid;
   gap: 7px;
 }
@@ -1896,10 +1898,22 @@ select:-webkit-autofill {
   font-weight: 800;
 }
 
+.vemo-flow-address-row {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.vemo-flow-phone-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
 .vemo-flow-country {
   position: relative;
-  display: grid;
-  gap: 7px;
 }
 
 .vemo-flow-country > button {
@@ -1910,13 +1924,13 @@ select:-webkit-autofill {
   padding: 0 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   color: #123A63;
   cursor: pointer;
 }
 
 .vemo-flow-country > button b {
-  font-size: 18px;
+  font-size: 17px;
 }
 
 .vemo-flow-country > button strong {
@@ -1924,12 +1938,23 @@ select:-webkit-autofill {
   font-weight: 900;
   flex: 1;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.vemo-flow-country > button small {
+.vemo-flow-country.is-country > button small {
+  display: none;
+}
+
+.vemo-flow-country.is-dial > button small {
   color: #5F728E;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
+  max-width: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .vemo-flow-country-menu {
@@ -1985,7 +2010,7 @@ select:-webkit-autofill {
 
 .vemo-flow-member {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 120px;
+  grid-template-columns: 1.15fr 0.8fr 1fr 110px;
   gap: 12px;
   border: 1px solid #DDE7F2;
   border-radius: 18px;
@@ -2004,16 +2029,127 @@ select:-webkit-autofill {
   cursor: pointer;
 }
 
+.vemo-flow-service-note {
+  border: 1px solid #DDE7F2;
+  background: #F8FAFC;
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  color: #123A63;
+  font-weight: 900;
+}
+
 .vemo-flow-service {
   display: flex;
   justify-content: space-between;
   gap: 14px;
   align-items: center;
+  cursor: default;
 }
 
 .vemo-flow-service strong {
   color: #F15A24;
   font-size: 13px;
+}
+
+.vemo-flow-pay-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 18px;
+}
+
+.vemo-flow-pay-methods {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.vemo-flow-payment-panel {
+  border: 1px solid #DDE7F2;
+  border-radius: 22px;
+  padding: 18px;
+  background: #F8FAFC;
+}
+
+.vemo-flow-card-ui,
+.vemo-flow-transfer-ui {
+  display: grid;
+  gap: 13px;
+}
+
+.vemo-flow-card-row {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 12px;
+}
+
+.vemo-flow-card-ui p,
+.vemo-flow-transfer-ui small,
+.vemo-flow-payment-empty p {
+  color: #5F728E;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.vemo-flow-transfer-ui > div {
+  border: 1px solid #DDE7F2;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.vemo-flow-transfer-ui > div span {
+  color: #123A63;
+  font-weight: 900;
+}
+
+.vemo-flow-transfer-ui > div strong,
+.vemo-flow-payment-empty span {
+  color: #F15A24;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.vemo-flow-upload {
+  border: 1px dashed #DDE7F2;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  color: #123A63;
+  font-weight: 900;
+}
+
+.vemo-flow-whatsapp {
+  height: 42px;
+  border-radius: 14px;
+  background: #F15A24;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.vemo-flow-payment-empty {
+  min-height: 210px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+}
+
+.vemo-flow-success {
+  border: 1px solid #DDE7F2;
+  background: #ffffff;
+  color: #123A63;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 16px;
+  font-weight: 900;
 }
 
 .vemo-flow-actions {
@@ -2074,6 +2210,21 @@ select:-webkit-autofill {
   text-align: right;
 }
 
+.vemo-flow-mini-services {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.vemo-flow-mini-services span {
+  border: 1px solid #DDE7F2;
+  border-radius: 12px;
+  padding: 8px 10px;
+  color: #123A63;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .vemo-flow-total-card {
   margin-top: 18px;
   border: 1px solid #F15A24;
@@ -2089,22 +2240,9 @@ select:-webkit-autofill {
   color: #F15A24;
 }
 
-.vemo-flow-summary-mobile {
-  display: none;
-}
-
-.vemo-flow-upload {
-  margin-top: 16px;
-  border: 1px solid #DDE7F2;
-  border-radius: 18px;
-  padding: 16px;
-  display: grid;
-  gap: 10px;
-}
-
 @media (max-width: 768px) {
   .vemo-flow {
-    padding: 20px 14px 38px;
+    padding: 18px 14px 36px;
   }
 
   .vemo-flow-inner {
@@ -2113,12 +2251,12 @@ select:-webkit-autofill {
 
   .vemo-flow-head {
     display: grid;
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 12px;
+    margin-bottom: 16px;
   }
 
   .vemo-flow-head h1 {
-    font-size: 30px;
+    font-size: 29px;
   }
 
   .vemo-flow-head p {
@@ -2162,16 +2300,11 @@ select:-webkit-autofill {
 
   .vemo-flow-card {
     border-radius: 24px;
-    padding: 20px;
+    padding: 18px;
   }
 
   .vemo-flow-side {
     display: none;
-  }
-
-  .vemo-flow-summary-mobile {
-    display: block;
-    margin-bottom: 18px;
   }
 
   .vemo-flow-card h2 {
@@ -2180,9 +2313,24 @@ select:-webkit-autofill {
   }
 
   .vemo-flow-two,
-  .vemo-flow-three,
+  .vemo-flow-pack-row,
+  .vemo-flow-address-row,
+  .vemo-flow-pay-layout,
   .vemo-flow-member {
     grid-template-columns: 1fr;
+  }
+
+  .vemo-flow-phone-row {
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .vemo-flow-country.is-dial > button {
+    padding: 0 9px;
+  }
+
+  .vemo-flow-country.is-dial > button small {
+    display: none;
   }
 
   .vemo-flow-choice,
@@ -2196,6 +2344,10 @@ select:-webkit-autofill {
   .vemo-flow-pack span,
   .vemo-flow-service span {
     font-size: 16px;
+  }
+
+  .vemo-flow-card-row {
+    grid-template-columns: 1fr 96px;
   }
 
   .vemo-flow-actions {
