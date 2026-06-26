@@ -106,11 +106,19 @@ const packs: Record<StateKey, Record<PackKey, PackInfo>> = {
   },
 };
 
-const availableByPack: Record<PackKey, string[]> = {
+const automaticByPack: Record<PackKey, string[]> = {
   starter: ["llcDocs", "stateFiling", "registeredAgent"],
-  standard: ["llcDocs", "stateFiling", "registeredAgent", "ein", "stripe", "mercury"],
-  premium: ["llcDocs", "stateFiling", "registeredAgent", "ein", "stripe", "mercury", "wise", "paypal", "shopify", "priority"],
+  standard: ["llcDocs", "stateFiling", "registeredAgent"],
+  premium: ["llcDocs", "stateFiling", "registeredAgent"],
 };
+
+const selectableByPack: Record<PackKey, string[]> = {
+  starter: [],
+  standard: ["ein", "stripe", "mercury"],
+  premium: ["ein", "stripe", "mercury", "wise", "paypal", "shopify", "priority"],
+};
+
+const availableByPack = selectableByPack;
 
 const serviceLabels = {
   fr: {
@@ -298,18 +306,19 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
     confirmPassword: "",
     country: defaultCountry,
     dial: defaultCountry,
-    phone: "651000000",
+    phone: "",
     city: "",
     address: "",
     structure: "single",
     management: "manager-managed",
     members: [{ name: "", country: defaultCountry.name, role: "Manager", percentage: "100" }],
-    selectedServices: availableByPack.standard,
+    selectedServices: [],
     payment: "",
     proofName: "",
   });
 
   const selectedPack = packs[form.state][form.pack];
+  const automaticServices = automaticByPack[form.pack];
   const availableServices = availableByPack[form.pack];
   const total = useMemo(() => selectedPack.price, [selectedPack.price]);
 
@@ -322,7 +331,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
   }
 
   function choosePack(pack: PackKey) {
-    setForm((old) => ({ ...old, pack, selectedServices: availableByPack[pack] }));
+    setForm((old) => ({ ...old, pack, selectedServices: [] }));
   }
 
   function cleanLocalPhone(value: string, dial: Country) {
@@ -408,7 +417,8 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
     }
 
     if (target === 6) {
-      if (!form.selectedServices.length) e.services = lang === "fr" ? "Sélectionne au moins un service." : "Select at least one service.";
+      // Les services de base du pack sont automatiques.
+      // Les services optionnels ne sont pas obligatoires.
     }
 
     if (target === 7) {
@@ -436,6 +446,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
       },
       total,
       pack: selectedPack,
+      automaticServices: automaticServices.map((key) => labels[key as keyof typeof labels]),
       selectedServices: form.selectedServices.map((key) => labels[key as keyof typeof labels]),
       clientPortalUrl: lang === "fr" ? "/fr/client" : "/en/client",
     };
@@ -454,7 +465,8 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
           return;
         }
 
-        window.location.href = data.url;
+        window.open(data.url, "_blank", "noopener,noreferrer");
+        setSubmitted(true);
         return;
       }
 
@@ -605,7 +617,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
 
                 <div className="vemo-flow-phone-row">
                   <CountrySelect label={t.dial} value={form.dial} onChange={(c) => update("dial", c)} searchLabel={t.searchDial} mode="dial" error={errors.dial} />
-                  <Field label={t.phone} value={form.phone} onChange={handlePhone} error={errors.phone} placeholder="651000000" />
+                  <Field label={t.phone} value={form.phone} onChange={handlePhone} error={errors.phone} placeholder="Ex. 651000000" />
                 </div>
 
                 <Field label={t.address} value={form.address} onChange={(v) => update("address", v)} error={errors.address} />
@@ -641,10 +653,16 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
               <StepBlock kicker="07" title={t.servicesTitle}>
                 <div className="vemo-flow-service-note">
                   {form.state === "newMexico" ? t.nm : t.wy} · {selectedPack.name} · {selectedPack.price} USD
-                  <small>{t.servicesHelp}</small>
+
                 </div>
 
                 <div className="vemo-flow-services">
+                  {availableServices.length === 0 && (
+                    <div className="vemo-flow-service-note">
+                      {lang === "fr" ? "Aucune option supplémentaire pour cette formule. Les services de base sont inclus automatiquement." : "No additional option for this package. Core services are included automatically."}
+                    </div>
+                  )}
+
                   {availableServices.map((key) => (
                     <button key={key} type="button" className={`vemo-flow-service ${form.selectedServices.includes(key) ? "active" : ""}`} onClick={() => toggleService(key)}>
                       <span>{labels[key as keyof typeof labels]}</span>
@@ -690,7 +708,14 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
                         </label>
                         {form.proofName && <b>{form.proofName}</b>}
                         {errors.proofName && <p className="vemo-flow-error">{errors.proofName}</p>}
-                        <a className="vemo-flow-whatsapp" href="https://wa.me/" target="_blank">{t.whatsapp}</a>
+                        <a
+                          className="vemo-flow-whatsapp"
+                          href={`https://wa.me/212708069471?text=${encodeURIComponent("Bonjour VEMO Technology, voici mon justificatif de virement pour la création LLC.")}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {t.whatsapp}
+                        </a>
                       </div>
                     )}
 
@@ -857,11 +882,11 @@ function Summary({
       <Row label={t.state} value={form.state === "newMexico" ? t.nm : t.wy} />
       <Row label={t.package} value={`${selectedPack.name} — ${selectedPack.price} USD`} />
       <Row label={t.client} value={form.email || "—"} />
-      <Row label={t.services} value={`${form.selectedServices.length}`} />
+      <Row label={t.services} value={`${automaticByPack[form.pack].length + form.selectedServices.length}`} />
       <Row label={t.payment} value={form.payment || "—"} />
 
       <div className="vemo-flow-mini-services">
-        {form.selectedServices.slice(0, 5).map((s) => <span key={s}>{labels[s]}</span>)}
+        {[...automaticByPack[form.pack], ...form.selectedServices].slice(0, 6).map((s) => <span key={s}>{labels[s]}</span>)}
       </div>
 
       <div className="vemo-flow-total-card">

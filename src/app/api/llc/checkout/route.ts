@@ -52,13 +52,15 @@ export async function POST(request: Request) {
     const params = new URLSearchParams();
     params.append("mode", "payment");
     params.append("customer_email", email);
-    params.append("success_url", `${origin}/api/llc/verify?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(portalPath)}&lang=${lang}&payment=success&session_id={CHECKOUT_SESSION_ID}`);
+    params.append("payment_intent_data[receipt_email]", email);
+    params.append("success_url", `${origin}/${lang === "fr" ? "fr/paiement/success" : "en/payment/success"}?session_id={CHECKOUT_SESSION_ID}&email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(portalPath)}&lang=${lang}`);
     params.append("cancel_url", `${origin}/${lang === "fr" ? "fr/commencer" : "en/start"}?payment=cancelled`);
     params.append("line_items[0][quantity]", "1");
     params.append("line_items[0][price_data][currency]", "usd");
     params.append("line_items[0][price_data][unit_amount]", String(Math.round(total * 100)));
     params.append("line_items[0][price_data][product_data][name]", `VEMO Technology — ${packName}`);
     params.append("line_items[0][price_data][product_data][description]", "US LLC formation service");
+    params.append("client_reference_id", email);
     params.append("metadata[email]", email);
     params.append("metadata[pack]", packName);
     params.append("metadata[state]", body?.form?.state || "");
