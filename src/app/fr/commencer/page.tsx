@@ -1,5 +1,10 @@
+import VemoPublicShell from "@/components/public/VemoPublicShell";
 import VemoPremiumStartFlow from "@/components/start/VemoPremiumStartFlow";
 
 export default function Page() {
-  return <VemoPremiumStartFlow lang="fr" />;
+  return (
+    <VemoPublicShell lang="fr">
+      <VemoPremiumStartFlow lang="fr" />
+    </VemoPublicShell>
+  );
 }

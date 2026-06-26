@@ -55,13 +55,9 @@ type Form = {
   structure: "single" | "multi";
   management: Management;
   members: Member[];
-  services: string[];
+  selectedServices: string[];
   payment: PaymentMethod;
   proofName: string;
-  cardHolder: string;
-  cardNumber: string;
-  cardExpiry: string;
-  cardCvc: string;
 };
 
 const countries: Country[] = [
@@ -80,7 +76,6 @@ const countries: Country[] = [
   { name: "United Arab Emirates", code: "AE", dial: "+971", flag: "🇦🇪", min: 9, max: 9 },
   { name: "Saudi Arabia", code: "SA", dial: "+966", flag: "🇸🇦", min: 9, max: 9 },
   { name: "Qatar", code: "QA", dial: "+974", flag: "🇶🇦", min: 8, max: 8 },
-  { name: "Kuwait", code: "KW", dial: "+965", flag: "🇰🇼", min: 8, max: 8 },
   { name: "Egypt", code: "EG", dial: "+20", flag: "🇪🇬", min: 10, max: 10 },
   { name: "Tunisia", code: "TN", dial: "+216", flag: "🇹🇳", min: 8, max: 8 },
   { name: "Algeria", code: "DZ", dial: "+213", flag: "🇩🇿", min: 9, max: 9 },
@@ -111,7 +106,7 @@ const packs: Record<StateKey, Record<PackKey, PackInfo>> = {
   },
 };
 
-const includedByPack: Record<PackKey, string[]> = {
+const availableByPack: Record<PackKey, string[]> = {
   starter: ["llcDocs", "stateFiling", "registeredAgent"],
   standard: ["llcDocs", "stateFiling", "registeredAgent", "ein", "stripe", "mercury"],
   premium: ["llcDocs", "stateFiling", "registeredAgent", "ein", "stripe", "mercury", "wise", "paypal", "shopify", "priority"],
@@ -120,7 +115,7 @@ const includedByPack: Record<PackKey, string[]> = {
 const serviceLabels = {
   fr: {
     llcDocs: "Documents de création LLC",
-    stateFiling: "Frais de dépôt inclus",
+    stateFiling: "Frais de dépôt de l’État inclus",
     registeredAgent: "Registered Agent offert 1 an",
     ein: "Demande EIN",
     stripe: "Assistance Stripe",
@@ -152,14 +147,14 @@ const copy = {
     subtitle: "Tunnel premium en 8 étapes, avec validation obligatoire avant de continuer.",
     next: "Continuer",
     back: "Retour",
-    final: "Finaliser le dossier",
+    final: "Finaliser",
     required: "Champ obligatoire.",
     invalid: "Information invalide.",
     summary: "Résumé",
     total: "Total estimé",
     state: "État",
     package: "Formule",
-    services: "Services inclus",
+    services: "Services sélectionnés",
     client: "Client",
     payment: "Paiement",
     chooseState: "État de création",
@@ -188,23 +183,18 @@ const copy = {
     single: "LLC à membre unique",
     multi: "LLC à plusieurs membres",
     management: "Mode de gestion",
-    memberManaged: "Member-managed",
-    managerManaged: "Manager-managed",
     member: "Membre",
     role: "Rôle",
     percentage: "Pourcentage",
     addMember: "Ajouter un membre",
-    servicesTitle: "Services de votre formule",
-    paymentTitle: "Paiement et création espace client",
+    servicesTitle: "Services disponibles pour votre formule",
+    servicesHelp: "Le client sélectionne les services souhaités parmi ceux disponibles dans le pack choisi.",
+    paymentTitle: "Paiement et création de l’espace client",
     card: "Carte bancaire",
     transfer: "Virement bancaire",
-    cardHolder: "Titulaire de la carte",
-    cardNumber: "Numéro de carte",
-    expiry: "MM/AA",
-    cvc: "CVC",
     upload: "Justificatif de virement",
     whatsapp: "Envoyer la preuve via WhatsApp",
-    secured: "Paiement sécurisé. L’espace client sera créé après validation.",
+    stripeRedirect: "Vous serez redirigé vers la page sécurisée Stripe.",
     bankNote: "Votre dossier passera en attente de vérification après l’envoi du justificatif.",
     searchCountry: "Rechercher un pays...",
     searchDial: "Rechercher indicatif...",
@@ -212,7 +202,7 @@ const copy = {
     wy: "Wyoming",
     nmDesc: "Confidentialité, coût optimisé, structure simple.",
     wyDesc: "Image corporate plus forte, traitement généralement plus rapide.",
-    ready: "Dossier prêt à être créé.",
+    success: "Dossier enregistré. Un email de confirmation a été envoyé.",
   },
   en: {
     steps: ["State & package", "LLC name", "Activity", "Owner", "Country & phone", "Structure", "Services", "Payment"],
@@ -221,14 +211,14 @@ const copy = {
     subtitle: "Premium 8-step flow with mandatory validation before continuing.",
     next: "Continue",
     back: "Back",
-    final: "Finalize file",
+    final: "Finalize",
     required: "Required field.",
     invalid: "Invalid information.",
     summary: "Summary",
     total: "Estimated total",
     state: "State",
     package: "Package",
-    services: "Included services",
+    services: "Selected services",
     client: "Client",
     payment: "Payment",
     chooseState: "Formation state",
@@ -257,23 +247,18 @@ const copy = {
     single: "Single-member LLC",
     multi: "Multi-member LLC",
     management: "Management mode",
-    memberManaged: "Member-managed",
-    managerManaged: "Manager-managed",
     member: "Member",
     role: "Role",
     percentage: "Percentage",
     addMember: "Add member",
-    servicesTitle: "Services in your package",
+    servicesTitle: "Services available in your package",
+    servicesHelp: "The client selects the requested services among those available in the chosen package.",
     paymentTitle: "Payment and client portal creation",
     card: "Card payment",
     transfer: "Bank transfer",
-    cardHolder: "Cardholder name",
-    cardNumber: "Card number",
-    expiry: "MM/YY",
-    cvc: "CVC",
     upload: "Transfer proof",
     whatsapp: "Send proof via WhatsApp",
-    secured: "Secure payment. The client portal will be created after validation.",
+    stripeRedirect: "You will be redirected to Stripe secure checkout.",
     bankNote: "Your file will be pending verification after proof upload.",
     searchCountry: "Search country...",
     searchDial: "Search code...",
@@ -281,7 +266,7 @@ const copy = {
     wy: "Wyoming",
     nmDesc: "Privacy, optimized cost, simple structure.",
     wyDesc: "Stronger corporate image, generally faster processing.",
-    ready: "File ready to be created.",
+    success: "File saved. A confirmation email has been sent.",
   },
 };
 
@@ -293,6 +278,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
 
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [form, setForm] = useState<Form>({
@@ -312,23 +298,19 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
     confirmPassword: "",
     country: defaultCountry,
     dial: defaultCountry,
-    phone: "",
+    phone: "651000000",
     city: "",
     address: "",
     structure: "single",
     management: "manager-managed",
     members: [{ name: "", country: defaultCountry.name, role: "Manager", percentage: "100" }],
-    services: includedByPack.standard,
+    selectedServices: availableByPack.standard,
     payment: "",
     proofName: "",
-    cardHolder: "",
-    cardNumber: "",
-    cardExpiry: "",
-    cardCvc: "",
   });
 
   const selectedPack = packs[form.state][form.pack];
-
+  const availableServices = availableByPack[form.pack];
   const total = useMemo(() => selectedPack.price, [selectedPack.price]);
 
   function update<K extends keyof Form>(key: K, value: Form[K]) {
@@ -336,11 +318,11 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
   }
 
   function chooseState(state: StateKey) {
-    setForm((old) => ({ ...old, state, services: includedByPack[old.pack] }));
+    setForm((old) => ({ ...old, state }));
   }
 
   function choosePack(pack: PackKey) {
-    setForm((old) => ({ ...old, pack, services: includedByPack[pack] }));
+    setForm((old) => ({ ...old, pack, selectedServices: availableByPack[pack] }));
   }
 
   function cleanLocalPhone(value: string, dial: Country) {
@@ -357,7 +339,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
       const found = [...countries].sort((a, b) => b.dial.length - a.dial.length).find((c) => compact.startsWith(c.dial));
       if (found) {
         const rest = compact.slice(found.dial.length).replace(/\D/g, "");
-        setForm((old) => ({ ...old, dial: found, country: found, phone: rest }));
+        setForm((old) => ({ ...old, dial: found, country: found, phone: rest || "651000000" }));
         return;
       }
     }
@@ -372,6 +354,16 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
       members: [{ name: fullName, country: old.country.name, role: "Manager", percentage: "100" }],
       management: "manager-managed",
     }));
+  }
+
+  function toggleService(key: string) {
+    if (!availableServices.includes(key)) return;
+    setForm((old) => {
+      const next = old.selectedServices.includes(key)
+        ? old.selectedServices.filter((s) => s !== key)
+        : [...old.selectedServices, key];
+      return { ...old, selectedServices: next };
+    });
   }
 
   function validate(target = step) {
@@ -415,15 +407,12 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
       if (totalPct !== 100) e.members = lang === "fr" ? "Le total doit être égal à 100%." : "Total must equal 100%.";
     }
 
+    if (target === 6) {
+      if (!form.selectedServices.length) e.services = lang === "fr" ? "Sélectionne au moins un service." : "Select at least one service.";
+    }
+
     if (target === 7) {
       if (!form.payment) e.payment = t.required;
-      if (form.payment === "card") {
-        const cardDigits = form.cardNumber.replace(/\D/g, "");
-        if (form.cardHolder.trim().length < 3) e.cardHolder = t.required;
-        if (cardDigits.length < 12 || cardDigits.length > 19) e.cardNumber = t.invalid;
-        if (!/^\d{2}\/\d{2}$/.test(form.cardExpiry)) e.cardExpiry = t.invalid;
-        if (!/^\d{3,4}$/.test(form.cardCvc)) e.cardCvc = t.invalid;
-      }
       if (form.payment === "transfer" && !form.proofName) e.proofName = lang === "fr" ? "Justificatif obligatoire." : "Proof is required.";
     }
 
@@ -431,12 +420,68 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
     return Object.keys(e).length === 0;
   }
 
-  function next() {
-    if (!validate()) return;
-    if (step === 7) {
+  async function finalize() {
+    if (!validate(7)) return;
+
+    setBusy(true);
+    setSubmitted(false);
+
+    const phoneLocal = cleanLocalPhone(form.phone, form.dial);
+    const payload = {
+      lang,
+      form: {
+        ...form,
+        phoneLocal,
+        phoneFull: `${form.dial.dial}${phoneLocal}`,
+      },
+      total,
+      pack: selectedPack,
+      selectedServices: form.selectedServices.map((key) => labels[key as keyof typeof labels]),
+      clientPortalUrl: lang === "fr" ? "/fr/client" : "/en/client",
+    };
+
+    try {
+      if (form.payment === "card") {
+        const res = await fetch("/api/llc/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.url) {
+          setErrors({ payment: data.error || "Stripe checkout error." });
+          return;
+        }
+
+        window.location.href = data.url;
+        return;
+      }
+
+      const res = await fetch("/api/llc/finalize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setErrors({ payment: data.error || "Finalization error." });
+        return;
+      }
+
       setSubmitted(true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function next() {
+    if (step === 7) {
+      finalize();
       return;
     }
+    if (!validate()) return;
     setErrors({});
     setStep((s) => Math.min(7, s + 1));
   }
@@ -560,7 +605,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
 
                 <div className="vemo-flow-phone-row">
                   <CountrySelect label={t.dial} value={form.dial} onChange={(c) => update("dial", c)} searchLabel={t.searchDial} mode="dial" error={errors.dial} />
-                  <Field label={t.phone} value={form.phone} onChange={handlePhone} error={errors.phone} placeholder="0651000000 / 651000000 / +212651000000" />
+                  <Field label={t.phone} value={form.phone} onChange={handlePhone} error={errors.phone} placeholder="651000000" />
                 </div>
 
                 <Field label={t.address} value={form.address} onChange={(v) => update("address", v)} error={errors.address} />
@@ -574,12 +619,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
                   <Choice active={form.structure === "multi"} title={t.multi} desc="2+ members" onClick={() => update("structure", "multi")} />
                 </div>
 
-                <Select
-                  label={t.management}
-                  value={form.management}
-                  onChange={(v) => update("management", v as Management)}
-                  options={["member-managed", "manager-managed"]}
-                />
+                <Select label={t.management} value={form.management} onChange={(v) => update("management", v as Management)} options={["member-managed", "manager-managed"]} />
 
                 <div className="vemo-flow-members">
                   {form.members.map((m, i) => (
@@ -601,39 +641,39 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
               <StepBlock kicker="07" title={t.servicesTitle}>
                 <div className="vemo-flow-service-note">
                   {form.state === "newMexico" ? t.nm : t.wy} · {selectedPack.name} · {selectedPack.price} USD
+                  <small>{t.servicesHelp}</small>
                 </div>
+
                 <div className="vemo-flow-services">
-                  {form.services.map((key) => (
-                    <div key={key} className="vemo-flow-service active">
+                  {availableServices.map((key) => (
+                    <button key={key} type="button" className={`vemo-flow-service ${form.selectedServices.includes(key) ? "active" : ""}`} onClick={() => toggleService(key)}>
                       <span>{labels[key as keyof typeof labels]}</span>
-                      <strong>{lang === "fr" ? "Inclus" : "Included"}</strong>
-                    </div>
+                      <strong>{form.selectedServices.includes(key) ? "✓" : "+"}</strong>
+                    </button>
                   ))}
                 </div>
+
+                {errors.services && <p className="vemo-flow-error">{errors.services}</p>}
               </StepBlock>
             )}
 
             {step === 7 && (
               <StepBlock kicker="08" title={t.paymentTitle}>
-                {submitted && <div className="vemo-flow-success">{t.ready}</div>}
+                {submitted && <div className="vemo-flow-success">{t.success}</div>}
 
                 <div className="vemo-flow-pay-layout">
                   <div className="vemo-flow-pay-methods">
-                    <Choice active={form.payment === "card"} title={t.card} desc="Stripe embedded" onClick={() => update("payment", "card")} />
+                    <Choice active={form.payment === "card"} title={t.card} desc={t.stripeRedirect} onClick={() => update("payment", "card")} />
                     <Choice active={form.payment === "transfer"} title={t.transfer} desc={t.upload} onClick={() => update("payment", "transfer")} />
                     {errors.payment && <p className="vemo-flow-error">{errors.payment}</p>}
                   </div>
 
                   <div className="vemo-flow-payment-panel">
                     {form.payment === "card" && (
-                      <div className="vemo-flow-card-ui">
-                        <Field label={t.cardHolder} value={form.cardHolder} onChange={(v) => update("cardHolder", v)} error={errors.cardHolder} />
-                        <Field label={t.cardNumber} value={form.cardNumber} onChange={(v) => update("cardNumber", v)} error={errors.cardNumber} placeholder="4242 4242 4242 4242" />
-                        <div className="vemo-flow-card-row">
-                          <Field label={t.expiry} value={form.cardExpiry} onChange={(v) => update("cardExpiry", v)} error={errors.cardExpiry} placeholder="12/28" />
-                          <Field label={t.cvc} value={form.cardCvc} onChange={(v) => update("cardCvc", v)} error={errors.cardCvc} placeholder="123" />
-                        </div>
-                        <p>{t.secured}</p>
+                      <div className="vemo-flow-payment-empty">
+                        <strong>Stripe Checkout</strong>
+                        <span>{total} USD</span>
+                        <p>{t.stripeRedirect}</p>
                       </div>
                     )}
 
@@ -650,9 +690,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
                         </label>
                         {form.proofName && <b>{form.proofName}</b>}
                         {errors.proofName && <p className="vemo-flow-error">{errors.proofName}</p>}
-                        <a className="vemo-flow-whatsapp" href="https://wa.me/" target="_blank">
-                          {t.whatsapp}
-                        </a>
+                        <a className="vemo-flow-whatsapp" href="https://wa.me/" target="_blank">{t.whatsapp}</a>
                       </div>
                     )}
 
@@ -660,7 +698,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
                       <div className="vemo-flow-payment-empty">
                         <strong>{t.total}</strong>
                         <span>{total} USD</span>
-                        <p>{lang === "fr" ? "Choisissez un moyen de paiement pour finaliser le dossier." : "Choose a payment method to finalize the file."}</p>
+                        <p>{lang === "fr" ? "Choisissez un moyen de paiement pour finaliser." : "Choose a payment method to finalize."}</p>
                       </div>
                     )}
                   </div>
@@ -669,8 +707,10 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
             )}
 
             <div className="vemo-flow-actions">
-              <button onClick={back} className="vemo-flow-back" disabled={step === 0}>← {t.back}</button>
-              <button onClick={next} className="vemo-flow-next">{step === 7 ? t.final : t.next} →</button>
+              <button onClick={back} className="vemo-flow-back" disabled={step === 0 || busy}>← {t.back}</button>
+              <button onClick={next} className="vemo-flow-next" disabled={busy}>
+                {busy ? "..." : step === 7 ? `${t.final} →` : `${t.next} →`}
+              </button>
             </div>
           </article>
 
@@ -817,11 +857,13 @@ function Summary({
       <Row label={t.state} value={form.state === "newMexico" ? t.nm : t.wy} />
       <Row label={t.package} value={`${selectedPack.name} — ${selectedPack.price} USD`} />
       <Row label={t.client} value={form.email || "—"} />
-      <Row label={t.services} value={`${form.services.length} ${t.services}`} />
+      <Row label={t.services} value={`${form.selectedServices.length}`} />
       <Row label={t.payment} value={form.payment || "—"} />
+
       <div className="vemo-flow-mini-services">
-        {form.services.slice(0, 4).map((s) => <span key={s}>{labels[s]}</span>)}
+        {form.selectedServices.slice(0, 5).map((s) => <span key={s}>{labels[s]}</span>)}
       </div>
+
       <div className="vemo-flow-total-card">
         <span>{t.total}</span>
         <strong>{total} USD</strong>
