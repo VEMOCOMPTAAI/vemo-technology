@@ -1,30 +1,27 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import VemoPublicShell from "@/components/public/VemoPublicShell";
 
-export default function Page() {
+export default async function Page() {
+  const cookieStore = await cookies();
+  const verified = cookieStore.get("vemo_client_verified")?.value === "1";
+
+  if (verified) {
+    redirect("/en/client/portal");
+  }
+
   return (
     <VemoPublicShell lang="en">
-      <main className="vemo-client-entry">
+      <main className="vemo-confirm-email-page">
         <section>
-          <span>CLIENT PORTAL</span>
-          <h1>Welcome to your client portal</h1>
+          <span>EMAIL CONFIRMATION</span>
+          <h1>Confirm your email address</h1>
           <p>
-            Your account is confirmed. Your LLC file is now pending preparation.
-            Documents, messages and status updates will be available here.
+            We have sent you a confirmation email.
+            Click the link received to activate your account and access your client portal.
           </p>
-
-          <div className="vemo-client-grid">
-            <article>
-              <strong>File status</strong>
-              <p>Pending verification / processing</p>
-            </article>
-            <article>
-              <strong>Documents</strong>
-              <p>Your files will be added after validation.</p>
-            </article>
-            <article>
-              <strong>Messages</strong>
-              <p>You will be able to track VEMO messages here.</p>
-            </article>
+          <div className="vemo-confirm-email-note">
+            Your client portal will open automatically after confirmation.
           </div>
         </section>
       </main>

@@ -11,20 +11,15 @@ export async function POST(request: Request) {
       "https://www.vemo-technology.com";
 
     const lang = body.lang === "en" ? "en" : "fr";
-    const email = body?.form?.email || "";
+    const email = body.email || "";
 
     const portalPath = lang === "fr" ? "/fr/client/espace" : "/en/client/portal";
-    const pendingPath = lang === "fr" ? "/fr/client" : "/en/client";
-
     const verifyUrl = `${origin}/api/llc/verify?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(portalPath)}&lang=${lang}`;
 
     await sendVemoVerificationEmail({ email, verifyUrl, lang });
 
-    return NextResponse.json({
-      ok: true,
-      pendingUrl: `${origin}${pendingPath}?sent=1&email=${encodeURIComponent(email)}`,
-    });
+    return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json({ error: "Erreur finalisation dossier." }, { status: 500 });
+    return NextResponse.json({ error: "Erreur envoi email." }, { status: 500 });
   }
 }

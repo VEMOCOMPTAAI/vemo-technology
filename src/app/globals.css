@@ -2794,3 +2794,137 @@ select:-webkit-autofill {
   }
 }
 /* === VEMO CLIENT ENTRY FIX END === */
+
+
+/* === VEMO EMAIL CONFIRMATION PRODUCTION START === */
+.vemo-confirm-email-page,
+.vemo-real-client-portal {
+  background: #F4F7FA;
+  min-height: 62vh;
+  padding: 64px 24px;
+}
+
+.vemo-confirm-email-page section,
+.vemo-real-client-portal section {
+  max-width: 920px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #DDE7F2;
+  border-radius: 28px;
+  padding: 42px;
+}
+
+.vemo-confirm-email-page span,
+.vemo-real-client-portal span {
+  color: #F15A24;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 4px;
+}
+
+.vemo-confirm-email-page h1,
+.vemo-real-client-portal h1 {
+  margin: 12px 0;
+  color: #101828;
+  font-size: 38px;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.vemo-confirm-email-page p,
+.vemo-real-client-portal p {
+  color: #5F728E;
+  font-weight: 700;
+  line-height: 1.6;
+  max-width: 760px;
+}
+
+.vemo-confirm-email-note {
+  margin-top: 24px;
+  border: 1px solid #DDE7F2;
+  border-radius: 18px;
+  padding: 16px 18px;
+  color: #123A63;
+  font-weight: 900;
+  background: #F8FAFC;
+}
+
+.vemo-client-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.vemo-client-top > strong {
+  border: 1px solid #F15A24;
+  color: #F15A24;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.vemo-client-tabs {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.vemo-client-tabs article {
+  border: 1px solid #DDE7F2;
+  border-radius: 20px;
+  padding: 18px;
+  background: #ffffff;
+}
+
+.vemo-client-tabs small {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #F15A24;
+  color: #ffffff;
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+
+.vemo-client-tabs h3 {
+  margin: 0 0 8px;
+  color: #123A63;
+  font-size: 18px;
+}
+
+.vemo-client-tabs p {
+  margin: 0;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .vemo-confirm-email-page,
+  .vemo-real-client-portal {
+    padding: 34px 14px;
+  }
+
+  .vemo-confirm-email-page section,
+  .vemo-real-client-portal section {
+    padding: 24px 18px;
+    border-radius: 24px;
+  }
+
+  .vemo-confirm-email-page h1,
+  .vemo-real-client-portal h1 {
+    font-size: 29px;
+  }
+
+  .vemo-client-top {
+    display: grid;
+  }
+
+  .vemo-client-tabs {
+    grid-template-columns: 1fr;
+  }
+}
+/* === VEMO EMAIL CONFIRMATION PRODUCTION END === */

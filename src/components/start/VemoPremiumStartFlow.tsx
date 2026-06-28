@@ -481,8 +481,8 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
         return;
       }
 
-      if (data.verifyUrl) {
-        window.location.href = data.verifyUrl;
+      if (data.pendingUrl) {
+        window.location.href = data.pendingUrl;
         return;
       }
 

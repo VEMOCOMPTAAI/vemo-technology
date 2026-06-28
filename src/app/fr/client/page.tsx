@@ -1,30 +1,27 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import VemoPublicShell from "@/components/public/VemoPublicShell";
 
-export default function Page() {
+export default async function Page() {
+  const cookieStore = await cookies();
+  const verified = cookieStore.get("vemo_client_verified")?.value === "1";
+
+  if (verified) {
+    redirect("/fr/client/espace");
+  }
+
   return (
     <VemoPublicShell lang="fr">
-      <main className="vemo-client-entry">
+      <main className="vemo-confirm-email-page">
         <section>
-          <span>ESPACE CLIENT</span>
-          <h1>Bienvenue dans votre espace client</h1>
+          <span>CONFIRMATION EMAIL</span>
+          <h1>Confirmez votre adresse email</h1>
           <p>
-            Votre compte est confirmé. Votre dossier LLC est en cours de préparation.
-            Les documents, messages et statuts seront disponibles ici.
+            Nous venons de vous envoyer un email de confirmation.
+            Cliquez sur le lien reçu pour activer votre compte et accéder à votre espace client.
           </p>
-
-          <div className="vemo-client-grid">
-            <article>
-              <strong>Statut dossier</strong>
-              <p>En attente de vérification / traitement</p>
-            </article>
-            <article>
-              <strong>Documents</strong>
-              <p>Vos fichiers seront ajoutés après validation.</p>
-            </article>
-            <article>
-              <strong>Messages</strong>
-              <p>Vous pourrez suivre les échanges avec VEMO.</p>
-            </article>
+          <div className="vemo-confirm-email-note">
+            Votre espace client sera ouvert automatiquement après confirmation.
           </div>
         </section>
       </main>
