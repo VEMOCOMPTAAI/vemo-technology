@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     params.append("mode", "payment");
     params.append("customer_email", email);
     params.append("payment_intent_data[receipt_email]", email);
-    params.append("success_url", `${origin}/${lang === "fr" ? "fr/paiement/success" : "en/payment/success"}?session_id={CHECKOUT_SESSION_ID}&email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(portalPath)}&lang=${lang}`);
+    params.append("success_url", `${origin}/${lang === "fr" ? "fr/paiement/success" : "en/payment/success"}?session_id={CHECKOUT_SESSION_ID}&email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(lang === "fr" ? "/fr/client" : "/en/client")}&lang=${lang}`);
     params.append("cancel_url", `${origin}/${lang === "fr" ? "fr/commencer" : "en/start"}?payment=cancelled`);
     params.append("line_items[0][quantity]", "1");
     params.append("line_items[0][price_data][currency]", "usd");

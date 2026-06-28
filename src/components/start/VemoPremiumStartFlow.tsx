@@ -296,7 +296,7 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
     noNameYet: false,
     designator: "LLC",
     altName: "",
-    sector: "",
+    sector: "E-commerce",
     activityDesc: "",
     firstName: "",
     lastName: "",
@@ -384,7 +384,6 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
     }
 
     if (target === 2) {
-      if (!form.sector.trim()) e.sector = t.required;
       if (form.activityDesc.trim().length < 20) e.activityDesc = lang === "fr" ? "Minimum 20 caractères." : "Minimum 20 characters.";
     }
 
@@ -479,6 +478,11 @@ export default function VemoPremiumStartFlow({ lang }: { lang: Lang }) {
       const data = await res.json();
       if (!res.ok) {
         setErrors({ payment: data.error || "Finalization error." });
+        return;
+      }
+
+      if (data.verifyUrl) {
+        window.location.href = data.verifyUrl;
         return;
       }
 
